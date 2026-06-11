@@ -1,0 +1,2686 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Framework</title>
+  <meta name="description" content="Project artifact tracking and governance">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Framework">
+  <meta name="theme-color" id="themeColorMeta" content="#0d1117">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" sizes="32x32" href="icon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:           #0d1117;
+      --surface:      #161b22;
+      --surface-2:    #1f2937;
+      --surface-h:    #252d3b;
+      --border:       #2d3748;
+      --border-l:     #374151;
+      --text:         #e2e8f0;
+      --text-m:       #718096;
+      --text-d:       #4a5568;
+      --accent:       #3b9eff;
+      --accent-dim:   rgba(59,158,255,.15);
+      --green:        #22c55e;
+      --green-bg:     rgba(34,197,94,.12);
+      --amber:        #f59e0b;
+      --amber-bg:     rgba(245,158,11,.12);
+      --red:          #ef4444;
+      --red-bg:       rgba(239,68,68,.12);
+      --radius:       10px;
+      --radius-s:     6px;
+      --radius-xs:    4px;
+      --shadow:       0 4px 24px rgba(0,0,0,.45);
+      --tr:           .15s ease;
+      --font:         'DM Sans', sans-serif;
+    }
+    [data-theme="light"] {
+      --bg:         #f1f5f9;
+      --surface:    #ffffff;
+      --surface-2:  #f8fafc;
+      --surface-h:  #edf2f7;
+      --border:     #e2e8f0;
+      --border-l:   #cbd5e0;
+      --text:       #1e293b;
+      --text-m:     #64748b;
+      --text-d:     #94a3b8;
+      --accent:     #0066cc;
+      --accent-dim: rgba(0,102,204,.10);
+      --shadow:     0 4px 24px rgba(0,0,0,.08);
+    }
+
+    html, body { height: 100%; }
+    body {
+      font-family: var(--font); font-size: 14px;
+      background: var(--bg); color: var(--text);
+      line-height: 1.5; -webkit-font-smoothing: antialiased; overflow-x: hidden;
+    }
+
+    /* ── LAYOUT ── */
+    #app { display: flex; flex-direction: column; height: 100dvh; }
+
+    /* ── HEADER ── */
+    header {
+      height: 56px; background: var(--surface); border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; padding: 0 18px; gap: 14px;
+      flex-shrink: 0; position: relative; z-index: 100;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-name { font-size: 14px; font-weight: 700; letter-spacing: -.3px; }
+    .header-mid { flex: 1; }
+    .icon-btn {
+      width: 34px; height: 34px; border: none; background: transparent; color: var(--text-m);
+      border-radius: var(--radius-s); cursor: pointer;
+      display: flex; align-items: center; justify-content: center; transition: var(--tr);
+    }
+    .icon-btn:hover { background: var(--surface-2); color: var(--text); }
+    .icon-btn svg { width: 17px; height: 17px; }
+
+    /* ── TABS ── */
+    .tabs {
+      height: 42px; background: var(--surface); border-bottom: 1px solid var(--border);
+      display: flex; padding: 0 18px; flex-shrink: 0; overflow-x: auto;
+    }
+    .tab-btn {
+      height: 100%; padding: 0 15px; border: none; background: transparent;
+      color: var(--text-m); font-family: var(--font); font-size: 13px; font-weight: 500;
+      cursor: pointer; display: flex; align-items: center; gap: 7px;
+      border-bottom: 2px solid transparent; transition: var(--tr);
+      position: relative; top: 1px; white-space: nowrap; flex-shrink: 0;
+    }
+    .tab-btn:hover { color: var(--text); }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab-count {
+      font-size: 11px; font-weight: 600; padding: 1px 6px;
+      border-radius: 10px; background: var(--surface-2); color: var(--text-m);
+    }
+    .tab-btn.active .tab-count { background: var(--accent-dim); color: var(--accent); }
+
+    /* ── MAIN ── */
+    main { flex: 1; overflow-y: auto; overflow-x: hidden; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── PROJECT BAR ── */
+    .proj-bar {
+      padding: 9px 18px; display: flex; gap: 8px; align-items: center;
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 68;
+    }
+    .proj-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--text-d); flex-shrink: 0; }
+    .proj-select {
+      font-family: var(--font); font-size: 13px; font-weight: 600;
+      background: var(--surface-2); border: 1px solid var(--border);
+      color: var(--text); border-radius: var(--radius-s);
+      height: 32px; padding: 0 26px 0 10px; cursor: pointer;
+      appearance: none; -webkit-appearance: none; outline: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%23718096' d='M5 7L1 3h8z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 8px center;
+      min-width: 180px; max-width: 320px; transition: border-color var(--tr);
+    }
+    .proj-select:focus { border-color: var(--accent); }
+    .proj-bar-sep { width: 1px; height: 20px; background: var(--border); margin: 0 4px; flex-shrink: 0; }
+    .proj-icon-btn {
+      width: 30px; height: 30px; border: 1px solid var(--border); background: transparent;
+      color: var(--text-m); border-radius: var(--radius-s); cursor: pointer;
+      display: flex; align-items: center; justify-content: center; transition: var(--tr);
+    }
+    .proj-icon-btn:hover { background: var(--surface-2); color: var(--text); border-color: var(--border-l); }
+    .proj-icon-btn svg { width: 14px; height: 14px; }
+    /* external project link badges in the project bar */
+    .proj-ext-link {
+      display:none; align-items:center; gap:5px; height:30px; padding:0 10px;
+      border:1px solid var(--border); border-radius:var(--radius-s);
+      font-family:var(--font); font-size:11px; font-weight:700;
+      color:var(--text-m); background:transparent; text-decoration:none;
+      letter-spacing:.2px; transition:var(--tr); flex-shrink:0;
+    }
+    .proj-ext-link:hover { background:var(--surface-2); color:var(--accent); border-color:rgba(59,158,255,.3); }
+    .proj-ext-link svg { width:13px; height:13px; flex-shrink:0; }
+    /* expand / collapse all */
+    .expand-ctrl {
+      font-family:var(--font); font-size:11px; font-weight:600; color:var(--text-d);
+      background:transparent; border:none; cursor:pointer;
+      padding:0 7px; height:32px; border-radius:var(--radius-xs);
+      display:flex; align-items:center; gap:4px; transition:var(--tr); white-space:nowrap;
+    }
+    .expand-ctrl:hover { color:var(--text); background:var(--surface-2); }
+    .expand-ctrl svg { width:13px; height:13px; }
+    .proj-new-btn {
+      margin-left: auto; height: 30px; padding: 0 12px;
+      font-family: var(--font); font-size: 12px; font-weight: 600;
+      background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(59,158,255,.25);
+      border-radius: var(--radius-s); cursor: pointer; transition: var(--tr); white-space: nowrap;
+    }
+    .proj-new-btn:hover { background: rgba(59,158,255,.25); }
+
+    /* ── TOOLBAR ── */
+    .toolbar {
+      padding: 10px 18px; display: flex; gap: 9px;
+      align-items: center; background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 64; flex-wrap: wrap;
+    }
+    #trackerToolbar { top: var(--tracker-toolbar-top, 50px); }
+    .search-wrap { position: relative; flex: 1; min-width: 140px; max-width: 240px; }
+    .search-wrap svg {
+      position: absolute; left: 9px; top: 50%;
+      transform: translateY(-50%); color: var(--text-d); width: 14px; height: 14px; pointer-events: none;
+    }
+    input, select, textarea {
+      font-family: var(--font); font-size: 13px;
+      background: var(--surface-2); border: 1px solid var(--border);
+      color: var(--text); border-radius: var(--radius-s);
+      transition: border-color var(--tr); outline: none;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+    .search-input { width: 100%; padding: 7px 10px 7px 30px; height: 32px; }
+    .filter-select {
+      height: 32px; padding: 0 24px 0 9px; cursor: pointer;
+      appearance: none; -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%23718096' d='M5 7L1 3h8z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 8px center;
+    }
+    .count-label { font-size: 12px; color: var(--text-m); white-space: nowrap; }
+
+    /* ── TRACKER TABLE ── */
+    .setup-banner {
+      margin: 14px 18px; padding: 13px 15px;
+      background: var(--accent-dim); border: 1px solid rgba(59,158,255,.2); border-radius: var(--radius);
+      display: flex; align-items: center; gap: 12px;
+    }
+    .setup-banner-icon { font-size: 20px; flex-shrink: 0; }
+    .setup-banner-text { flex: 1; font-size: 13px; }
+    .setup-banner-text strong { color: var(--accent); }
+    .setup-banner-text .link-btn {
+      background: none; border: none; color: var(--accent); cursor: pointer;
+      font-family: var(--font); font-size: 13px; font-weight: 600; padding: 0; text-decoration: underline;
+    }
+
+    .folder-group { }
+    .folder-header {
+      display: flex; align-items: center; gap: 10px; padding: 8px 18px;
+      background: var(--surface-2); border-bottom: 1px solid var(--border);
+      border-top: 1px solid var(--border); cursor: pointer; user-select: none;
+    }
+    .folder-header:hover { background: var(--surface-h); }
+    .folder-chevron { color: var(--text-d); transition: transform var(--tr); flex-shrink: 0; }
+    .folder-chevron.col { transform: rotate(-90deg); }
+    .folder-name { flex: 1; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--text-m); }
+    .folder-stats { display: flex; gap: 5px; align-items: center; }
+    .fstat { font-size: 11px; color: var(--text-d); display: flex; align-items: center; gap: 3px; }
+    .fstat-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .fstat-dot.g { background: var(--green); }
+    .fstat-dot.a { background: var(--amber); }
+    .fstat-dot.r { background: var(--red); }
+    .folder-body.hidden { display: none; }
+
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      background: var(--surface); color: var(--text-d);
+      font-size: 11px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: .5px; padding: 7px 12px; text-align: left;
+      border-bottom: 1px solid var(--border); white-space: nowrap;
+    }
+    tbody td { padding: 8px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    tbody tr { cursor: pointer; transition: background var(--tr); }
+    tbody tr:hover { background: var(--surface-h); }
+    tbody tr.row-na td { opacity: .5; }
+
+    .cell-num { font-size: 11px; color: var(--text-d); width: 36px; }
+    .cell-name { font-size: 13px; font-weight: 500; }
+    .cell-na-hint { font-size: 10px; color: var(--text-d); margin-left: 5px; }
+    .cell-cad { display: block; font-size: 11px; color: var(--text-d); margin-top: 2px; line-height: 1.3; }
+    .cell-link {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 26px; height: 26px; border-radius: var(--radius-s);
+      color: var(--accent); border: 1px solid rgba(59,158,255,.3);
+      background: var(--accent-dim);
+      transition: opacity .12s, background .12s;
+    }
+    .cell-link:hover { background: rgba(59,158,255,.25); border-color: rgba(59,158,255,.5); }
+    .cell-link svg { width: 12px; height: 12px; }
+    .cell-link-empty { width: 26px; height: 26px; display: inline-block; }
+    .cell-date { font-size: 12px; color: var(--text-m); white-space: nowrap; }
+    /* url field in edit modal */
+    .url-row { display: flex; gap: 8px; align-items: center; }
+    .url-row .finput { flex: 1; min-width: 0; }
+    .url-open-btn {
+      width: 34px; height: 34px; border: 1px solid var(--border);
+      background: transparent; border-radius: var(--radius-s);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: var(--tr); flex-shrink: 0;
+    }
+    .url-open-btn svg { width: 15px; height: 15px; }
+    .url-open-btn.active { color: var(--accent); border-color: rgba(59,158,255,.4); background: var(--accent-dim); }
+    .url-open-btn.active:hover { background: rgba(59,158,255,.25); }
+    .url-open-btn:not(.active) { color: var(--text-d); pointer-events: none; opacity: .45; }
+    /* custom artifact badges and row buttons */
+    .ca-badge { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.4px;
+                padding:2px 5px; border-radius:4px; background:rgba(59,158,255,.15);
+                color:var(--accent); border:1px solid rgba(59,158,255,.25); margin-left:6px; vertical-align:middle; }
+    .ca-edit-btn { width:22px; height:22px; border:1px solid var(--border); background:transparent;
+                   color:var(--text-d); border-radius:4px; cursor:pointer; flex-shrink:0;
+                   display:inline-flex; align-items:center; justify-content:center; transition:var(--tr); }
+    .ca-edit-btn:hover { background:var(--surface-2); color:var(--accent); border-color:rgba(59,158,255,.3); }
+    .ca-edit-btn svg { width:11px; height:11px; }
+    .add-ca-row { padding:6px 14px 8px; }
+    .add-ca-btn { font-family:var(--font); font-size:11px; font-weight:600; color:var(--text-d);
+                  background:transparent; border:1px dashed var(--border); border-radius:var(--radius-s);
+                  padding:4px 12px; cursor:pointer; transition:var(--tr); width:100%; text-align:left; }
+    .add-ca-btn:hover { color:var(--accent); border-color:rgba(59,158,255,.4); background:var(--accent-dim); }
+    /* hide-N/A and other filter toggle buttons */
+    .filter-btn { height:32px; padding:0 11px; font-family:var(--font); font-size:12px; font-weight:600;
+                  border:1px solid var(--border); border-radius:var(--radius-s);
+                  background:transparent; color:var(--text-m); cursor:pointer; transition:var(--tr); white-space:nowrap; }
+    .filter-btn:hover { background:var(--surface-2); color:var(--text); }
+    .filter-btn.active { background:var(--accent-dim); color:var(--accent); border-color:rgba(59,158,255,.3); }
+    /* status-cell: clickable badge, inline editor */
+    .status-cell { position: relative; }
+    .status-cell:hover .sbadge { outline: 2px solid var(--accent); outline-offset: 1px; }
+    .inline-status-sel {
+      font-family: var(--font); font-size: 11px; font-weight: 600;
+      background: var(--surface); border: 2px solid var(--accent);
+      color: var(--text); border-radius: 20px;
+      padding: 2px 22px 2px 10px; cursor: pointer; outline: none;
+      appearance: none; -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%233b9eff' d='M5 7L1 3h8z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 7px center;
+      box-shadow: 0 2px 10px rgba(0,0,0,.35); max-width: 130px;
+    }
+    [data-theme="light"] .inline-status-sel { box-shadow: 0 2px 10px rgba(0,0,0,.12); }
+
+    /* ── STATUS BADGES ── */
+    .sbadge {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 11px; font-weight: 600; padding: 3px 9px;
+      border-radius: 20px; white-space: nowrap;
+    }
+    .sbadge::before { content:''; width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+    .s-ns  { background:var(--surface-2); color:var(--text-m); border:1px solid var(--border); }
+    .s-ns::before  { background:var(--text-d); }
+    .s-ip  { background:var(--accent-dim); color:var(--accent); border:1px solid rgba(59,158,255,.2); }
+    .s-ip::before  { background:var(--accent); }
+    .s-co  { background:var(--green-bg); color:var(--green); border:1px solid rgba(34,197,94,.2); }
+    .s-co::before  { background:var(--green); }
+    .s-cu  { background:rgba(16,163,74,.12); color:#16a34a; border:1px solid rgba(16,163,74,.2); }
+    .s-cu::before  { background:#16a34a; }
+    .s-st  { background:var(--red-bg); color:var(--red); border:1px solid rgba(239,68,68,.2); }
+    .s-st::before  { background:var(--red); }
+    .s-na  { background:var(--surface-2); color:var(--text-d); border:1px solid var(--border); }
+    .s-na::before  { background:transparent; border:1px solid var(--text-d); }
+    .s-de  { background:var(--amber-bg); color:var(--amber); border:1px solid rgba(245,158,11,.2); }
+    .s-de::before  { background:var(--amber); }
+    .s-fu  { background:rgba(139,92,246,.12); color:#8b5cf6; border:1px solid rgba(139,92,246,.2); }
+    .s-fu::before  { background:#8b5cf6; }
+
+    .hbadge { display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:600; padding:3px 8px; border-radius:20px; white-space:nowrap; }
+    .h-g { background:var(--green-bg); color:var(--green); }
+    .h-a { background:var(--amber-bg); color:var(--amber); }
+    .h-r { background:var(--red-bg); color:var(--red); }
+    .h-f  { background:rgba(139,92,246,.12); color:#8b5cf6; }
+    .h-na { background:var(--surface-2); color:var(--text-d); border:1px solid var(--border); }
+    .h-ds { background:rgba(245,158,11,.08); color:var(--amber); border:1px solid rgba(245,158,11,.2); }
+
+    /* phase bar */
+    .phase-bar { padding:6px 18px; background:var(--surface); border-bottom:1px solid var(--border); display:flex; align-items:center; gap:2px; overflow-x:auto; flex-shrink:0;
+                 position:sticky; top:var(--phase-bar-top,50px); z-index:66; }
+    .phase-bar-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--text-d); margin-right:8px; flex-shrink:0; }
+    .phase-sep { color:var(--text-d); font-size:10px; margin:0 3px; flex-shrink:0; }
+    .phase-step { display:flex; align-items:center; gap:5px; padding:3px 9px 3px 4px; border-radius:20px; white-space:nowrap; font-size:11px; font-weight:500; flex-shrink:0; }
+    .phase-num { width:16px; height:16px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:700; background:var(--border); color:var(--text-d); flex-shrink:0; }
+    .phase-check { font-size:10px; margin-left:1px; font-weight:600; }
+    .phase-step.past      { color:var(--text-m); }
+    .phase-step.past .phase-num { background:var(--border-l); color:var(--text-m); }
+    .phase-step.past-done { color:var(--green); }
+    .phase-step.past-done .phase-num { background:var(--green); color:#fff; }
+    .phase-step.past-warn { color:var(--amber); }
+    .phase-step.past-warn .phase-num { background:var(--amber); color:#fff; }
+    .phase-step.current { color:var(--accent); font-weight:700; background:var(--accent-dim); }
+    .phase-step.current .phase-num { background:var(--accent); color:#fff; }
+    .phase-step.future { opacity:.4; }
+    /* phase-aware folder header left bar */
+    .folder-header.ph-current   { border-left:3px solid var(--accent); padding-left:15px; }
+    .folder-header.ph-past-done { border-left:3px solid var(--green);  padding-left:15px; }
+    .folder-header.ph-past-warn { border-left:3px solid var(--amber);  padding-left:15px; }
+    /* artifact history in edit modal */
+    .art-history-wrap { margin-top:10px; padding:10px 12px; background:var(--surface-2); border-radius:var(--radius-s); }
+    .art-history-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--text-d); margin-bottom:8px; }
+    .ah-item { display:flex; align-items:baseline; gap:8px; padding:4px 0; border-bottom:1px solid var(--border); }
+    .ah-item:last-child { border-bottom:none; padding-bottom:0; }
+    .ah-ts { font-size:11px; color:var(--text-d); white-space:nowrap; flex-shrink:0; min-width:58px; }
+    .ah-change { font-size:12px; color:var(--text-m); flex:1; }
+    .ah-from { color:var(--text-d); text-decoration:line-through; }
+    .ah-to { color:var(--text); font-weight:500; }
+    /* activity feed in dashboard */
+    .activity-feed { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
+    .activity-feed-title { font-size:13px; font-weight:600; padding:13px 17px; border-bottom:1px solid var(--border); }
+    .af-item { display:flex; align-items:baseline; gap:10px; padding:8px 17px; border-bottom:1px solid var(--border); font-size:12px; }
+    .af-item:last-child { border-bottom:none; }
+    .af-ts { color:var(--text-d); white-space:nowrap; flex-shrink:0; min-width:64px; }
+    .af-art { color:var(--accent); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:160px; flex-shrink:0; }
+    .af-detail { color:var(--text-m); flex:1; }
+    .af-project { color:var(--text-d); font-size:11px; white-space:nowrap; flex-shrink:0; }
+
+    .badge {
+      font-size: 10px; font-weight: 600; padding: 2px 7px;
+      border-radius: 20px; background: var(--surface-2);
+      color: var(--text-m); border: 1px solid var(--border);
+      text-transform: uppercase; letter-spacing: .3px;
+    }
+    .badge-accent { background: var(--accent-dim); color: var(--accent); border-color: transparent; }
+
+    /* ── DASHBOARD ── */
+    .dash-toolbar {
+      padding: 10px 18px; display: flex; gap: 9px; align-items: center;
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 60;
+    }
+    .dash-toolbar-label { font-size: 12px; font-weight: 600; color: var(--text-m); white-space: nowrap; }
+    .dash { padding: 18px; display: flex; flex-direction: column; gap: 14px; }
+    .dash-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 16px 18px;
+    }
+    .card-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; color: var(--text-m); margin-bottom: 7px; }
+    .big-num { font-size: 38px; font-weight: 700; letter-spacing: -1.5px; line-height: 1; }
+    .big-num.g { color: var(--green); }
+    .big-num.a { color: var(--amber); }
+    .big-num.r { color: var(--red); }
+    .big-num.n { color: var(--text); }
+    .card-sub { font-size: 12px; color: var(--text-m); margin-top: 4px; }
+
+    .health-bar-wrap { display: flex; flex-direction: column; gap: 9px; }
+    .hbar { height: 12px; border-radius: 6px; background: var(--surface-2); overflow: hidden; display: flex; }
+    .hbar-seg { height: 100%; transition: width .5s ease; }
+    .hbar-g { background: var(--green); }
+    .hbar-a { background: var(--amber); }
+    .hbar-r { background: var(--red); }
+    .hbar-legend { display: flex; gap: 14px; flex-wrap: wrap; }
+    .hleg { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text-m); }
+    .hleg-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+    /* Portfolio project list */
+    .proj-list { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+    .proj-list-title { font-size: 13px; font-weight: 600; padding: 13px 17px; border-bottom: 1px solid var(--border); }
+    .proj-list-row {
+      display: flex; align-items: center; gap: 12px; padding: 10px 17px;
+      border-bottom: 1px solid var(--border); cursor: pointer; transition: background var(--tr);
+    }
+    .proj-list-row:last-child { border-bottom: none; }
+    .proj-list-row:hover { background: var(--surface-h); }
+    .plr-name { flex: 1; font-size: 13px; font-weight: 600; }
+    .plr-meta { font-size: 11px; color: var(--text-d); margin-top: 1px; }
+    .plr-minibar { width: 80px; height: 5px; border-radius: 3px; background: var(--surface-2); overflow: hidden; display: flex; flex-shrink: 0; }
+    .plr-mb-g { background: var(--green); height: 100%; }
+    .plr-mb-a { background: var(--amber); height: 100%; }
+    .plr-mb-r { background: var(--red); height: 100%; }
+    .plr-pct { font-size: 13px; font-weight: 700; min-width: 36px; text-align: right; }
+    .plr-arrow { color: var(--text-d); }
+
+    /* Folder breakdown */
+    .fbreakdown { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+    .fbreakdown-title { font-size: 13px; font-weight: 600; padding: 13px 17px; border-bottom: 1px solid var(--border); }
+    .fbrow { display: flex; align-items: center; gap: 12px; padding: 8px 17px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background var(--tr); }
+    .fbrow:hover { background: var(--surface-h); }
+    .fbrow-arrow { color: var(--text-d); flex-shrink:0; }
+    .archived-badge { font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px;
+                      background:var(--amber-bg); color:var(--amber); border:1px solid rgba(245,158,11,.2); flex-shrink:0; }
+    .archived-banner { display:flex; align-items:center; gap:14px; padding:13px 17px;
+                       background:var(--amber-bg); border:1px solid rgba(245,158,11,.25); border-radius:var(--radius); }
+    .archived-banner svg { width:20px; height:20px; color:var(--amber); flex-shrink:0; }
+    .archived-banner-text { flex:1; font-size:13px; color:var(--amber); font-weight:500; }
+    .archived-banner-sub { font-size:11px; color:var(--text-m); margin-top:2px; font-weight:400; }
+    .proj-notes-box { font-size:12px; color:var(--text-m); line-height:1.5; white-space:pre-wrap;
+                      padding:10px 12px; background:var(--surface-2); border-radius:var(--radius-s); margin-top:10px; }
+    .fbrow:last-child { border-bottom: none; }
+    .fbrow-name { flex: 1; font-size: 12px; font-weight: 500; }
+    .fb-minibar { width: 90px; height: 5px; border-radius: 3px; background: var(--surface-2); overflow: hidden; display: flex; flex-shrink: 0; }
+    .fbmb-g { background: var(--green); height: 100%; }
+    .fbmb-a { background: var(--amber); height: 100%; }
+    .fbmb-r { background: var(--red); height: 100%; }
+    .fb-pct { font-size: 12px; font-weight: 700; min-width: 32px; text-align: right; }
+    .fb-cnt { font-size: 11px; color: var(--text-d); min-width: 18px; text-align: right; }
+
+    /* Action list */
+    .alist { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+    .alist-title { font-size: 13px; font-weight: 600; padding: 13px 17px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+    .alist-cnt { font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 20px; }
+    .alist-cnt-r { background: var(--red-bg); color: var(--red); }
+    .alist-cnt-a { background: var(--amber-bg); color: var(--amber); }
+    .aitem { display: flex; align-items: center; gap: 10px; padding: 9px 17px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background var(--tr); }
+    .aitem:last-child { border-bottom: none; }
+    .aitem:hover { background: var(--surface-h); }
+    .aitem-name { flex: 1; font-size: 13px; }
+    .aitem-proj { font-size: 11px; color: var(--accent); white-space: nowrap; }
+    .aitem-folder { font-size: 11px; color: var(--text-d); white-space: nowrap; }
+    .alist-empty { padding: 20px; text-align: center; font-size: 13px; color: var(--text-d); }
+
+    .dash-two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+    /* ── CADENCE ── */
+    .cad-table th { background: var(--surface-2); color: var(--text-d); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; padding: 8px 15px; text-align: left; border-bottom: 1px solid var(--border); }
+    .cad-table td { padding: 8px 15px; font-size: 13px; border-bottom: 1px solid var(--border); }
+    .cad-table tbody tr:hover { background: var(--surface-h); }
+    .atag { display: inline-flex; align-items: center; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 20px; background: var(--surface-2); color: var(--text-m); border: 1px solid var(--border); }
+    .atag.all { background: var(--accent-dim); color: var(--accent); border-color: transparent; }
+
+    /* ── MODAL ── */
+    .overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.65); backdrop-filter: blur(4px);
+      z-index: 1000; align-items: center; justify-content: center; padding: 20px;
+    }
+    .overlay.open { display: flex; }
+    .modal {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); width: 100%; max-width: 520px;
+      box-shadow: var(--shadow); animation: mopen .18s ease;
+    }
+    @keyframes mopen { from { opacity:0; transform:scale(.96) translateY(-6px); } to { opacity:1; transform:none; } }
+    .mhead {
+      padding: 17px 19px 13px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: flex-start; gap: 12px;
+    }
+    .mhead-info { flex: 1; }
+    .mtitle { font-size: 15px; font-weight: 600; line-height: 1.3; }
+    .msub { font-size: 12px; color: var(--text-m); margin-top: 3px; }
+    .mbody { padding: 17px 19px; }
+    .mfoot {
+      padding: 13px 19px; border-top: 1px solid var(--border);
+      display: flex; justify-content: flex-end; gap: 10px;
+    }
+    .mfoot-left { margin-right: auto; }
+    .form-group { margin-bottom: 13px; }
+    .form-group:last-child { margin-bottom: 0; }
+    .flabel { display: block; font-size: 11px; font-weight: 700; color: var(--text-m); margin-bottom: 5px; text-transform: uppercase; letter-spacing: .4px; }
+    .finput { width: 100%; padding: 8px 11px; }
+    .fselect { width: 100%; padding: 8px 26px 8px 11px; }
+    .fgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+    .ftarea { width: 100%; padding: 8px 11px; resize: vertical; min-height: 68px; }
+    .fcadence { padding: 10px 12px; background: var(--surface-2); border-radius: var(--radius-s); font-size: 12px; color: var(--text-m); }
+    .auto-stale-notice { font-size: 11px; color: var(--amber); background: var(--amber-bg); border: 1px solid rgba(245,158,11,.2); border-radius: var(--radius-s); padding: 7px 10px; margin-top: 5px; }
+
+    .btn {
+      font-family: var(--font); font-size: 13px; font-weight: 600;
+      padding: 8px 17px; border-radius: var(--radius-s);
+      border: none; cursor: pointer; transition: var(--tr);
+    }
+    .btn-g { background: transparent; color: var(--text-m); border: 1px solid var(--border); }
+    .btn-g:hover { background: var(--surface-2); color: var(--text); }
+    .btn-p { background: var(--accent); color: #fff; }
+    .btn-p:hover { opacity: .88; }
+    .btn-d { background: var(--red-bg); color: var(--red); border: 1px solid rgba(239,68,68,.2); }
+    .btn-d:hover { background: rgba(239,68,68,.22); }
+
+    /* ── SETTINGS ── */
+    .ssec { padding: 17px 19px; border-bottom: 1px solid var(--border); }
+    .ssec:last-child { border-bottom: none; }
+    .ssec-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--text-m); margin-bottom: 13px; }
+    .toggle-row { display: flex; align-items: center; justify-content: space-between; }
+    .toggle-label { font-size: 13px; font-weight: 500; }
+    .toggle { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .tslider { position: absolute; inset: 0; background: var(--border-l); border-radius: 11px; cursor: pointer; transition: var(--tr); }
+    .tslider::before { content:''; position:absolute; width:16px; height:16px; left:3px; top:3px; background:#fff; border-radius:50%; transition:var(--tr); }
+    .toggle input:checked + .tslider { background: var(--accent); }
+    .toggle input:checked + .tslider::before { transform: translateX(18px); }
+
+    /* ── EMPTY STATES ── */
+    .empty { text-align: center; padding: 60px 20px; color: var(--text-m); }
+    .empty-icon { font-size: 38px; margin-bottom: 13px; opacity: .4; }
+    .empty-title { font-size: 16px; font-weight: 600; margin-bottom: 5px; }
+    .empty-sub { font-size: 13px; margin-bottom: 18px; }
+    .empty-btn {
+      display: inline-block; padding: 9px 20px;
+      background: var(--accent); color: #fff; border: none;
+      border-radius: var(--radius-s); font-family: var(--font);
+      font-size: 13px; font-weight: 600; cursor: pointer; transition: var(--tr);
+    }
+    .empty-btn:hover { opacity: .88; }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 720px) {
+      .dash-row { grid-template-columns: 1fr 1fr; }
+      .dash-two { grid-template-columns: 1fr; }
+      thead th:nth-child(n+5), tbody td:nth-child(n+5) { display: none; }
+      .plr-minibar { display: none; }
+    }
+    @media (max-width: 480px) {
+      .dash-row { grid-template-columns: 1fr; }
+      .proj-label { display: none; }
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- HEADER -->
+  <header>
+    <div class="brand">
+      <svg width="30" height="30" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0" aria-label="Framework">
+        <rect width="512" height="512" rx="76" fill="#161b22"/>
+        <rect x="68" y="50"  width="376" height="68" rx="13" fill="#22C55E"/>
+        <rect x="68" y="136" width="84"  height="68" rx="13" fill="#194B33"/>
+        <rect x="68" y="222" width="244" height="68" rx="13" fill="#EA970C"/>
+        <rect x="68" y="308" width="84"  height="68" rx="13" fill="#54401C"/>
+        <rect x="68" y="394" width="84"  height="68" rx="13" fill="#CE3E3F"/>
+      </svg>
+      <div class="brand-name">Framework</div>
+    </div>
+    <div class="header-mid"></div>
+    <div style="display:flex;gap:6px;align-items:center;">
+      <button class="icon-btn" id="settingsBtn" title="Preferences &amp; Data">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- TABS -->
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="tracker">
+      Tracker <span class="tab-count" id="tcount">—</span>
+    </button>
+    <button class="tab-btn" data-tab="dashboard">Dashboard</button>
+    <button class="tab-btn" data-tab="cadence">
+      Reference
+    </button>
+  </nav>
+
+  <main>
+
+    <!-- TRACKER PANEL -->
+    <div class="tab-panel active" id="panel-tracker">
+      <!-- Project Bar -->
+      <div class="proj-bar">
+        <span class="proj-label">Project</span>
+        <select class="proj-select" id="projectSelect"></select>
+        <span id="projArchivedBadge" class="archived-badge" style="display:none">Archived</span>
+        <a id="projPscLink" class="proj-ext-link" href="#" target="_blank" rel="noopener" title="Open PSCloud">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
+          PSC
+        </a>
+        <a id="projSpLink" class="proj-ext-link" href="#" target="_blank" rel="noopener" title="Open SharePoint">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          SP
+        </a>
+        <button class="proj-icon-btn" id="editProjBtn" title="Edit project settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+        </button>
+        <button class="proj-new-btn" id="newProjBtn">+ New Project</button>
+      </div>
+      <!-- Phase Bar -->
+      <div id="phaseBar" class="phase-bar" style="display:none"></div>
+      <!-- Filter Toolbar -->
+      <div class="toolbar" id="trackerToolbar">
+        <div class="search-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" class="search-input" id="tSearch" placeholder="Search artifacts…">
+        </div>
+        <select class="filter-select" id="tStatus">
+          <option value="">All Statuses</option>
+          <option>Not Started</option><option>In Progress</option>
+          <option>Complete</option><option>Current</option>
+          <option>Stale</option><option>N/A</option><option>Deferred</option><option>Future</option>
+        </select>
+        <select class="filter-select" id="tHealth">
+          <option value="">All Health</option>
+          <option value="green">🟢 Green</option>
+          <option value="amber">🟡 Amber</option>
+          <option value="red">🔴 Red</option>
+          <option value="future">🟣 Future</option>
+          <option value="na">⚪ Not Applicable</option>
+          <option value="due-soon">⏰ Due Soon</option>
+        </select>
+        <select class="filter-select" id="tFolder"><option value="">All Folders</option></select>
+        <button class="filter-btn" id="hideNABtn" title="Hide artifacts marked Not Applicable">Hide N/A</button>
+        <div style="margin-left:auto;display:flex;gap:2px;align-items:center;">
+          <button class="expand-ctrl" id="expandAllBtn" title="Expand all folders">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>
+            Expand all
+          </button>
+          <button class="expand-ctrl" id="collapseAllBtn" title="Collapse all folders">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m7 20 5-5 5 5"/><path d="m7 4 5 5 5-5"/></svg>
+            Collapse all
+          </button>
+          <span class="count-label" id="cLabel" style="margin-left:8px"></span>
+        </div>
+      </div>
+      <div id="trackerBody"></div>
+    </div>
+
+    <!-- DASHBOARD PANEL -->
+    <div class="tab-panel" id="panel-dashboard">
+      <div class="dash-toolbar">
+        <span class="dash-toolbar-label">View:</span>
+        <select class="filter-select" id="dashFilter" style="min-width:200px;"></select>
+        <button class="filter-btn" id="showArchivedBtn" style="margin-left:auto" title="Include archived projects in portfolio view">Show archived</button>
+      </div>
+      <div class="dash" id="dashBody"></div>
+    </div>
+
+    <!-- CADENCE PANEL -->
+    <div class="tab-panel" id="panel-cadence">
+      <div class="toolbar">
+        <div class="search-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" class="search-input" id="cSearch" placeholder="Search artifacts…">
+        </div>
+        <select class="filter-select" id="cApplies">
+          <option value="">All Types</option>
+          <option value="All">All Projects</option>
+          <option value="Conversions">Conversions</option>
+          <option value="Implementations">Implementations</option>
+          <option value="Agile">Agile</option>
+          <option value="T&M">T&amp;M</option>
+          <option value="Fixed-Fee">Fixed-Fee</option>
+        </select>
+
+      </div>
+      <table class="cad-table" style="width:100%;border-collapse:collapse;">
+        <thead>
+          <tr>
+            <th style="width:36px">#</th>
+            <th style="width:180px">Folder</th>
+            <th>Artifact</th>
+            <th style="width:220px">Cadence</th>
+            <th style="width:130px">Applies To</th>
+          </tr>
+        </thead>
+        <tbody id="cadBody"></tbody>
+      </table>
+    </div>
+
+  </main>
+</div>
+
+<!-- EDIT ARTIFACT MODAL -->
+<div class="overlay" id="editOverlay">
+  <div class="modal">
+    <div class="mhead">
+      <div class="mhead-info">
+        <div class="mtitle" id="editTitle"></div>
+        <div class="msub" id="editSub"></div>
+      </div>
+      <button class="icon-btn" id="closeEdit">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="mbody">
+      <div class="form-group">
+        <label class="flabel">Status</label>
+        <select class="fselect filter-select" id="eStatus">
+          <option>Not Started</option><option>In Progress</option>
+          <option>Complete</option><option>Current</option>
+          <option>Stale</option><option>N/A</option><option>Deferred</option><option>Future</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="flabel">Last Updated</label>
+        <input type="date" class="finput" id="eDate" style="max-width:180px">
+      </div>
+      <div class="form-group">
+        <label class="flabel">Artifact Link</label>
+        <div class="url-row">
+          <input type="text" class="finput" id="eUrl" placeholder="https://…" autocomplete="url" spellcheck="false">
+          <button class="url-open-btn" id="eUrlBtn" tabindex="-1" title="Open link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+              <polyline points="15 3 21 3 21 9"/>
+              <line x1="10" y1="14" x2="21" y2="3"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="flabel">Cadence</label>
+        <select class="fselect filter-select" id="eCadence"></select>
+        <div class="auto-stale-notice" id="eAutoStaleNote" style="display:none">⏰ Showing as <strong>Stale</strong> — cadence not met since last update. Saving a new date will clear it.</div>
+      </div>
+      <div class="form-group">
+        <label class="flabel">Notes</label>
+        <textarea class="ftarea" id="eNotes" placeholder="Optional notes…"></textarea>
+      </div>
+      <div class="fcadence" id="eCadInfo"></div>
+      <div id="eHistoryWrap" class="art-history-wrap" style="display:none">
+        <div class="art-history-title">Activity Log</div>
+        <div id="eHistoryList"></div>
+      </div>
+    </div>
+    <div class="mfoot">
+      <button class="btn btn-g" id="cancelEdit">Cancel</button>
+      <button class="btn btn-p" id="saveEdit">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- PROJECT MODAL (create / edit) -->
+<div class="overlay" id="projectOverlay">
+  <div class="modal" style="max-width:480px;">
+    <div class="mhead">
+      <div class="mhead-info">
+        <div class="mtitle" id="projModalTitle">New Project</div>
+        <div class="msub" id="projModalSub">Configure your project's details and type</div>
+      </div>
+      <button class="icon-btn" id="closeProjModal">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div style="overflow-y:auto;max-height:72vh;">
+      <div class="ssec">
+        <div class="form-group">
+          <label class="flabel">Project Name</label>
+          <input type="text" class="finput" id="pName" placeholder="e.g. Acme Corp OnBase Implementation">
+        </div>
+        <div class="fgrid">
+          <div class="form-group">
+            <label class="flabel">Project Type</label>
+            <select class="fselect filter-select" id="pType">
+              <option value="">Select type…</option>
+              <option>Conversions</option><option>Implementations</option>
+              <option>Agile</option><option>Consulting</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="flabel">Billing Model</label>
+            <select class="fselect filter-select" id="pBilling">
+              <option value="">Select…</option>
+              <option value="T&M">T&amp;M</option>
+              <option value="Fixed-Fee">Fixed-Fee</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="flabel">Project Start Date</label>
+          <input type="date" class="finput" id="pStart">
+        </div>
+        <div class="form-group">
+          <label class="flabel">Project Manager</label>
+          <input type="text" class="finput" id="pPM" placeholder="Name">
+        </div>
+        <div class="form-group">
+          <label class="flabel">Current Phase</label>
+          <select class="fselect filter-select" id="pPhase">
+            <option value="">Not set</option>
+            <option value="1">1 — Initiation</option>
+            <option value="2">2 — Discovery</option>
+            <option value="3">3 — Implementation</option>
+            <option value="4">4 — Testing</option>
+            <option value="5">5 — Go-Live</option>
+            <option value="6">6 — Closure / Complete</option>
+          </select>
+          <p style="font-size:11px;color:var(--text-m);margin-top:5px">Setting a phase promotes Future artifacts in that phase to Not Started and marks earlier-phase items as Stale.</p>
+        </div>
+        <div class="form-group">
+          <label class="flabel">PSCloud Link</label>
+          <div class="url-row">
+            <input type="text" class="finput" id="pPscCloud" placeholder="https://…" autocomplete="url" spellcheck="false">
+            <button class="url-open-btn" id="pPscBtn" tabindex="-1" title="Open PSCloud">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="flabel">SharePoint Link</label>
+          <div class="url-row">
+            <input type="text" class="finput" id="pSharePoint" placeholder="https://…" autocomplete="url" spellcheck="false">
+            <button class="url-open-btn" id="pSpBtn" tabindex="-1" title="Open SharePoint">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="ssec">
+        <div class="form-group" style="margin-bottom:0">
+          <label class="flabel">Project Notes</label>
+          <textarea class="ftarea" id="pNotes" placeholder="Internal notes, context, reminders…" style="min-height:80px"></textarea>
+        </div>
+      </div>
+      <div class="ssec" id="projDangerZone" style="display:none;">
+        <div class="ssec-title" style="color:var(--red)">Danger Zone</div>
+        <p style="font-size:12px;color:var(--text-m);margin-bottom:11px;">Archive to hide from the active portfolio while preserving all data. Or permanently delete everything.</p>
+        <div style="display:flex;gap:9px;flex-wrap:wrap;">
+          <button class="btn" id="archiveProjBtn">Archive Project</button>
+          <button class="btn btn-d" id="deleteProjBtn">Delete Project</button>
+        </div>
+      </div>
+    </div>
+    <div class="mfoot">
+      <button class="btn btn-g" id="cancelProjModal">Cancel</button>
+      <button class="btn btn-p" id="saveProjModal">Save Project</button>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS / PREFERENCES MODAL -->
+<div class="overlay" id="settingsOverlay">
+  <div class="modal" style="max-width:440px;">
+    <div class="mhead">
+      <div class="mhead-info">
+        <div class="mtitle">Preferences</div>
+        <div class="msub">Appearance and data management</div>
+      </div>
+      <button class="icon-btn" id="closeSettings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div style="overflow-y:auto;max-height:72vh;">
+      <div class="ssec">
+        <div class="ssec-title">Appearance</div>
+        <div class="toggle-row">
+          <span class="toggle-label">Dark Mode</span>
+          <label class="toggle">
+            <input type="checkbox" id="darkToggle">
+            <span class="tslider"></span>
+          </label>
+        </div>
+      </div>
+      <div class="ssec">
+        <div class="ssec-title">Data Management</div>
+        <p style="font-size:12px;color:var(--text-m);margin-bottom:13px;">All data lives in your browser's localStorage — nothing is sent to any server. Back up regularly.</p>
+        <p style="font-size:12px;color:var(--text-m);margin-bottom:13px;" id="backupInfo"></p>
+        <div style="display:flex;gap:9px;flex-wrap:wrap;">
+          <button class="btn btn-g" id="dlBackup">⬇ Download Backup</button>
+          <button class="btn btn-g" id="restoreBtn">⬆ Restore Backup</button>
+          <input type="file" id="restoreFile" accept=".json" style="display:none">
+        </div>
+      </div>
+      <div class="ssec">
+        <div class="ssec-title" style="color:var(--red)">Danger Zone</div>
+        <p style="font-size:12px;color:var(--text-m);margin-bottom:13px;">Delete all projects and data from this device.</p>
+        <button class="btn btn-d" id="clearBtn">Clear All Data</button>
+      </div>
+    </div>
+    <div class="mfoot">
+      <button class="btn btn-g" id="cancelSettings">Cancel</button>
+      <button class="btn btn-p" id="saveSettings">Save</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- CUSTOM ARTIFACT MODAL -->
+<div class="overlay" id="caOverlay">
+  <div class="modal" style="max-width:440px;">
+    <div class="mhead">
+      <div class="mhead-info">
+        <div class="mtitle" id="caModalTitle">New Custom Artifact</div>
+        <div class="msub">Add a project-specific artifact to track</div>
+      </div>
+      <button class="icon-btn" id="closeCa">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="mbody">
+      <div class="form-group">
+        <label class="flabel">Artifact Name</label>
+        <input type="text" class="finput" id="caName" placeholder="e.g. Client Onboarding Checklist">
+      </div>
+      <div class="form-group">
+        <label class="flabel">Folder</label>
+        <select class="fselect filter-select" id="caFolder"></select>
+      </div>
+      <div class="form-group">
+        <label class="flabel">Default Cadence</label>
+        <select class="fselect filter-select" id="caCadence">
+          <option value="">As-needed / None</option>
+        </select>
+      </div>
+    </div>
+    <div class="mfoot">
+      <div class="mfoot-left">
+        <button class="btn btn-d" id="deleteCaBtn" style="display:none">Delete Artifact</button>
+      </div>
+      <button class="btn btn-g" id="cancelCa">Cancel</button>
+      <button class="btn btn-p" id="saveCa">Save Artifact</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  ARTIFACTS
+// ═══════════════════════════════════════════════════════
+const ARTS = [
+  {id:1,  folder:'01 - Initiation',       name:'Project Charter',                    cadence:'One-time / Baselined',           at:['All']},
+  {id:2,  folder:'01 - Initiation',       name:'SOW / Contract',                     cadence:'One-time / Baselined',           at:['All']},
+  {id:3,  folder:'01 - Initiation',       name:'Stakeholder Register',               cadence:'Monthly',                        at:['All']},
+  {id:4,  folder:'01 - Initiation',       name:'RACI Matrix',                        cadence:'Phase Gate',                     at:['All']},
+  {id:5,  folder:'01 - Initiation',       name:'Initial Risk Assessment',            cadence:'One-time (feeds RAID)',           at:['All']},
+  {id:6,  folder:'01 - Initiation',       name:'Assumptions & Constraints Log',      cadence:'Phase Gate',                     at:['All']},
+  {id:7,  folder:'01 - Initiation',       name:'Project Kickoff Deck',               cadence:'One-time',                       at:['All']},
+  {id:8,  folder:'01 - Initiation',       name:'Kickoff Meeting Minutes',            cadence:'One-time',                       at:['All']},
+  {id:9,  folder:'02 - Discovery',        name:'Requirements Document',              cadence:'Phase Gate',                     at:['Conversions']},
+  {id:10, folder:'02 - Discovery',        name:'Requirements Traceability Matrix',   cadence:'Weekly during testing',          at:['Conversions']},
+  {id:11, folder:'02 - Discovery',        name:'Current State Assessment',           cadence:'One-time / Baselined',           at:['Implementations']},
+  {id:12, folder:'02 - Discovery',        name:'Future State Design',                cadence:'Phase Gate',                     at:['Implementations']},
+  {id:13, folder:'02 - Discovery',        name:'DTKW Spreadsheet',                   cadence:'Weekly during implementation',   at:['Conversions']},
+  {id:14, folder:'02 - Discovery',        name:'Remote Discovery Report',            cadence:'One-time',                       at:['Conversions']},
+  {id:15, folder:'02 - Discovery',        name:'Scope Baseline Document',            cadence:'One-time / Baselined',           at:['All']},
+  {id:16, folder:'03 - Implementation',   name:'Detailed Project Schedule',          cadence:'Weekly',                         at:['All']},
+  {id:17, folder:'03 - Implementation',   name:'Solution Design Document',           cadence:'As-needed during build',         at:['Conversions']},
+  {id:18, folder:'03 - Implementation',   name:'Build / Configuration Checklists',  cadence:'Daily during build',             at:['Implementations']},
+  {id:19, folder:'03 - Implementation',   name:'Integration Specifications',         cadence:'As-needed',                      at:['Implementations']},
+  {id:20, folder:'03 - Implementation',   name:'Data Conversion Runbook',            cadence:'As-needed + Phase Gate',         at:['Conversions']},
+  {id:21, folder:'03 - Implementation',   name:'Environment Setup Log',              cadence:'As-needed',                      at:['Implementations']},
+  {id:22, folder:'03 - Implementation',   name:'Sprint / Iteration Status',          cadence:'Per sprint cadence',             at:['Agile']},
+  {id:23, folder:'04 - Testing',          name:'Test Strategy',                      cadence:'Phase Gate',                     at:['Implementations']},
+  {id:24, folder:'04 - Testing',          name:'Test Plan',                          cadence:'Weekly during testing',          at:['Implementations']},
+  {id:25, folder:'04 - Testing',          name:'Test Cases / Scripts',               cadence:'Daily during testing',           at:['Implementations']},
+  {id:26, folder:'04 - Testing',          name:'Defect Log / Issue Tracker',         cadence:'Daily during testing',           at:['All']},
+  {id:27, folder:'04 - Testing',          name:'UAT Sign-Off Email',                 cadence:'One-time',                       at:['All']},
+  {id:28, folder:'04 - Testing',          name:'Test Summary Report',                cadence:'Per test cycle',                 at:['All']},
+  {id:29, folder:'04 - Testing',          name:'Reconciliation Report',              cadence:'Per conversion round',           at:['Conversions']},
+  {id:30, folder:'04 - Testing',          name:'Performance Test Results',           cadence:'Per test execution',             at:['Implementations']},
+  {id:31, folder:'05 - Go-Live',          name:'Go-Live Checklist',                  cadence:'Daily in final week',            at:['All']},
+  {id:32, folder:'05 - Go-Live',          name:'Go-Live Runbook',                    cadence:'Daily in final week',            at:['All']},
+  {id:33, folder:'05 - Go-Live',          name:'Rollback Plan',                      cadence:'Phase Gate',                     at:['All']},
+  {id:34, folder:'05 - Go-Live',          name:'Production Cutover Plan',            cadence:'Daily in final week',            at:['Implementations']},
+  {id:35, folder:'05 - Go-Live',          name:'Hypercare / Warranty Plan',          cadence:'Weekly during hypercare',        at:['All']},
+  {id:36, folder:'05 - Go-Live',          name:'Go-Live Communication',              cadence:'As-needed on go-live day',       at:['All']},
+  {id:37, folder:'05 - Go-Live',          name:'Production Validation Results',      cadence:'Daily during hypercare',         at:['Implementations']},
+  {id:38, folder:'05 - Go-Live',          name:'Go/No-Go Decision Record',           cadence:'One-time',                       at:['All']},
+  {id:39, folder:'06 - Closure',          name:'Project Closure Report',             cadence:'One-time',                       at:['All']},
+  {id:40, folder:'06 - Closure',          name:'After Action Review (AAR)',          cadence:'One-time',                       at:['All']},
+  {id:41, folder:'06 - Closure',          name:'Final Financial Summary',            cadence:'One-time',                       at:['All']},
+  {id:42, folder:'06 - Closure',          name:'Deliverable Acceptance Log',         cadence:'Phase Gate',                     at:['All']},
+  {id:43, folder:'06 - Closure',          name:'Archive Checklist',                  cadence:'One-time',                       at:['All']},
+  {id:44, folder:'07 - Financials',       name:'Budget Tracker (Excel)',             cadence:'Weekly',                         at:['T&M']},
+  {id:45, folder:'07 - Financials',       name:'Change Order Log',                   cadence:'Event-driven',                   at:['All']},
+  {id:46, folder:'07 - Financials',       name:'Invoice Tracker',                    cadence:'Biweekly / Monthly',             at:['All']},
+  {id:47, folder:'07 - Financials',       name:'Time & Expense Reports',             cadence:'Weekly',                         at:['T&M']},
+  {id:48, folder:'07 - Financials',       name:'Milestone Billing Schedule',         cadence:'Phase Gate / Event-driven',      at:['Fixed-Fee']},
+  {id:49, folder:'07 - Financials',       name:'Financial Forecast',                 cadence:'Monthly',                        at:['All']},
+  {id:50, folder:'08 - Meeting Notes',    name:'Weekly Status Meeting Notes',        cadence:'Weekly',                         at:['All']},
+  {id:51, folder:'08 - Meeting Notes',    name:'Technical Working Session Notes',    cadence:'Per session',                    at:['All']},
+  {id:52, folder:'08 - Meeting Notes',    name:'Internal Sync Notes',                cadence:'Weekly / as needed',             at:['All']},
+  {id:53, folder:'09 - Project Plans',    name:'Master Project Schedule',            cadence:'Weekly',                         at:['All']},
+  {id:54, folder:'09 - Project Plans',    name:'Resource Plan',                      cadence:'Biweekly / Monthly',             at:['All']},
+  {id:55, folder:'09 - Project Plans',    name:'Communication Plan',                 cadence:'Phase Gate',                     at:['All']},
+  {id:56, folder:'09 - Project Plans',    name:'Risk Management Plan',               cadence:'Phase Gate',                     at:['All']},
+  {id:57, folder:'09 - Project Plans',    name:'Quality Management Plan',            cadence:'Phase Gate',                     at:['All']},
+  {id:58, folder:'09 - Project Plans',    name:'Change Management Plan',             cadence:'Phase Gate',                     at:['All']},
+  {id:59, folder:'10 - Project Team',     name:'Onboarding Checklist',               cadence:'Event-driven',                   at:['All']},
+  {id:60, folder:'11 - Status Reporting', name:'Weekly Status Report',               cadence:'Weekly',                         at:['All']},
+  {id:61, folder:'11 - Status Reporting', name:'Monthly Executive Summary',          cadence:'Monthly',                        at:['All']},
+  {id:62, folder:'11 - Status Reporting', name:'Escalation Log',                     cadence:'Event-driven',                   at:['All']},
+  {id:63, folder:'11 - Status Reporting', name:'Milestone Tracker',                  cadence:'Weekly',                         at:['Fixed-Fee']},
+  {id:64, folder:'12 - Risk & Issues',    name:'RAID Log (Excel)',                   cadence:'Daily / As-needed',              at:['All']},
+  {id:65, folder:'12 - Risk & Issues',    name:'Risk Register',                      cadence:'Weekly review',                  at:['All']},
+  {id:66, folder:'12 - Risk & Issues',    name:'Issue Log',                          cadence:'Daily / As-needed',              at:['All']},
+  {id:67, folder:'12 - Risk & Issues',    name:'Decision Log',                       cadence:'As-needed',                      at:['All']},
+  {id:68, folder:'13 - Change Management',name:'Change Request Form',                cadence:'Event-driven',                   at:['All']},
+  {id:69, folder:'13 - Change Management',name:'Change Order Register',              cadence:'Event-driven',                   at:['All']},
+  {id:70, folder:'13 - Change Management',name:'Scope Change Impact Assessments',   cadence:'Event-driven',                   at:['All']},
+  {id:71, folder:'13 - Change Management',name:'Change Order Correspondence',        cadence:'Event-driven',                   at:['All']},
+  {id:72, folder:'13 - Change Management',name:'Scope Variance Log',                 cadence:'Weekly',                         at:['All']},
+  {id:73, folder:'14 - Communications',   name:'Stakeholder Communication Log',      cadence:'As-needed',                      at:['All']},
+  {id:74, folder:'14 - Communications',   name:'Escalation Records',                 cadence:'Event-driven',                   at:['All']},
+  {id:75, folder:'14 - Communications',   name:'Key Correspondence Archive',         cadence:'As-needed',                      at:['All']},
+  {id:76, folder:'14 - Communications',   name:'Decision Register',                  cadence:'As-needed',                      at:['All']},
+  {id:77, folder:'14 - Communications',   name:'Executive Briefing Materials',       cadence:'Event-driven',                   at:['All']},
+  {id:78, folder:'15 - Technical Docs',   name:'Architecture Diagram',               cadence:'Phase Gate',                     at:['Implementations']},
+  {id:79, folder:'15 - Technical Docs',   name:'Environment Documentation',          cadence:'Event-driven',                   at:['All']},
+  {id:80, folder:'15 - Technical Docs',   name:'Technical Specifications',           cadence:'As-needed during build',         at:['Implementations']},
+  {id:81, folder:'15 - Technical Docs',   name:'Interface / Integration Guide',      cadence:'As-needed',                      at:['Implementations']},
+  {id:82, folder:'16 - Training & KT',    name:'User Guides / Quick Reference Cards',cadence:'Phase Gate',                     at:['All']},
+  {id:83, folder:'16 - Training & KT',    name:'Knowledge Transfer Checklist',       cadence:'Weekly during KT',               at:['All']},
+  {id:84, folder:'17 - Vendor & 3rd Party',name:'Vendor Contact Directory',          cadence:'Event-driven',                   at:['All']},
+  {id:85, folder:'17 - Vendor & 3rd Party',name:'Vendor Performance Log',            cadence:'Monthly',                        at:['All']},
+  {id:86, folder:'17 - Vendor & 3rd Party',name:'Third-Party Correspondence',        cadence:'As-needed',                      at:['All']},
+];
+
+const FOLDERS = [...new Set(ARTS.map(a => a.folder))];
+
+// ═══════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════
+const STORE_KEY = 'framework-v2';
+const LEGACY_KEY = 'framework-v1';
+
+const DEF = {
+  version: 2,
+  activeProjectId: null,
+  projects: {},
+  ui: { collapsed:{}, tSearch:'', tStatus:'', tHealth:'', tFolder:'', cSearch:'', cApplies:'', dashFilter:'', hideNA:false, showArchived:false },
+  global: { darkMode: true }
+};
+
+let S = deepClone(DEF);
+let editingArtId = null;
+let editingProjId = null; // null = creating new
+
+function deepClone(o) { return JSON.parse(JSON.stringify(o)); }
+
+function load() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (raw) {
+      const p = JSON.parse(raw);
+      S.version        = 2;
+      S.activeProjectId = p.activeProjectId || null;
+      S.projects       = p.projects || {};
+      S.ui             = { ...DEF.ui, ...(p.ui || {}) };
+      S.global         = { ...DEF.global, ...(p.global || {}) };
+      return;
+    }
+    // Migrate from v1
+    const legacy = localStorage.getItem(LEGACY_KEY);
+    if (legacy) {
+      const p = JSON.parse(legacy);
+      const id = newId();
+      const proj = {
+        id, name: p.settings?.projectName || 'Imported Project',
+        type: p.settings?.projectType || '',
+        billing: p.settings?.billingModel || '',
+        startDate: p.settings?.startDate || '',
+        pm: p.settings?.pm || '',
+        currentPhase: null,
+        createdAt: today(),
+        tracker: p.tracker || {},
+        history: []
+      };
+      S.projects[id] = proj;
+      S.activeProjectId = id;
+      S.global.darkMode = p.settings?.darkMode ?? true;
+      save();
+    }
+  } catch(e) { console.error(e); }
+}
+
+function save() {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(S)); } catch(e) {}
+}
+
+// ═══════════════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════════════
+function newId() { return 'p' + Date.now() + Math.random().toString(36).slice(2, 6); }
+function today() { return new Date().toISOString().slice(0,10); }
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function fmtDate(d) {
+  if (!d) return '—';
+  const [y,m,dd] = d.split('-');
+  return `${m}/${dd}/${y}`;
+}
+
+function allProjects() {
+  return Object.values(S.projects).sort((a,b) => (a.name||'').localeCompare(b.name||''));
+}
+
+function getProject(pid) { return S.projects[pid] || null; }
+function activeProject() { return S.activeProjectId ? getProject(S.activeProjectId) : null; }
+
+function projectEntry(pid, artId) {
+  const p = getProject(pid);
+  return (p && p.tracker && p.tracker[artId]) || { status:'Not Started', lastUpdated:'', url:'', cadence:'', notes:'' };
+}
+
+function projectApplies(pid, art) {
+  const p = getProject(pid);
+  if (!p || (!p.type && !p.billing)) return true;
+  return art.at.some(x => x === 'All' || x === p.type || x === p.billing);
+}
+
+// Active project shortcuts used by tracker
+function entry(artId) { return projectEntry(S.activeProjectId, artId); }
+function applies(art) { return projectApplies(S.activeProjectId, art); }
+
+// ═══════════════════════════════════════════════════════
+//  PHASES
+// ═══════════════════════════════════════════════════════
+const PHASES = [
+  { num:1, label:'Initiation',     folder:'01' },
+  { num:2, label:'Discovery',      folder:'02' },
+  { num:3, label:'Implementation', folder:'03' },
+  { num:4, label:'Testing',        folder:'04' },
+  { num:5, label:'Go-Live',        folder:'05' },
+  { num:6, label:'Closure',        folder:'06' },
+];
+
+// Returns 1–6 if folder belongs to a phase, null if always-active.
+function folderPhase(folder) {
+  const m = folder.match(/^0([1-6]) -/);
+  return m ? parseInt(m[1]) : null;
+}
+
+// Compute per-step info for the phase progress bar.
+// Uses stored status (not effectiveStatus) to avoid circular dependency.
+function phaseStepInfo(pid, phaseNum) {
+  const _pStd  = ARTS.filter(a => folderPhase(a.folder) === phaseNum && projectApplies(pid, a));
+  const _pCust = (getProject(pid)?.customArts || [])
+    .filter(a => folderPhase(a.folder) === phaseNum)
+    .map(a => ({ ...a, at:['All'], custom:true }));
+  const phArts = [..._pStd, ..._pCust];
+  if (!phArts.length) return { pct:0, done:0, total:0, hasRed:false };
+  const done = phArts.filter(a => ['Complete','Current','N/A'].includes(projectEntry(pid, a.id).status || 'Not Started')).length;
+  const total = phArts.length;
+  // Check cadence-based stale only (not phase rule) to avoid circularity
+  const hasRed = phArts.some(a => {
+    const e = projectEntry(pid, a.id);
+    const s = e.status || 'Not Started';
+    if (s === 'Stale') return true;
+    if (['N/A','Future','Not Started','Complete','Current'].includes(s)) return false;
+    if (!e.lastUpdated) return false;
+    const days = cadenceDays(effectiveCadence(pid, a.id));
+    if (!days) return false;
+    return Math.floor((Date.now() - new Date(e.lastUpdated).getTime()) / 86400000) > days;
+  });
+  return { pct: Math.round(done / total * 100), done, total, hasRed };
+}
+
+// ═══════════════════════════════════════════════════════
+//  STALENESS DETAILS
+// ═══════════════════════════════════════════════════════
+// Returns enrichment data for badge display (not used for scoring).
+function stalenessDetails(pid, artId) {
+  const e    = projectEntry(pid, artId);
+  const stored = e.status || 'Not Started';
+  // Check phase-past flag
+  const art = findArt(pid, artId);
+  const p   = getProject(pid);
+  if (art && p && p.currentPhase) {
+    const fp = folderPhase(art.folder);
+    if (fp && fp < p.currentPhase && !['Complete','Current','N/A','Stale'].includes(stored)) {
+      return { overdueDays:0, dueSoon:false, phasePast:true };
+    }
+  }
+  if (['N/A','Future','Stale','Not Started'].includes(stored) || !e.lastUpdated)
+    return { overdueDays:0, dueSoon:false, phasePast:false };
+  const days = cadenceDays(effectiveCadence(pid, artId));
+  if (!days) return { overdueDays:0, dueSoon:false, phasePast:false };
+  const elapsed    = Math.floor((Date.now() - new Date(e.lastUpdated).getTime()) / 86400000);
+  const overdueDays = Math.max(0, elapsed - days);
+  const dueSoon    = overdueDays === 0 && elapsed > 0 && (elapsed / days) >= 0.8;
+  return { overdueDays, dueSoon, phasePast:false };
+}
+
+// Returns the health value for scoring — same as health(effectiveStatus) but
+// treats due-soon items as amber so they don't inflate green counts.
+function effectiveHealth(pid, artId) {
+  const effS = effectiveStatus(pid, artId);
+  // In Progress with cadence satisfied (date is within window) → treat as Current
+  if (effS === 'In Progress') {
+    const e    = projectEntry(pid, artId);
+    const days = cadenceDays(effectiveCadence(pid, artId));
+    if (days !== null && e.lastUpdated) {
+      const elapsed = Math.floor((Date.now() - new Date(e.lastUpdated).getTime()) / 86400000);
+      if (elapsed <= days) return 'green';
+    }
+  }
+  const h = health(effS);
+  if (h === 'green' && stalenessDetails(pid, artId).dueSoon) return 'amber';
+  return h;
+}
+
+// ═══════════════════════════════════════════════════════
+//  ACTIVITY LOG
+// ═══════════════════════════════════════════════════════
+function logChange(pid, artId, changes) {
+  const p = getProject(pid);
+  if (!p) return;
+  if (!p.history) p.history = [];
+  const art = artId ? findArt(pid, artId) : null;
+  const ts  = new Date().toISOString();
+  changes.forEach(ch => {
+    if (ch.from === ch.to) return;
+    p.history.unshift({
+      ts, artId: artId||null,
+      artName: art?.name || (artId ? '' : '(Project)'),
+      field: ch.field, from: ch.from||'', to: ch.to||''
+    });
+  });
+  if (p.history.length > 500) p.history = p.history.slice(0, 500);
+}
+
+function fmtTs(ts) {
+  if (!ts) return '—';
+  const d    = new Date(ts);
+  if (isNaN(d.getTime())) return '—';
+  const diff = Math.floor((Date.now() - d.getTime()) / 86400000);
+  if (diff === 0) return 'Today';
+  if (diff === 1) return 'Yesterday';
+  if (diff < 7)   return `${diff}d ago`;
+  const opts = diff > 335
+    ? { month:'short', day:'numeric', year:'numeric' }
+    : { month:'short', day:'numeric' };
+  return d.toLocaleDateString('en-US', opts);
+}
+
+// ═══════════════════════════════════════════════════════
+//  PHASE BAR RENDERER
+// ═══════════════════════════════════════════════════════
+function renderPhaseBar(pid) {
+  const bar = document.getElementById('phaseBar');
+  if (!bar) return;
+  const p = getProject(pid);
+  if (!p) { bar.style.display = 'none'; return; }
+  bar.style.display = 'flex';
+  const cur = p.currentPhase || 0;
+
+  let html = `<span class="phase-bar-label">Phase</span>`;
+  PHASES.forEach((ph, i) => {
+    const { pct, done, total, hasRed } = phaseStepInfo(pid, ph.num);
+    let cls = 'future';
+    let check = '';
+    if (ph.num < cur) {
+      cls = hasRed ? 'past-warn' : (pct === 100 ? 'past-done' : 'past');
+      check = pct === 100 ? '✓' : (hasRed ? '!' : `${pct}%`);
+    } else if (ph.num === cur) {
+      cls = 'current';
+      check = total > 0 ? `${done}/${total}` : '';
+    }
+    const sep = i > 0 ? '<span class="phase-sep">›</span>' : '';
+    html += `${sep}<div class="phase-step ${cls}">
+      <span class="phase-num">${ph.num}</span>
+      <span class="phase-lbl">${ph.label}${check?`<span class="phase-check"> ${check}</span>`:''}</span>
+    </div>`;
+  });
+
+  if (!cur) html += `<span style="font-size:11px;color:var(--text-d);margin-left:10px;">— <button class="link-btn" onclick="openEditProject('${esc(pid)}')">set phase</button></span>`;
+  bar.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════════
+//  ARTIFACT HISTORY RENDERER (edit modal)
+// ═══════════════════════════════════════════════════════
+function renderArtHistory(pid, artId) {
+  const wrap = document.getElementById('eHistoryWrap');
+  const list = document.getElementById('eHistoryList');
+  if (!wrap || !list) return;
+  const p = getProject(pid);
+  const entries = (p?.history || []).filter(e => e.artId === artId).slice(0, 10);
+  if (!entries.length) { wrap.style.display = 'none'; return; }
+  wrap.style.display = '';
+  list.innerHTML = entries.map(e =>
+    `<div class="ah-item">
+      <span class="ah-ts">${fmtTs(e.ts)}</span>
+      <span class="ah-change">${esc(e.field)}: <span class="ah-from">${esc(e.from||'—')}</span> → <span class="ah-to">${esc(e.to||'—')}</span></span>
+    </div>`
+  ).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+//  CUSTOM ARTIFACT HELPERS
+// ═══════════════════════════════════════════════════════
+function customNewId() { return 'c_' + Date.now() + Math.random().toString(36).slice(2,5); }
+
+function isCustomArt(artId) { return typeof artId === 'string' && artId.startsWith('c_'); }
+
+// Look up art definition from ARTS (standard) or project customArts.
+// Handles numeric, string-numeric, or 'c_...' IDs.
+function findArt(pid, artId) {
+  const numId = typeof artId === 'string' ? parseInt(artId, 10) : artId;
+  if (Number.isInteger(numId) && numId >= 1 && numId <= 86)
+    return ARTS.find(a => a.id === numId) || null;
+  return (getProject(pid)?.customArts || []).find(a => a.id === String(artId)) || null;
+}
+
+// All applicable arts for a project: standard (filtered by type/billing) + all custom arts.
+function projectApplicableArts(pid) {
+  const p    = getProject(pid);
+  if (!p) return [];
+  const std  = ARTS.filter(a => projectApplies(pid, a));
+  const cust = (p.customArts || []).map(a => ({ ...a, at: ['All'], custom: true }));
+  return [...std, ...cust];
+}
+
+// ═══════════════════════════════════════════════════════
+//  CUSTOM ARTIFACT MODAL
+// ═══════════════════════════════════════════════════════
+let editingCaId = null; // null = new, string = editing existing
+
+function openCustomArt(folder, artId) {
+  editingCaId = artId || null;
+  const editing = !!artId;
+  document.getElementById('caModalTitle').textContent = editing ? 'Edit Custom Artifact' : 'New Custom Artifact';
+  document.getElementById('deleteCaBtn').style.display = editing ? '' : 'none';
+
+  // Populate folder dropdown
+  const fSel = document.getElementById('caFolder');
+  fSel.innerHTML = FOLDERS.map(f => `<option value="${esc(f)}" ${f===folder?'selected':''}>${esc(f)}</option>`).join('');
+
+  // Populate cadence dropdown
+  const cSel = document.getElementById('caCadence');
+  cSel.innerHTML = '<option value="">As-needed / None</option>' +
+    CADENCE_OPTIONS.map(o => `<option value="${esc(o.value)}">${esc(o.label)}</option>`).join('');
+
+  if (editing) {
+    const art = findArt(S.activeProjectId, artId);
+    if (art) {
+      document.getElementById('caName').value   = art.name    || '';
+      fSel.value                                 = art.folder  || folder;
+      cSel.value                                 = art.cadence || '';
+    }
+  } else {
+    document.getElementById('caName').value = '';
+    cSel.value = '';
+  }
+
+  document.getElementById('caOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('caName').focus(), 50);
+}
+
+function closeCustomArt() {
+  document.getElementById('caOverlay').classList.remove('open');
+  editingCaId = null;
+}
+
+function saveCustomArt() {
+  const name    = document.getElementById('caName').value.trim();
+  const folder  = document.getElementById('caFolder').value;
+  const cadence = document.getElementById('caCadence').value;
+  if (!name) { document.getElementById('caName').focus(); return; }
+  const pid = S.activeProjectId;
+  const p   = getProject(pid);
+  if (!p) return;
+  if (!p.customArts) p.customArts = [];
+
+  if (editingCaId) {
+    // Edit existing
+    const art = p.customArts.find(a => a.id === editingCaId);
+    if (art) Object.assign(art, { name, folder, cadence });
+  } else {
+    // Create new — initialise tracker entry too
+    const id = customNewId();
+    p.customArts.push({ id, name, folder, cadence });
+    if (!p.tracker) p.tracker = {};
+    p.tracker[id] = { status:'Not Started', lastUpdated:'', url:'', cadence:'', notes:'' };
+    logChange(pid, id, [{ field:'Status', from:'', to:'Not Started' }]);
+  }
+
+  save(); closeCustomArt(); renderAll();
+}
+
+function deleteCustomArt(artId) {
+  if (!confirm('Permanently delete this custom artifact and all its tracking data?')) return;
+  const pid = S.activeProjectId;
+  const p   = getProject(pid);
+  if (!p) return;
+  p.customArts = (p.customArts || []).filter(a => a.id !== artId);
+  if (p.tracker) delete p.tracker[artId];
+  save(); closeCustomArt(); renderAll();
+}
+
+// ═══════════════════════════════════════════════════════
+//  CADENCE & AUTO-STALE
+// ═══════════════════════════════════════════════════════
+const CADENCE_OPTIONS = [
+  { value:'Daily',         label:'Daily',              days:1   },
+  { value:'Weekly',        label:'Weekly',             days:7   },
+  { value:'Biweekly',      label:'Biweekly',           days:14  },
+  { value:'Monthly',       label:'Monthly',            days:30  },
+  { value:'Quarterly',     label:'Quarterly',          days:90  },
+  { value:'Per Sprint',    label:'Per Sprint (2 wk)',  days:14  },
+  { value:'Phase Gate',    label:'Phase Gate',         days:null},
+  { value:'One-time',      label:'One-time',           days:null},
+  { value:'As-needed',     label:'As-needed',          days:null},
+  { value:'Event-driven',  label:'Event-driven',       days:null},
+];
+
+// Map a cadence string (default or override) to a staleness threshold in days.
+// Returns null → no automatic staleness for this cadence.
+function cadenceDays(cadence) {
+  if (!cadence) return null;
+  const c = cadence.toLowerCase();
+  if (c.includes('daily'))                                             return 1;
+  if (c.includes('biweekly'))                                         return 14;
+  if (c.includes('per sprint') || c.includes('sprint'))               return 14;
+  if (c.includes('weekly'))                                           return 7;
+  if (c.includes('quarterly'))                                        return 90;
+  if (c.includes('monthly') || c.includes('bimonthly'))               return 30;
+  // One-time, phase gate, as-needed, event-driven, per-xxx → never auto-stale
+  return null;
+}
+
+// Resolve the effective cadence string for an artifact on a project.
+// Returns the per-project override if set, otherwise the standard ARTS cadence.
+function effectiveCadence(pid, artId) {
+  const e   = projectEntry(pid, artId);
+  const art = findArt(pid, artId);
+  return (e.cadence && e.cadence !== '') ? e.cadence : (art ? art.cadence || '' : '');
+}
+
+// Compute the display/scoring status for an artifact, applying auto-stale when
+// the cadence threshold has elapsed since lastUpdated.
+// Statuses that are NEVER auto-staled: N/A, Future, Stale, Not Started.
+function effectiveStatus(pid, artId) {
+  const e      = projectEntry(pid, artId);
+  const stored = e.status || 'Not Started';
+  if (['N/A','Future'].includes(stored)) return stored;
+  // Phase-past rule
+  const _art = findArt(pid, artId);
+  const _p   = getProject(pid);
+  if (_art && _p && _p.currentPhase) {
+    const _fp = folderPhase(_art.folder);
+    if (_fp && _fp < _p.currentPhase && !['Complete','Current','N/A','Stale'].includes(stored))
+      return 'Stale';
+  }
+  if (stored === 'Stale' || stored === 'Not Started') return stored;
+  if (!e.lastUpdated) return stored;
+  const days = cadenceDays(effectiveCadence(pid, artId));
+  if (!days) return stored;
+  const elapsed = Math.floor((Date.now() - new Date(e.lastUpdated).getTime()) / 86400000);
+  return elapsed > days ? 'Stale' : stored;
+}
+
+function health(status) {
+  if (status === 'Future') return 'future';
+  if (status === 'N/A')    return 'na';
+  if (['Complete','Current'].includes(status)) return 'green';
+  if (status === 'Stale') return 'red';
+  return 'amber';
+}
+
+function projectHealth(pid) {
+  const p = getProject(pid);
+  if (!p) return { total:0, g:0, am:0, r:0, fu:0, pct:0 };
+  const app = projectApplicableArts(pid);
+  const fu   = app.filter(a => effectiveHealth(pid, a.id) === 'future').length;
+  const na   = app.filter(a => effectiveHealth(pid, a.id) === 'na').length;
+  const scored = app.filter(a => !['future','na'].includes(effectiveHealth(pid, a.id)));
+  const total = scored.length;
+  const g  = scored.filter(a => effectiveHealth(pid, a.id) === 'green').length;
+  const am = scored.filter(a => effectiveHealth(pid, a.id) === 'amber').length;
+  const r  = scored.filter(a => effectiveHealth(pid, a.id) === 'red').length;
+  const pct = total > 0 ? Math.round(g / total * 100) : 0;
+  return { total, g, am, r, fu, na, pct };
+}
+
+function sbadge(status) {
+  const map = {
+    'Not Started':'s-ns','In Progress':'s-ip','Complete':'s-co','Current':'s-cu',
+    'Stale':'s-st','N/A':'s-na','Deferred':'s-de','Future':'s-fu'
+  };
+  return `<span class="sbadge ${map[status]||'s-ns'}">${esc(status||'Not Started')}</span>`;
+}
+
+function hbadge(h, sinfo) {
+  if (h === 'future') return `<span class="hbadge h-f">◌ Future Stage</span>`;
+  if (h === 'na')     return `<span class="hbadge h-na">— Not Applicable</span>`;
+  if (h === 'amber' && sinfo?.dueSoon) return `<span class="hbadge h-ds">⏰ Due Soon</span>`;
+  if (h === 'red') {
+    const suffix = sinfo?.phasePast ? ' · Phase Past'
+                 : sinfo?.overdueDays > 0 ? ` · +${sinfo.overdueDays}d` : '';
+    return `<span class="hbadge h-r">● Action Needed${suffix}</span>`;
+  }
+  const lbl = h==='green'?'● Current':'● Attention';
+  return `<span class="hbadge h-${h[0]}">${lbl}</span>`;
+}
+
+function applyTheme() {
+  const dark = S.global.darkMode;
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  document.getElementById('themeColorMeta').content = dark ? '#0d1117' : '#ffffff';
+}
+
+// ═══════════════════════════════════════════════════════
+//  RENDER — PROJECT BAR & SELECTORS
+// ═══════════════════════════════════════════════════════
+function renderProjectSelect() {
+  const sel = document.getElementById('projectSelect');
+  const active   = activeProjects();
+  const archived = allProjects().filter(p => p.archived);
+  if (!active.length && !archived.length) {
+    sel.innerHTML = '<option value="">— No projects yet —</option>';
+    document.getElementById('editProjBtn').style.display = 'none';
+    return;
+  }
+  const mkOpt = p => `<option value="${esc(p.id)}" ${p.id===S.activeProjectId?'selected':''}>${esc(p.name||'Unnamed Project')}${p.archived?' (archived)':''}</option>`;
+  sel.innerHTML = active.map(mkOpt).join('')
+    + (archived.length ? '<option disabled>──────────────</option>' + archived.map(mkOpt).join('') : '');
+  document.getElementById('editProjBtn').style.display = '';
+}
+
+function renderDashFilter() {
+  const sel = document.getElementById('dashFilter');
+  const active   = activeProjects();
+  const archived = allProjects().filter(p => p.archived);
+  const cur = S.ui.dashFilter;
+  const mkOpt = p => `<option value="${esc(p.id)}" ${p.id===cur?'selected':''}>${esc(p.name||'Unnamed')}${p.archived?' (archived)':''}</option>`;
+  const label = S.ui.showArchived
+    ? `Portfolio — All Projects (${active.length + archived.length})`
+    : `Portfolio — Active (${active.length})`;
+  sel.innerHTML = `<option value="">${label}</option>` + active.map(mkOpt).join('')
+    + (S.ui.showArchived && archived.length
+        ? '<option disabled>── Archived ──</option>' + archived.map(mkOpt).join('')
+        : '');
+  // Sync button state
+  const btn = document.getElementById('showArchivedBtn');
+  if (btn) btn.classList.toggle('active', !!S.ui.showArchived);
+}
+
+// ═══════════════════════════════════════════════════════
+//  RENDER — TRACKER
+// ═══════════════════════════════════════════════════════
+function renderTracker() {
+  const body = document.getElementById('trackerBody');
+  const projs = allProjects();
+
+  if (!projs.length) {
+    body.innerHTML = `<div class="empty">
+      <div class="empty-icon">📁</div>
+      <div class="empty-title">No projects yet</div>
+      <div class="empty-sub">Create your first project to start tracking artifacts.</div>
+      <button class="empty-btn" onclick="openNewProject()">+ New Project</button>
+    </div>`;
+    document.getElementById('tcount').textContent = '—';
+    document.getElementById('cLabel').textContent = '';
+    return;
+  }
+
+  if (!S.activeProjectId || !getProject(S.activeProjectId)) {
+    S.activeProjectId = projs[0].id;
+    save();
+    renderProjectSelect();
+  }
+
+  const proj = activeProject();
+  const needsSetup = !proj.type || !proj.billing;
+  renderPhaseBar(S.activeProjectId);
+
+  const q      = S.ui.tSearch.toLowerCase();
+  const fStatus = S.ui.tStatus;
+  const fHealth  = S.ui.tHealth;
+  const fFolder  = S.ui.tFolder;
+
+  let visible = 0; let total = 0;
+  let html = '';
+
+  if (needsSetup) {
+    html += `<div class="setup-banner">
+      <div class="setup-banner-icon">⚙️</div>
+      <div class="setup-banner-text">
+        <strong>Project type not set.</strong> 
+        <button class="link-btn" onclick="openEditProject('${esc(proj.id)}')">Edit project settings</button> to configure type and billing model so applicable artifacts are determined correctly.
+      </div>
+    </div>`;
+  }
+
+  FOLDERS.forEach(folder => {
+    if (fFolder && fFolder !== folder) return;
+    // Standard arts + custom arts for this folder
+    const _fCust = (getProject(S.activeProjectId)?.customArts || [])
+      .filter(a => a.folder === folder)
+      .map(a => ({ ...a, at:['All'], custom:true }));
+    const _allFolderArts = [...ARTS.filter(a => a.folder === folder), ..._fCust];
+    const arts = _allFolderArts.filter(a => {
+      if (q && !a.name.toLowerCase().includes(q)) return false;
+      const effS = effectiveStatus(S.activeProjectId, a.id);
+      if (fStatus && effS !== fStatus) return false;
+      const _eh       = effectiveHealth(S.activeProjectId, a.id);
+      const _isDueSoon = _eh === 'amber' && stalenessDetails(S.activeProjectId, a.id).dueSoon;
+      if (fHealth === 'due-soon' && !_isDueSoon) return false;
+      if (fHealth && fHealth !== 'due-soon' && _eh !== fHealth) return false;
+      if (S.ui.hideNA && _eh === 'na') return false;
+      return true;
+    });
+    if (!arts.length) return;
+    total += arts.length;
+
+    const fg = _allFolderArts.filter(a => effectiveHealth(S.activeProjectId, a.id)==='green').length;
+    const fa = _allFolderArts.filter(a => effectiveHealth(S.activeProjectId, a.id)==='amber').length;
+    const fr = _allFolderArts.filter(a => effectiveHealth(S.activeProjectId, a.id)==='red').length;
+
+    const col = S.ui.collapsed[folder];
+    const _fp = folderPhase(folder);
+    const _cur = proj.currentPhase || 0;
+    let _phCls = "";
+    if (_fp && _cur) {
+      if (_fp === _cur) _phCls = "ph-current";
+      else if (_fp < _cur) {
+        const _phHasRed = _allFolderArts.some(a=>effectiveHealth(S.activeProjectId,a.id)==='red');
+        _phCls = _phHasRed ? "ph-past-warn" : "ph-past-done";
+      }
+    }
+    html += `<div class="folder-group">
+      <div class="folder-header ${_phCls}" onclick="toggleFolder('${esc(folder)}')">
+        <svg class="folder-chevron ${col?'col':''}" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+        <span class="folder-name">${esc(folder)}</span>
+        <div class="folder-stats">
+          <span class="fstat"><span class="fstat-dot g"></span>${fg}</span>
+          <span class="fstat"><span class="fstat-dot a"></span>${fa}</span>
+          <span class="fstat"><span class="fstat-dot r"></span>${fr}</span>
+        </div>
+      </div>
+      <div class="folder-body ${col?'hidden':''}">
+        <table><thead><tr>
+          <th style="width:36px">#</th><th>Artifact</th>
+          <th style="width:36px"></th>
+          <th style="width:145px">Status</th><th style="width:105px">Last Updated</th>
+          <th style="width:130px">Health</th>
+        </tr></thead><tbody>`;
+
+    arts.forEach(a => {
+      const e      = entry(a.id);
+      const effS   = effectiveStatus(S.activeProjectId, a.id);
+      const h      = effectiveHealth(S.activeProjectId, a.id);
+      const sinfo  = stalenessDetails(S.activeProjectId, a.id);
+      const app    = a.custom ? true : applies(a);
+      const effCad = effectiveCadence(S.activeProjectId, a.id);
+      if (app) visible++;
+      const _linkCell = e.url&&isValidUrl(e.url)
+        ? `<a href="${esc(e.url)}" target="_blank" rel="noopener" class="cell-link" onclick="event.stopPropagation()" title="Open: ${esc(e.url)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>`
+        : '<span class="cell-link-empty"></span>';
+      if (a.custom) {
+        html += `<tr onclick="openEdit('${a.id}')">
+          <td class="cell-num" style="color:var(--text-d)">—</td>
+          <td>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <div style="min-width:0;flex:1">
+                <span class="cell-name">${esc(a.name)}</span><span class="ca-badge">custom</span>
+                <span class="cell-cad">${esc(effCad)}</span>
+              </div>
+              <button class="ca-edit-btn" onclick="event.stopPropagation();openCustomArt('${esc(a.folder)}','${a.id}')" title="Edit artifact definition"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7\"/><path d=\"M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z\"/></svg></button>
+            </div>
+          </td>
+          <td style="text-align:center">${_linkCell}</td>
+          <td class="status-cell" onclick="statusClick(event,'${a.id}')" title="Click to change status">${sbadge(effS)}</td>
+          <td class="cell-date">${fmtDate(e.lastUpdated)}</td>
+          <td>${hbadge(h, sinfo)}</td>
+        </tr>`;
+      } else {
+        html += `<tr class="${app?'':'row-na'}" onclick="openEdit(${a.id})">
+          <td class="cell-num">${a.id}</td>
+          <td>
+            <span class="cell-name">${esc(a.name)}</span>${!app?'<span class="cell-na-hint">(not applicable)</span>':''}
+            <span class="cell-cad">${esc(effCad)}</span>
+          </td>
+          <td style="text-align:center">${_linkCell}</td>
+          <td class="status-cell" onclick="statusClick(event,${a.id})" title="Click to change status">${sbadge(effS)}</td>
+          <td class="cell-date">${fmtDate(e.lastUpdated)}</td>
+          <td>${hbadge(h, sinfo)}</td>
+        </tr>`;
+      }
+    });
+
+    html += `</tbody></table><div class="add-ca-row"><button class="add-ca-btn" onclick="openCustomArt('${esc(folder)}', null)">+ Add custom artifact</button></div></div></div>`;
+  });
+
+  if (!total) {
+    html += `<div class="empty">
+      <div class="empty-icon">🔍</div>
+      <div class="empty-title">No results</div>
+      <div class="empty-sub">Try adjusting your filters.</div>
+    </div>`;
+  }
+
+  body.innerHTML = html;
+  document.getElementById('tcount').textContent = visible || total;
+  document.getElementById('cLabel').textContent = total ? `${visible} artifact${visible!==1?'s':''}` : '';
+  updateStickyOffsets();
+}
+
+// ═══════════════════════════════════════════════════════
+//  RENDER — DASHBOARD
+// ═══════════════════════════════════════════════════════
+function renderDashboard() {
+  const body = document.getElementById('dashBody');
+  const projs = allProjects();
+
+  if (!projs.length) {
+    body.innerHTML = `<div class="empty">
+      <div class="empty-icon">📊</div>
+      <div class="empty-title">${allProj.length ? 'All projects are archived' : 'No projects to show'}</div>
+      <div class="empty-sub">${allProj.length ? 'Toggle \'Show archived\' to view them.' : 'Create a project in the Tracker tab to see dashboard data.'}</div>
+    </div>`;
+    return;
+  }
+
+  const filter = S.ui.dashFilter;
+  if (filter && getProject(filter)) {
+    renderProjectDashboard(filter);
+  } else {
+    renderPortfolioDashboard();
+  }
+}
+
+function renderPortfolioDashboard() {
+  const body = document.getElementById('dashBody');
+  const projs = allProjects();
+  const n = projs.length;
+
+  // Aggregate across all projects (Future excluded from health)
+  let totalG=0, totalAm=0, totalR=0, totalAll=0, totalFu=0, totalNa=0;
+  const projStats = projs.map(p => {
+    const h = projectHealth(p.id);
+    totalG  += h.g; totalAm += h.am; totalR += h.r; totalAll += h.total;
+    totalFu += (h.fu||0); totalNa += (h.na||0);
+    return { p, h };
+  });
+
+  const pct  = totalAll > 0 ? Math.round(totalG / totalAll * 100) : 0;
+  const gw   = totalAll > 0 ? (totalG  / totalAll * 100).toFixed(1) : 0;
+  const aw   = totalAll > 0 ? (totalAm / totalAll * 100).toFixed(1) : 0;
+  const rw   = totalAll > 0 ? (totalR  / totalAll * 100).toFixed(1) : 0;
+  const avgH = n > 0 ? Math.round(projStats.reduce((s,x) => s + x.h.pct, 0) / n) : 0;
+
+  // All red items across portfolio
+  const redItems = projs.flatMap(p =>
+    projectApplicableArts(p.id).filter(a => effectiveHealth(p.id, a.id) === 'red')
+        .map(a => ({ art:a, proj:p }))
+  );
+  const amberItems = projs.flatMap(p =>
+    projectApplicableArts(p.id).filter(a => effectiveHealth(p.id, a.id) === 'amber')
+        .map(a => ({ art:a, proj:p }))
+  );
+
+  const sortedProjs = [...projStats].sort((a,b) => a.h.pct - b.h.pct);
+
+  let html = `
+    <!-- Portfolio Summary -->
+    <div class="card">
+      <div style="display:flex;align-items:flex-start;gap:16px;">
+        <div style="flex:1">
+          <div class="card-label">Portfolio Overview</div>
+          <div style="font-size:18px;font-weight:700;letter-spacing:-.3px;margin-bottom:6px">${n} Active Project${n!==1?'s':''}</div>
+          <div style="font-size:12px;color:var(--text-m)">${totalAll} scored · ${totalG} current · ${totalAm} attention · ${totalR} action needed${totalFu>0?` · <span style="color:#8b5cf6">${totalFu} future</span>`:''}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div class="card-label">Avg. Health</div>
+          <div class="big-num ${avgH>=70?'g':avgH>=40?'a':'r'}">${avgH}%</div>
+          <div class="card-sub">across all projects</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Health Bar -->
+    <div class="card health-bar-wrap">
+      <div style="font-size:13px;font-weight:600;margin-bottom:9px">Portfolio Health Distribution</div>
+      <div class="hbar">
+        <div class="hbar-seg hbar-g" style="width:${gw}%"></div>
+        <div class="hbar-seg hbar-a" style="width:${aw}%"></div>
+        <div class="hbar-seg hbar-r" style="width:${rw}%"></div>
+      </div>
+      <div class="hbar-legend">
+        <div class="hleg"><div class="hleg-dot" style="background:var(--green)"></div>${totalG} Current (${gw}%)</div>
+        <div class="hleg"><div class="hleg-dot" style="background:var(--amber)"></div>${totalAm} Attention (${aw}%)</div>
+        <div class="hleg"><div class="hleg-dot" style="background:var(--red)"></div>${totalR} Action Needed (${rw}%)</div>
+      </div>
+    </div>
+
+    <!-- Count Cards -->
+    <div class="dash-row">
+      <div class="card"><div class="card-label">🟢 Current</div><div class="big-num g">${totalG}</div><div class="card-sub">Complete, Current, or N/A</div></div>
+      <div class="card"><div class="card-label">🟡 Attention</div><div class="big-num a">${totalAm}</div><div class="card-sub">In Progress, Deferred, or Not Started</div></div>
+      <div class="card"><div class="card-label">🔴 Action Needed</div><div class="big-num r">${totalR}</div><div class="card-sub">Stale artifacts across portfolio</div></div>
+    </div>
+
+    <!-- Project Breakdown -->
+    <div class="proj-list">
+      <div class="proj-list-title">Projects by Health — click to drill in</div>
+      ${sortedProjs.map(({p, h}) => {
+        const gw2 = h.total>0?(h.g/h.total*100).toFixed(1):0;
+        const aw2 = h.total>0?(h.am/h.total*100).toFixed(1):0;
+        const rw2 = h.total>0?(h.r/h.total*100).toFixed(1):0;
+        const col = h.pct>=70?'var(--green)':h.pct>=40?'var(--amber)':'var(--red)';
+        return `<div class="proj-list-row" onclick="drillToProject('${esc(p.id)}')">
+          <div style="flex:1;min-width:0">
+            <div class="plr-name">${esc(p.name||'Unnamed Project')}</div>
+            <div class="plr-meta">${p.type?esc(p.type):'—'}${p.billing?' · '+esc(p.billing):''}${p.currentPhase?' · Phase '+p.currentPhase:''} · ${h.total} scored</div>
+          </div>
+          <div class="plr-minibar">
+            <div class="plr-mb-g" style="width:${gw2}%"></div>
+            <div class="plr-mb-a" style="width:${aw2}%"></div>
+            <div class="plr-mb-r" style="width:${rw2}%"></div>
+          </div>
+          <div class="plr-pct" style="color:${col}">${h.pct}%</div>
+          <svg class="plr-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+        </div>`;
+      }).join('')}
+    </div>
+
+    <!-- Action Needed -->
+    <div class="dash-two">
+      <div class="alist">
+        <div class="alist-title">🔴 Action Needed <span class="alist-cnt alist-cnt-r">${redItems.length}</span></div>
+        ${redItems.length ? redItems.slice(0,15).map(({art, proj}) =>
+          `<div class="aitem" onclick="jumpTo(${art.id},'${esc(proj.id)}')">
+            <div class="aitem-name">${esc(art.name)}</div>
+            <div class="aitem-proj">${esc(proj.name||'?')}</div>
+          </div>`).join('')
+          + (redItems.length>15?`<div class="alist-empty">+${redItems.length-15} more</div>`:'')
+          : '<div class="alist-empty">🎉 No stale artifacts</div>'}
+      </div>
+      <div class="alist">
+        <div class="alist-title">🟡 Needs Attention <span class="alist-cnt alist-cnt-a">${amberItems.length}</span></div>
+        ${amberItems.length ? amberItems.slice(0,10).map(({art, proj}) =>
+          `<div class="aitem" onclick="jumpTo(${art.id},'${esc(proj.id)}')">
+            <div class="aitem-name">${esc(art.name)}</div>
+            <div class="aitem-proj">${esc(proj.name||'?')}</div>
+          </div>`).join('')
+          + (amberItems.length>10?`<div class="alist-empty">+${amberItems.length-10} more</div>`:'')
+          : '<div class="alist-empty">✓ All artifacts current</div>'}
+      </div>
+    </div>`;
+
+  body.innerHTML = html;
+}
+
+function renderProjectDashboard(pid) {
+  const body = document.getElementById('dashBody');
+  const p = getProject(pid);
+  if (!p) { renderPortfolioDashboard(); return; }
+
+  const app = projectApplicableArts(pid);
+  const fu   = app.filter(a => effectiveHealth(pid, a.id)==='future').length;
+  const na   = app.filter(a => effectiveHealth(pid, a.id)==='na').length;
+  const scored = app.filter(a => !['future','na'].includes(effectiveHealth(pid, a.id)));
+  const total = scored.length;
+  const g  = scored.filter(a => effectiveHealth(pid, a.id)==='green').length;
+  const am = scored.filter(a => effectiveHealth(pid, a.id)==='amber').length;
+  const r  = scored.filter(a => effectiveHealth(pid, a.id)==='red').length;
+  const pct = total>0?Math.round(g/total*100):0;
+  const gw  = total>0?(g/total*100).toFixed(1):0;
+  const aw  = total>0?(am/total*100).toFixed(1):0;
+  const rw  = total>0?(r/total*100).toFixed(1):0;
+
+  const folderStats = FOLDERS.map(f => {
+    const _fsStd  = ARTS.filter(a => a.folder===f && projectApplies(pid,a) && !['future','na'].includes(effectiveHealth(pid,a.id)));
+    const _fsCust = (getProject(pid)?.customArts||[]).filter(a=>a.folder===f && !['future','na'].includes(effectiveHealth(pid,a.id))).map(a=>({...a,at:['All'],custom:true}));
+    const fas = [..._fsStd, ..._fsCust];
+    const fg  = fas.filter(a => effectiveHealth(pid,a.id)==='green').length;
+    const fa  = fas.filter(a => effectiveHealth(pid,a.id)==='amber').length;
+    const fr  = fas.filter(a => effectiveHealth(pid,a.id)==='red').length;
+    const ft  = fas.length;
+    return { f, fg, fa, fr, ft, pct: ft>0?Math.round(fg/ft*100):0 };
+  }).filter(x => x.ft>0).sort((a,b) => FOLDERS.indexOf(a.f) - FOLDERS.indexOf(b.f));
+
+  const redItems   = app.filter(a => effectiveHealth(pid,a.id)==='red');
+  const amberItems = app.filter(a => effectiveHealth(pid,a.id)==='amber');
+
+  let html = `
+    <!-- Archived banner (shown when project is archived) -->
+    ${p.archived ? `<div class="archived-banner">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5" rx="1"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+      <div class="archived-banner-text">Project archived
+        <div class="archived-banner-sub">Excluded from portfolio health. <button class="link-btn" onclick="archiveProject('${esc(pid)}', false)">Restore project</button></div>
+      </div>
+    </div>` : ''}
+    <!-- Project Card -->
+    <div class="card">
+      <div style="display:flex;align-items:flex-start;gap:16px;">
+        <div style="flex:1">
+          <div class="card-label">Project</div>
+          <div style="font-size:17px;font-weight:700;letter-spacing:-.3px;margin-bottom:7px">${esc(p.name||'Unnamed Project')}</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:7px;">
+            ${p.type?`<span class="badge badge-accent">${esc(p.type)}</span>`:''}
+            ${p.billing?`<span class="badge">${esc(p.billing)}</span>`:''}
+            ${p.currentPhase?`<span class="badge" style="background:var(--accent-dim);color:var(--accent);border-color:transparent">Phase ${p.currentPhase} · ${PHASES.find(x=>x.num===p.currentPhase)?.label||''}</span>`:''}
+            ${p.startDate?`<span class="badge">Started ${fmtDate(p.startDate)}</span>`:''}
+            ${p.pm?`<span class="badge">PM: ${esc(p.pm)}</span>`:''}
+          </div>
+          <div style="font-size:12px;color:var(--text-m)">${total} scored${fu>0?` · <span style="color:#8b5cf6">${fu} future stage</span>`:''}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div class="card-label">Health</div>
+          <div class="big-num ${pct>=70?'g':pct>=40?'a':'r'}">${pct}%</div>
+          <div class="card-sub">in good health</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Health Bar -->
+    <div class="card health-bar-wrap">
+      <div style="font-size:13px;font-weight:600;margin-bottom:9px">Health Distribution${fu>0?` <span style="font-size:11px;font-weight:400;color:#8b5cf6">(${fu} future excluded)</span>`:''}</div>
+      <div class="hbar">
+        <div class="hbar-seg hbar-g" style="width:${gw}%"></div>
+        <div class="hbar-seg hbar-a" style="width:${aw}%"></div>
+        <div class="hbar-seg hbar-r" style="width:${rw}%"></div>
+      </div>
+      <div class="hbar-legend">
+        <div class="hleg"><div class="hleg-dot" style="background:var(--green)"></div>${g} Current (${gw}%)</div>
+        <div class="hleg"><div class="hleg-dot" style="background:var(--amber)"></div>${am} Attention (${aw}%)</div>
+        <div class="hleg"><div class="hleg-dot" style="background:var(--red)"></div>${r} Action Needed (${rw}%)</div>
+      </div>
+    </div>
+
+    <!-- Count Cards -->
+    <div class="dash-row">
+      <div class="card"><div class="card-label">🟢 Current</div><div class="big-num g">${g}</div><div class="card-sub">Complete, Current, or N/A</div></div>
+      <div class="card"><div class="card-label">🟡 Attention</div><div class="big-num a">${am}</div><div class="card-sub">In Progress, Deferred, or Not Started</div></div>
+      <div class="card"><div class="card-label">🔴 Action Needed</div><div class="big-num r">${r}</div><div class="card-sub">Stale artifacts</div></div>
+    </div>
+
+    <!-- Folder Breakdown -->
+    <div class="fbreakdown">
+      <div class="fbreakdown-title">Health by Folder</div>
+      ${folderStats.map(({f,fg,fa,fr,ft,pct:fp}) => {
+        const gw2=ft>0?(fg/ft*100).toFixed(1):0;
+        const aw2=ft>0?(fa/ft*100).toFixed(1):0;
+        const rw2=ft>0?(fr/ft*100).toFixed(1):0;
+        const col=fp>=70?'var(--green)':fp>=40?'var(--amber)':'var(--red)';
+        return `<div class="fbrow" onclick="jumpToFolder('${esc(pid)}','${esc(f)}')" title="Open ${esc(f)} in Tracker">
+          <span class="fbrow-name">${esc(f)}</span>
+          <div class="fb-minibar"><div class="fbmb-g" style="width:${gw2}%"></div><div class="fbmb-a" style="width:${aw2}%"></div><div class="fbmb-r" style="width:${rw2}%"></div></div>
+          <span class="fb-pct" style="color:${col}">${fp}%</span>
+          <span class="fb-cnt">${ft}</span>
+          <svg class="fbrow-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+        </div>`;
+      }).join('')}
+    </div>
+
+    <!-- Action & Watch Lists -->
+    <div class="dash-two">
+      <div class="alist">
+        <div class="alist-title">🔴 Action Needed <span class="alist-cnt alist-cnt-r">${redItems.length}</span></div>
+        ${redItems.length ? redItems.map(a =>
+          `<div class="aitem" onclick="jumpTo(${a.id},'${esc(pid)}')">
+            <div class="aitem-name">${esc(a.name)}</div>
+            <div class="aitem-folder">${esc(a.folder)}</div>
+          </div>`).join('')
+          : '<div class="alist-empty">🎉 No stale artifacts</div>'}
+      </div>
+      <div class="alist">
+        <div class="alist-title">🟡 Watch List <span class="alist-cnt alist-cnt-a">${amberItems.length}</span></div>
+        ${amberItems.length ? amberItems.slice(0,10).map(a =>
+          `<div class="aitem" onclick="jumpTo(${a.id},'${esc(pid)}')">
+            <div class="aitem-name">${esc(a.name)}</div>
+            <div class="aitem-folder">${esc(a.folder)}</div>
+          </div>`).join('')
+          + (amberItems.length>10?`<div class="alist-empty">+${amberItems.length-10} more</div>`:'')
+          : '<div class="alist-empty">✓ All artifacts current</div>'}
+      </div>
+    </div>
+    ${(() => {
+      const hist = (p.history||[]).slice(0,20);
+      if (!hist.length) return '';
+      return `<div class="activity-feed">
+        <div class="activity-feed-title">📋 Recent Activity</div>
+        ${hist.map(e => `<div class="af-item">
+          <span class="af-ts">${fmtTs(e.ts)}</span>
+          ${e.artId?`<span class="af-art" title="${esc(e.artName)}">${esc(e.artName)}</span>`:''}
+          <span class="af-detail">${esc(e.field)}: <span style="text-decoration:line-through;color:var(--text-d)">${esc(e.from||'—')}</span> → <strong>${esc(e.to||'—')}</strong></span>
+        </div>`).join('')}
+      </div>`;
+    })()} `;
+
+  body.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════════
+//  RENDER — CADENCE
+// ═══════════════════════════════════════════════════════
+function renderCadence() {
+  const q = S.ui.cSearch.toLowerCase();
+  const fa = S.ui.cApplies;
+  const arts = ARTS.filter(a => {
+    if (q && !a.name.toLowerCase().includes(q) && !a.folder.toLowerCase().includes(q)) return false;
+    if (fa && !a.at.includes(fa)) return false;
+    return true;
+  });
+
+  document.getElementById('cadBody').innerHTML = arts.map(a =>
+    `<tr>
+      <td style="color:var(--text-d);font-size:11px">${a.id}</td>
+      <td style="color:var(--text-m);font-size:12px">${esc(a.folder)}</td>
+      <td>${esc(a.name)}</td>
+      <td style="color:var(--text-m)">${esc(a.cadence)}</td>
+      <td>${a.at.map(t=>`<span class="atag ${t==='All'?'all':''}">${esc(t)}</span> `).join('')}</td>
+    </tr>`
+  ).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+//  POPULATE FOLDER FILTER
+// ═══════════════════════════════════════════════════════
+function populateFolderFilter() {
+  const sel = document.getElementById('tFolder');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">All Folders</option>';
+  FOLDERS.forEach(f => sel.insertAdjacentHTML('beforeend', `<option value="${esc(f)}" ${cur===f?'selected':''}>${esc(f)}</option>`));
+}
+
+// ═══════════════════════════════════════════════════════
+//  URL HELPERS
+// ═══════════════════════════════════════════════════════
+function isValidUrl(url) {
+  if (!url) return false;
+  try { const u = new URL(url); return u.protocol === 'http:' || u.protocol === 'https:'; }
+  catch { return false; }
+}
+
+function updateProjLinkBtns() {
+  const pscUrl = (document.getElementById('pPscCloud')?.value || '').trim();
+  const spUrl  = (document.getElementById('pSharePoint')?.value || '').trim();
+  const pBtn   = document.getElementById('pPscBtn');
+  const sBtn   = document.getElementById('pSpBtn');
+  if (pBtn) {
+    const ok = isValidUrl(pscUrl);
+    pBtn.classList.toggle('active', ok);
+    pBtn.onclick = ok ? () => window.open(pscUrl, '_blank', 'noopener') : null;
+  }
+  if (sBtn) {
+    const ok = isValidUrl(spUrl);
+    sBtn.classList.toggle('active', ok);
+    sBtn.onclick = ok ? () => window.open(spUrl, '_blank', 'noopener') : null;
+  }
+}
+
+function updateUrlBtn() {
+  const url = (document.getElementById('eUrl')?.value || '').trim();
+  const btn = document.getElementById('eUrlBtn');
+  if (!btn) return;
+  if (isValidUrl(url)) {
+    btn.classList.add('active');
+    btn.onclick = () => window.open(url, '_blank', 'noopener');
+  } else {
+    btn.classList.remove('active');
+    btn.onclick = null;
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  ARCHIVE / ACTIVE PROJECT HELPERS
+// ═══════════════════════════════════════════════════════
+function activeProjects() {
+  return Object.values(S.projects)
+    .filter(p => !p.archived)
+    .sort((a,b) => (a.name||'').localeCompare(b.name||''));
+}
+
+function archiveProject(pid, archive = true) {
+  const p = getProject(pid);
+  if (!p) return;
+  p.archived = archive;
+  save();
+  closeProjModal();
+  renderAll();
+}
+
+// ═══════════════════════════════════════════════════════
+//  DASHBOARD → TRACKER FOLDER LINK
+// ═══════════════════════════════════════════════════════
+function jumpToFolder(pid, folder) {
+  if (pid && getProject(pid)) S.activeProjectId = pid;
+  S.ui.tSearch = ''; S.ui.tStatus = ''; S.ui.tHealth = ''; S.ui.tFolder = folder;
+  S.ui.collapsed[folder] = false;
+  // Switch tab
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelector('[data-tab="tracker"]').classList.add('active');
+  document.getElementById('panel-tracker').classList.add('active');
+  // Sync filter inputs
+  document.getElementById('tSearch').value = '';
+  document.getElementById('tStatus').value = '';
+  document.getElementById('tHealth').value = '';
+  document.getElementById('tFolder').value = folder;
+  save();
+  renderAll();
+}
+
+// ═══════════════════════════════════════════════════════
+//  PROJECT LINKS + EXPAND / COLLAPSE ALL
+// ═══════════════════════════════════════════════════════
+function renderProjLinks() {
+  const p   = activeProject();
+  // Archived badge in project bar
+  let _ab = document.getElementById('projArchivedBadge');
+  if (_ab) _ab.style.display = (p && p.archived) ? '' : 'none';
+  const psc = document.getElementById('projPscLink');
+  const sp  = document.getElementById('projSpLink');
+  if (!psc || !sp) return;
+  if (p && p.pscCloud && isValidUrl(p.pscCloud)) {
+    psc.href = p.pscCloud; psc.style.display = 'inline-flex';
+  } else { psc.style.display = 'none'; }
+  if (p && p.sharePoint && isValidUrl(p.sharePoint)) {
+    sp.href = p.sharePoint; sp.style.display = 'inline-flex';
+  } else { sp.style.display = 'none'; }
+}
+
+function expandAll() {
+  S.ui.collapsed = {};
+  save(); renderTracker();
+}
+
+function collapseAll() {
+  FOLDERS.forEach(f => { S.ui.collapsed[f] = true; });
+  save(); renderTracker();
+}
+
+// ═══════════════════════════════════════════════════════
+//  INLINE STATUS EDITOR
+// ═══════════════════════════════════════════════════════
+function statusClick(event, artId) {
+  event.stopPropagation();
+  if (!S.activeProjectId) return;
+
+  const cell = event.currentTarget;
+  // If an inline-select is already open in this cell, ignore
+  if (cell.querySelector('.inline-status-sel')) return;
+
+  const e   = entry(artId);
+  const statuses = ['Not Started','In Progress','Complete','Current','Stale','N/A','Deferred','Future'];
+  const origHTML = cell.innerHTML;
+
+  const sel = document.createElement('select');
+  sel.className = 'inline-status-sel';
+  statuses.forEach(st => {
+    const opt = document.createElement('option');
+    opt.value = st; opt.textContent = st;
+    if (st === (e.status || 'Not Started')) opt.selected = true;
+    sel.appendChild(opt);
+  });
+
+  cell.innerHTML = '';
+  cell.appendChild(sel);
+  sel.focus();
+
+  let committed = false;
+
+  function commit() {
+    if (committed) return;
+    committed = true;
+    const newStatus = sel.value;
+    const pid = S.activeProjectId;
+    if (!S.projects[pid].tracker) S.projects[pid].tracker = {};
+    const existing = projectEntry(pid, artId);
+    const oldStatus = existing.status || 'Not Started';
+    S.projects[pid].tracker[artId] = {
+      ...existing,
+      status: newStatus,
+      lastUpdated: today(),
+    };
+    if (oldStatus !== newStatus) logChange(pid, artId, [{ field:'Status', from:oldStatus, to:newStatus }]);
+    save();
+    // Preserve scroll position through re-render
+    const main = document.querySelector('main');
+    const scrollY = main.scrollTop;
+    document.getElementById('hideNABtn').classList.toggle('active', !!S.ui.hideNA);
+  renderAll();
+    main.scrollTop = scrollY;
+  }
+
+  function cancel() {
+    if (committed) return;
+    committed = true;
+    cell.innerHTML = origHTML;
+  }
+
+  sel.addEventListener('change', commit);
+  sel.addEventListener('blur',   () => setTimeout(cancel, 80));
+  sel.addEventListener('keydown', ev => {
+    if (ev.key === 'Escape') { ev.preventDefault(); ev.stopPropagation(); cancel(); }
+    if (ev.key === 'Enter')  { ev.preventDefault(); commit(); }
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+//  EDIT ARTIFACT MODAL
+// ═══════════════════════════════════════════════════════
+function openEdit(artId) {
+  if (!S.activeProjectId) return;
+  editingArtId = artId;
+  const a = findArt(S.activeProjectId, artId);
+  const e = entry(artId);
+  document.getElementById('editTitle').textContent = a.name;
+  document.getElementById('editSub').textContent   = a.folder;
+  document.getElementById('eStatus').value  = e.status || 'Not Started';
+  document.getElementById('eDate').value    = e.lastUpdated || '';
+  document.getElementById('eUrl').value     = e.url || '';
+  updateUrlBtn();
+  // Cadence dropdown — default option shows the standard cadence
+  const _stdCad = a.cadence || '';
+  const _cadSel = document.getElementById('eCadence');
+  _cadSel.innerHTML = `<option value="">Default: ${esc(_stdCad)}</option>` +
+    CADENCE_OPTIONS.map(o => `<option value="${esc(o.value)}">${esc(o.label)}</option>`).join('');
+  _cadSel.value = e.cadence || '';
+  // Auto-stale notice
+  const _effS = effectiveStatus(S.activeProjectId, artId);
+  const _notice = document.getElementById('eAutoStaleNote');
+  if (_notice) _notice.style.display = (_effS === 'Stale' && (e.status||'Not Started') !== 'Stale') ? 'block' : 'none';
+  document.getElementById('eNotes').value   = e.notes || '';
+  document.getElementById('eCadInfo').innerHTML = a?.custom
+    ? `<strong>Custom artifact</strong> &nbsp;·&nbsp; ${esc(a.folder)}`
+    : (a ? `<strong>Cadence:</strong> ${esc(a.cadence)} &nbsp;·&nbsp; <strong>Applies to:</strong> ${a.at.join(', ')}` : '');
+  renderArtHistory(S.activeProjectId, artId);
+  document.getElementById('editOverlay').classList.add('open');
+}
+
+function closeEdit() {
+  document.getElementById('editOverlay').classList.remove('open');
+  editingArtId = null;
+}
+
+function saveEdit() {
+  if (!editingArtId || !S.activeProjectId) return;
+  const pid = S.activeProjectId;
+  if (!S.projects[pid].tracker) S.projects[pid].tracker = {};
+  const old = { ...projectEntry(pid, editingArtId) };
+  const newData = {
+    status:      document.getElementById('eStatus').value,
+    lastUpdated: document.getElementById('eDate').value || today(),
+    url:         document.getElementById('eUrl').value.trim(),
+    cadence:     document.getElementById('eCadence').value,
+    notes:       document.getElementById('eNotes').value.trim(),
+  };
+  const changes = [];
+  if ((old.status||'Not Started') !== newData.status)
+    changes.push({ field:'Status', from:old.status||'Not Started', to:newData.status });
+  if ((old.lastUpdated||'') !== newData.lastUpdated)
+    changes.push({ field:'Last Updated', from:old.lastUpdated||'', to:newData.lastUpdated });
+  if ((old.url||'') !== newData.url)
+    changes.push({ field:'Link', from:old.url?'(set)':'(none)', to:newData.url?'(set)':'(none)' });
+  if ((old.cadence||'') !== newData.cadence)
+    changes.push({ field:'Cadence', from:old.cadence||'Default', to:newData.cadence||'Default' });
+  if ((old.notes||'') !== newData.notes)
+    changes.push({ field:'Notes', from:old.notes?'(updated)':'(empty)', to:newData.notes?'(updated)':'(empty)' });
+  if (changes.length) logChange(pid, editingArtId, changes);
+  S.projects[pid].tracker[editingArtId] = newData;
+  save(); closeEdit(); renderAll();
+}
+
+// ═══════════════════════════════════════════════════════
+//  PROJECT MODAL (Create / Edit)
+// ═══════════════════════════════════════════════════════
+function openNewProject() {
+  editingProjId = null;
+  document.getElementById('projModalTitle').textContent = 'New Project';
+  document.getElementById('projModalSub').textContent   = 'Set up a new project to track its artifacts';
+  document.getElementById('pName').value    = '';
+  document.getElementById('pType').value    = '';
+  document.getElementById('pBilling').value = '';
+  document.getElementById('pStart').value   = '';
+  document.getElementById('pPM').value      = '';
+  document.getElementById('pPhase').value      = '';
+  document.getElementById('pPscCloud').value   = '';
+  document.getElementById('pSharePoint').value = '';
+  document.getElementById('pNotes').value      = '';
+  updateProjLinkBtns();
+  document.getElementById('projDangerZone').style.display = 'none';
+  document.getElementById('projectOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('pName').focus(), 50);
+}
+
+function openEditProject(pid) {
+  const p = getProject(pid);
+  if (!p) return;
+  editingProjId = pid;
+  document.getElementById('projModalTitle').textContent = 'Edit Project';
+  document.getElementById('projModalSub').textContent   = 'Update project settings';
+  document.getElementById('pName').value    = p.name    || '';
+  document.getElementById('pType').value    = p.type    || '';
+  document.getElementById('pBilling').value = p.billing || '';
+  document.getElementById('pStart').value   = p.startDate || '';
+  document.getElementById('pPM').value      = p.pm      || '';
+  document.getElementById('pPhase').value      = p.currentPhase ? String(p.currentPhase) : '';
+  document.getElementById('pPscCloud').value   = p.pscCloud    || '';
+  document.getElementById('pSharePoint').value = p.sharePoint  || '';
+  document.getElementById('pNotes').value      = p.notes       || '';
+  updateProjLinkBtns();
+  // Archive button — label and style change based on current state
+  const _aBtn = document.getElementById('archiveProjBtn');
+  if (_aBtn) {
+    _aBtn.textContent = p.archived ? 'Restore Project' : 'Archive Project';
+    _aBtn.style.cssText = p.archived
+      ? 'background:var(--accent-dim);color:var(--accent);border:1px solid rgba(59,158,255,.3)'
+      : 'background:var(--amber-bg);color:var(--amber);border:1px solid rgba(245,158,11,.2)';
+  }
+  document.getElementById('projDangerZone').style.display = '';
+  document.getElementById('projectOverlay').classList.add('open');
+}
+
+function closeProjModal() {
+  document.getElementById('projectOverlay').classList.remove('open');
+  editingProjId = null;
+}
+
+// ═══════════════════════════════════════════════════════
+//  PROJECT TRACKER INITIALISATION
+// ═══════════════════════════════════════════════════════
+function initProjectTracker(pid) {
+  const p = getProject(pid);
+  if (!p) return;
+  p.tracker = {};
+  const cur = p.currentPhase || 0;   // 0 = no phase set
+  ARTS.forEach(a => {
+    const fp      = folderPhase(a.folder); // 1–6 for phase folders, null for always-active
+    const applies = projectApplies(pid, a);
+    let status;
+    if (!applies) {
+      status = 'N/A';
+    } else if (fp) {
+      // Phase folders 01–06: Future until the project reaches that phase
+      status = (cur && fp <= cur) ? 'Not Started' : 'Future';
+    } else {
+      // Always-active folders 07–17: start as Not Started
+      status = 'Not Started';
+    }
+    p.tracker[a.id] = { status, lastUpdated: '', url: '', cadence: '', notes: '' };
+  });
+}
+
+function saveProjModal() {
+  const name    = document.getElementById('pName').value.trim();
+  const type    = document.getElementById('pType').value;
+  const billing = document.getElementById('pBilling').value;
+  const startDate = document.getElementById('pStart').value;
+  const pm      = document.getElementById('pPM').value.trim();
+  const phase      = parseInt(document.getElementById('pPhase').value) || null;
+  const pscCloud   = document.getElementById('pPscCloud').value.trim();
+  const sharePoint = document.getElementById('pSharePoint').value.trim();
+  const notes      = document.getElementById('pNotes').value.trim();
+
+  if (!name) { document.getElementById('pName').focus(); return; }
+
+  if (editingProjId) {
+    const p = S.projects[editingProjId];
+    const oldPhase = p.currentPhase || null;
+    Object.assign(p, { name, type, billing, startDate, pm, currentPhase: phase, pscCloud, sharePoint, notes });
+    if (!p.history) p.history = [];
+    // On phase change: log it, then promote Future → Not Started in the new phase folder
+    if (phase !== oldPhase) {
+      logChange(editingProjId, null, [{ field:'Phase',
+        from: oldPhase ? PHASES.find(x=>x.num===oldPhase)?.label || String(oldPhase) : 'None',
+        to:   phase    ? PHASES.find(x=>x.num===phase)?.label    || String(phase)    : 'None' }]);
+      if (phase) {
+        const ph = PHASES.find(x => x.num === phase);
+        if (ph) {
+          ARTS.forEach(a => {
+            if (!a.folder.startsWith(ph.folder)) return;
+            const e = projectEntry(editingProjId, a.id);
+            if (e.status === 'Future') {
+              if (!p.tracker) p.tracker = {};
+              p.tracker[a.id] = { ...e, status:'Not Started', lastUpdated:today() };
+              logChange(editingProjId, a.id, [{ field:'Status', from:'Future', to:'Not Started' }]);
+            }
+          });
+        }
+      }
+    }
+  } else {
+    // Create new
+    const id = newId();
+    S.projects[id] = { id, name, type, billing, startDate, pm, currentPhase: phase, pscCloud, sharePoint, notes, createdAt: today(), tracker: {}, history: [], customArts: [] };
+    S.activeProjectId = id;
+    initProjectTracker(id);
+  }
+  save(); closeProjModal(); renderAll();
+}
+
+function deleteProject(pid) {
+  if (!confirm(`Permanently delete "${S.projects[pid]?.name||'this project'}" and all its data?`)) return;
+  delete S.projects[pid];
+  const projs = allProjects();
+  S.activeProjectId = projs.length ? projs[0].id : null;
+  if (S.ui.dashFilter === pid) S.ui.dashFilter = '';
+  save(); closeProjModal(); renderAll();
+}
+
+// ═══════════════════════════════════════════════════════
+//  SETTINGS / PREFERENCES
+// ═══════════════════════════════════════════════════════
+function openSettings() {
+  document.getElementById('darkToggle').checked = !!S.global.darkMode;
+  const n = allProjects().length;
+  document.getElementById('backupInfo').textContent = `You have ${n} project${n!==1?'s':''} stored on this device.`;
+  document.getElementById('settingsOverlay').classList.add('open');
+}
+
+function closeSettings() {
+  document.getElementById('settingsOverlay').classList.remove('open');
+}
+
+function saveSettings() {
+  S.global.darkMode = document.getElementById('darkToggle').checked;
+  save(); applyTheme(); closeSettings();
+}
+
+// ═══════════════════════════════════════════════════════
+//  MISC
+// ═══════════════════════════════════════════════════════
+function toggleFolder(folder) {
+  S.ui.collapsed[folder] = !S.ui.collapsed[folder];
+  save(); renderTracker();
+}
+
+function drillToProject(pid) {
+  S.ui.dashFilter = pid;
+  save();
+  renderDashFilter();
+  document.getElementById('dashFilter').value = pid;
+  renderDashboard();
+}
+
+function jumpTo(artId, pid) {
+  // Switch active project
+  if (pid && getProject(pid)) {
+    S.activeProjectId = pid;
+    save();
+  }
+  // Switch to tracker tab
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelector('[data-tab="tracker"]').classList.add('active');
+  document.getElementById('panel-tracker').classList.add('active');
+  // Clear filters
+  S.ui.tSearch=''; S.ui.tStatus=''; S.ui.tHealth=''; S.ui.tFolder='';
+  document.getElementById('tSearch').value='';
+  document.getElementById('tStatus').value='';
+  document.getElementById('tHealth').value='';
+  document.getElementById('tFolder').value='';
+  // Expand folder
+  const a = findArt(S.activeProjectId, artId) || ARTS.find(x => x.id === artId);
+  if (a) S.ui.collapsed[a.folder] = false;
+  renderProjectSelect();
+  renderTracker();
+  setTimeout(() => openEdit(artId), 50);
+}
+
+function downloadBackup() {
+  const ts   = new Date().toISOString().replace(/[:.]/g,'-').slice(0,19);
+  const blob = new Blob([JSON.stringify(S, null, 2)], { type:'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const el   = document.createElement('a');
+  el.href=url; el.download=`framework-backup-${ts}.json`; el.click();
+  URL.revokeObjectURL(url);
+}
+
+function restoreBackup(file) {
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const p = JSON.parse(ev.target.result);
+      // Support both v1 and v2 backups
+      if (p.version === 2 || p.projects) {
+        S.projects       = p.projects || {};
+        S.activeProjectId = p.activeProjectId || null;
+        S.ui             = { ...DEF.ui, ...(p.ui || {}) };
+        S.global         = { ...DEF.global, ...(p.global || {}) };
+      } else {
+        // v1 backup
+        const id = newId();
+        S.projects[id] = {
+          id, name: p.settings?.projectName || 'Imported Project',
+          type: p.settings?.projectType || '', billing: p.settings?.billingModel || '',
+          startDate: p.settings?.startDate || '', pm: p.settings?.pm || '',
+          currentPhase: null, createdAt: today(),
+          tracker: p.tracker || {}, history: [], customArts: []
+        };
+        S.activeProjectId = id;
+        S.global.darkMode = p.settings?.darkMode ?? true;
+      }
+      save(); applyTheme(); closeSettings(); renderAll();
+      alert('Backup restored successfully.');
+    } catch { alert('Failed to restore — invalid file format.'); }
+  };
+  reader.readAsText(file);
+}
+
+// ═══════════════════════════════════════════════════════
+//  RENDER ALL
+// ═══════════════════════════════════════════════════════
+function updateStickyOffsets() {
+  requestAnimationFrame(() => {
+    const projBar  = document.querySelector('#panel-tracker .proj-bar');
+    const phaseBar = document.getElementById('phaseBar');
+    const projH    = projBar  ? projBar.offsetHeight  : 0;
+    const phaseH   = (phaseBar && phaseBar.style.display !== 'none') ? phaseBar.offsetHeight : 0;
+    document.documentElement.style.setProperty('--phase-bar-top',       `${projH}px`);
+    document.documentElement.style.setProperty('--tracker-toolbar-top', `${projH + phaseH}px`);
+  });
+}
+
+function renderAll() {
+  populateFolderFilter();
+  renderProjectSelect();
+  renderProjLinks();
+  renderDashFilter();
+  renderTracker();
+  renderDashboard();
+  renderCadence();
+}
+
+// ═══════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  load();
+  applyTheme();
+
+  // Tab switching
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(`panel-${btn.dataset.tab}`).classList.add('active');
+    });
+  });
+
+  // Project bar
+  document.getElementById('projectSelect').addEventListener('change', e => {
+    S.activeProjectId = e.target.value || null;
+    save(); renderTracker(); renderProjLinks();
+  });
+  document.getElementById('newProjBtn').addEventListener('click', openNewProject);
+  document.getElementById('editProjBtn').addEventListener('click', () => {
+    if (S.activeProjectId) openEditProject(S.activeProjectId);
+  });
+
+  // Project modal
+  document.getElementById('closeProjModal').addEventListener('click', closeProjModal);
+  document.getElementById('cancelProjModal').addEventListener('click', closeProjModal);
+  document.getElementById('saveProjModal').addEventListener('click', saveProjModal);
+  document.getElementById('deleteProjBtn').addEventListener('click', () => deleteProject(editingProjId));
+  document.getElementById('archiveProjBtn').addEventListener('click', () => {
+    if (editingProjId) archiveProject(editingProjId, !getProject(editingProjId)?.archived);
+  });
+  document.getElementById('showArchivedBtn').addEventListener('click', () => {
+    S.ui.showArchived = !S.ui.showArchived;
+    save(); renderDashFilter(); renderDashboard();
+  });
+  document.getElementById('projectOverlay').addEventListener('click', e => { if (e.target===e.currentTarget) closeProjModal(); });
+
+  // Settings
+  document.getElementById('settingsBtn').addEventListener('click', openSettings);
+  document.getElementById('closeSettings').addEventListener('click', closeSettings);
+  document.getElementById('cancelSettings').addEventListener('click', closeSettings);
+  document.getElementById('saveSettings').addEventListener('click', saveSettings);
+  document.getElementById('settingsOverlay').addEventListener('click', e => { if (e.target===e.currentTarget) closeSettings(); });
+
+  // Edit artifact modal
+  document.getElementById('closeEdit').addEventListener('click', closeEdit);
+  document.getElementById('cancelEdit').addEventListener('click', closeEdit);
+  document.getElementById('saveEdit').addEventListener('click', saveEdit);
+  document.getElementById('editOverlay').addEventListener('click', e => { if (e.target===e.currentTarget) closeEdit(); });
+
+  // Live dark mode preview in settings
+  document.getElementById('darkToggle').addEventListener('change', e => {
+    document.documentElement.setAttribute('data-theme', e.target.checked ? 'dark' : 'light');
+  });
+
+  // Auto-set date when status changes
+  document.getElementById('eUrl').addEventListener('input', updateUrlBtn);
+  document.getElementById('pPscCloud').addEventListener('input', updateProjLinkBtns);
+  document.getElementById('pSharePoint').addEventListener('input', updateProjLinkBtns);
+  document.getElementById('expandAllBtn').addEventListener('click', expandAll);
+  document.getElementById('collapseAllBtn').addEventListener('click', collapseAll);
+
+  // Custom artifact modal
+  document.getElementById('closeCa').addEventListener('click', closeCustomArt);
+  document.getElementById('cancelCa').addEventListener('click', closeCustomArt);
+  document.getElementById('saveCa').addEventListener('click', saveCustomArt);
+  document.getElementById('deleteCaBtn').addEventListener('click', () => deleteCustomArt(editingCaId));
+  document.getElementById('caOverlay').addEventListener('click', e => { if (e.target===e.currentTarget) closeCustomArt(); });
+
+  // Hide N/A toggle
+  document.getElementById('hideNABtn').addEventListener('click', () => {
+    S.ui.hideNA = !S.ui.hideNA;
+    document.getElementById('hideNABtn').classList.toggle('active', S.ui.hideNA);
+    save(); renderTracker();
+  });
+  document.getElementById('eStatus').addEventListener('change', () => {
+    if (!document.getElementById('eDate').value) document.getElementById('eDate').value = today();
+  });
+
+  // Dashboard filter
+  document.getElementById('dashFilter').addEventListener('change', e => {
+    S.ui.dashFilter = e.target.value;
+    save(); renderDashboard();
+  });
+
+  // Tracker filters
+  document.getElementById('tSearch').addEventListener('input',  e => { S.ui.tSearch = e.target.value; renderTracker(); });
+  document.getElementById('tStatus').addEventListener('change', e => { S.ui.tStatus = e.target.value; renderTracker(); });
+  document.getElementById('tHealth').addEventListener('change', e => { S.ui.tHealth = e.target.value; renderTracker(); });
+  document.getElementById('tFolder').addEventListener('change', e => { S.ui.tFolder = e.target.value; renderTracker(); });
+
+  // Cadence filters
+  document.getElementById('cSearch').addEventListener('input',  e => { S.ui.cSearch = e.target.value; renderCadence(); });
+  document.getElementById('cApplies').addEventListener('change',e => { S.ui.cApplies= e.target.value; renderCadence(); });
+
+  // Data management
+  document.getElementById('dlBackup').addEventListener('click', downloadBackup);
+  document.getElementById('restoreBtn').addEventListener('click', () => document.getElementById('restoreFile').click());
+  document.getElementById('restoreFile').addEventListener('change', e => { if (e.target.files[0]) restoreBackup(e.target.files[0]); });
+  document.getElementById('clearBtn').addEventListener('click', () => {
+    if (confirm('Permanently delete ALL projects and data? This cannot be undone.')) {
+      S = deepClone(DEF); save(); closeSettings(); renderAll();
+    }
+  });
+
+  // Keyboard shortcuts
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { closeEdit(); closeProjModal(); closeSettings(); closeCustomArt(); }
+    if ((e.ctrlKey||e.metaKey) && e.key==='Enter') {
+      if (document.getElementById('editOverlay').classList.contains('open')) saveEdit();
+      if (document.getElementById('projectOverlay').classList.contains('open')) saveProjModal();
+      if (document.getElementById('settingsOverlay').classList.contains('open')) saveSettings();
+      if (document.getElementById('caOverlay').classList.contains('open')) saveCustomArt();
+    }
+  });
+
+  renderAll();
+
+  // Service Worker registration
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  }
+});
+</script>
+</body>
+</html>

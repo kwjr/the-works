@@ -1,0 +1,2483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0c1526">
+<title>Groundwork</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="32x32" href="groundwork-icon-32.png">
+<link rel="apple-touch-icon" href="groundwork-icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0c1526; --bg2:#101c2e; --surface:#162238; --surface2:#1c2d48; --surface3:#243658;
+  --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.12); --border3:rgba(255,255,255,0.18);
+  --text:#dde6f5; --text-muted:#7a94bc; --text-dim:#3f5878;
+  --green:#34d399; --green-bg:rgba(52,211,153,.10); --green-bd:rgba(52,211,153,.20);
+  --amber:#fbbf24; --amber-bg:rgba(251,191,36,.10); --amber-bd:rgba(251,191,36,.20);
+  --red:#f87171; --red-bg:rgba(248,113,113,.10); --red-bd:rgba(248,113,113,.20);
+  --blue:#60a5fa; --blue-bg:rgba(96,165,250,.10); --blue-bd:rgba(96,165,250,.20);
+  --purple:#c084fc; --purple-bg:rgba(192,132,252,.10); --purple-bd:rgba(192,132,252,.20);
+  --accent:#34d399; --r:10px; --rs:6px; --shadow:0 8px 32px rgba(0,0,0,.5); --font:'DM Sans',system-ui,sans-serif;
+}
+html.light {
+  --bg:#f2f5fa; --bg2:#e8edf5; --surface:#fff; --surface2:#edf0f7; --surface3:#e2e7f0;
+  --border:rgba(0,0,0,.08); --border2:rgba(0,0,0,.13); --border3:rgba(0,0,0,.20);
+  --text:#141e30; --text-muted:#3d5070; --text-dim:#8a9ab8;
+  --green:#0a9e6a; --green-bg:rgba(10,158,106,.09); --green-bd:rgba(10,158,106,.22);
+  --amber:#b87a00; --amber-bg:rgba(184,122,0,.09); --amber-bd:rgba(184,122,0,.22);
+  --red:#c93535; --red-bg:rgba(201,53,53,.09); --red-bd:rgba(201,53,53,.22);
+  --blue:#1a6fcc; --blue-bg:rgba(26,111,204,.09); --blue-bd:rgba(26,111,204,.22);
+  --purple:#7c3aed; --purple-bg:rgba(124,58,237,.09); --purple-bd:rgba(124,58,237,.22);
+  --accent:#0a9e6a; --shadow:0 8px 32px rgba(0,0,0,.15);
+}
+html.light .field select option { background:#fff; color:#141e30; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;font-family:var(--font)}
+textarea,input,select{font-family:var(--font);font-size:14px}
+
+/* HEADER */
+.hdr{background:var(--bg2);border-bottom:1px solid var(--border);height:54px;padding:0 24px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:300}
+.hdr-logo{width:32px;height:32px;background:#0c1526;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;border:1px solid rgba(52,211,153,0.25)}
+html.light .hdr-logo{background:#0c1526;border-color:rgba(52,211,153,0.40)}
+.hdr-name{font-size:16px;font-weight:700;color:var(--text);line-height:1.1}
+.hdr-spacer{flex:1}
+.btn-icon{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--rs);width:34px;height:34px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:16px;transition:all .15s;flex-shrink:0}
+.btn-icon:hover{background:var(--surface3);color:var(--text)}
+
+/* TABS */
+.tabs{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;display:flex;gap:0;overflow-x:auto;position:sticky;top:54px;z-index:290}
+.tab-btn{background:none;border:none;color:var(--text-muted);font-size:13px;font-weight:500;padding:14px 18px 12px;display:flex;align-items:center;gap:7px;white-space:nowrap;transition:color .15s;border-bottom:2px solid transparent}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-btn .cnt{font-size:11px;font-weight:600;min-width:18px;background:var(--surface2);border-radius:10px;padding:1px 6px;color:var(--text-muted);text-align:center}
+.tab-btn.active .cnt{background:var(--green-bg);color:var(--green)}
+
+/* PROJECT BAR */
+.proj-bar-wrap{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;position:sticky;top:107px;z-index:280}
+.proj-bar{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:10px;height:46px}
+.proj-switcher{position:relative;display:flex;align-items:center;flex:1;min-width:0}
+.proj-current-btn{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--rs);padding:6px 12px;color:var(--text);font-size:13px;font-weight:600;transition:all .15s;max-width:380px;min-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.proj-current-btn:hover{border-color:var(--accent);background:var(--surface2)}
+.proj-current-btn.open{border-color:var(--accent)}
+.proj-btn-name{flex:1;overflow:hidden;text-overflow:ellipsis;text-align:left}
+.proj-btn-chevron{font-size:10px;color:var(--text-muted);flex-shrink:0;transition:transform .2s}
+.proj-current-btn.open .proj-btn-chevron{transform:rotate(180deg)}
+.proj-type-tag{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-bd);text-transform:uppercase;letter-spacing:.4px;flex-shrink:0;white-space:nowrap}
+.proj-phase-tag{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;background:var(--purple-bg);color:var(--purple);border:1px solid var(--purple-bd);text-transform:uppercase;letter-spacing:.4px;flex-shrink:0;white-space:nowrap}
+/* RAG */
+.rag-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;display:inline-block}
+.rag-green{background:var(--green)}
+.rag-amber{background:var(--amber)}
+.rag-red{background:var(--red)}
+.rag-none{background:var(--surface3);border:1px solid var(--border2)}
+.rag-selector{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.rag-opt{background:var(--surface2);border:1px solid var(--border2);border-radius:20px;color:var(--text-muted);font-size:12px;font-weight:500;padding:4px 12px;transition:all .15s;display:flex;align-items:center;gap:5px}
+.rag-opt:hover{border-color:var(--border3);color:var(--text)}
+.rag-opt.active-green{background:var(--green-bg);border-color:var(--green-bd);color:var(--green)}
+.rag-opt.active-amber{background:var(--amber-bg);border-color:var(--amber-bd);color:var(--amber)}
+.rag-opt.active-red{background:var(--red-bg);border-color:var(--red-bd);color:var(--red)}
+.rag-opt.active-none{background:var(--surface2);border-color:var(--border2);color:var(--text-muted)}
+/* Project dropdown */
+.proj-dropdown{position:absolute;top:calc(100% + 6px);left:0;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);box-shadow:var(--shadow);min-width:340px;max-width:440px;z-index:500;overflow:hidden;animation:fadeUp .15s ease}
+.proj-dropdown-list{max-height:280px;overflow-y:auto}
+.proj-dropdown-item{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;transition:background .12s;border-bottom:1px solid var(--border)}
+.proj-dropdown-item:last-child{border-bottom:none}
+.proj-dropdown-item:hover{background:var(--surface2)}
+.proj-dropdown-item.current{background:var(--green-bg)}
+.proj-dropdown-item.current .proj-item-name{color:var(--green)}
+.proj-item-info{flex:1;min-width:0}
+.proj-item-name{font-size:13px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.proj-item-meta{font-size:11px;color:var(--text-dim);margin-top:2px}
+.proj-item-actions{display:flex;gap:4px;flex-shrink:0;opacity:0;transition:opacity .15s}
+.proj-dropdown-item:hover .proj-item-actions{opacity:1}
+.proj-item-btn{background:none;border:none;color:var(--text-dim);padding:3px 6px;border-radius:4px;font-size:12px;transition:all .12s}
+.proj-item-btn:hover{background:var(--surface3);color:var(--text)}
+.proj-item-btn.del:hover{background:var(--red-bg);color:var(--red)}
+.proj-dropdown-footer{padding:10px 14px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:center}
+.proj-count-badge{font-size:11px;color:var(--text-dim);margin-left:auto}
+
+/* LAYOUT */
+.main{max-width:1080px;margin:0 auto;padding:24px}
+.tab-pane{display:none}
+.tab-pane.visible{display:block}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:14px}
+.card-hd{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:14px;display:flex;align-items:center;gap:7px}
+
+/* META CARD */
+.meta-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:22px;margin-bottom:16px}
+.proj-name-input{font-size:24px;font-weight:700;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text);width:100%;padding:0 0 8px;margin-bottom:18px;transition:border-color .15s;font-family:var(--font)}
+.proj-name-input:focus{outline:none;border-bottom-color:var(--accent)}
+.proj-name-input::placeholder{color:var(--text-dim)}
+.meta-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+.field label{display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);margin-bottom:5px}
+.field input,.field select,.field textarea{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--rs);color:var(--text);padding:8px 10px;transition:border-color .15s}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent)}
+.field select option{background:var(--surface2)}
+.field textarea{resize:vertical}
+.field input::placeholder,.field textarea::placeholder{color:var(--text-dim)}
+
+/* TWO/THREE COL */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:680px){.two-col,.three-col{grid-template-columns:1fr}}
+
+/* LIST EDITOR */
+.list-item{display:flex;align-items:flex-start;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);animation:fadeUp .15s ease}
+.list-item:last-child{border-bottom:none}
+.list-num{font-size:11px;font-weight:600;color:var(--text-dim);min-width:18px;padding-top:9px}
+.list-ta{flex:1;background:transparent;border:none;color:var(--text);padding:7px 0;resize:none;min-height:34px;line-height:1.5;overflow:hidden}
+.list-ta:focus{outline:none}
+.list-ta::placeholder{color:var(--text-dim)}
+.list-del{background:none;border:none;color:var(--text-dim);padding:7px 4px;opacity:0;transition:opacity .15s,color .15s;font-size:14px}
+.list-item:hover .list-del{opacity:1}
+.list-del:hover{color:var(--red)}
+.add-btn{background:none;border:1px dashed var(--border2);border-radius:var(--rs);color:var(--text-dim);padding:8px 12px;width:100%;text-align:left;font-size:13px;margin-top:8px;transition:all .15s;display:flex;align-items:center;gap:6px}
+.add-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* BUTTONS */
+.btn{border:none;border-radius:var(--rs);padding:8px 16px;font-size:13px;font-weight:500;transition:all .15s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;font-family:var(--font)}
+.btn-primary{background:var(--green);color:#0c1526}
+.btn-primary:hover{filter:brightness(1.08)}
+.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border2)}
+.btn-secondary:hover{background:var(--surface3)}
+.btn-ghost{background:transparent;color:var(--text-muted)}
+.btn-ghost:hover{background:var(--surface2);color:var(--text)}
+.btn-danger{background:var(--red-bg);color:var(--red);border:1px solid var(--red-bd)}
+.btn-danger:hover{background:rgba(248,113,113,.18)}
+.btn-ai{background:var(--purple-bg);color:var(--purple);border:1px solid var(--purple-bd)}
+.btn-ai:hover{background:rgba(192,132,252,.18)}
+.btn-sm{padding:5px 10px;font-size:12px}
+
+/* TOOLBAR */
+.toolbar{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.search-wrap{flex:1;position:relative}
+.search-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-dim);pointer-events:none}
+.search-wrap input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);color:var(--text);padding:8px 12px 8px 34px;font-size:13px;font-family:var(--font);transition:border-color .15s}
+.search-wrap input:focus{outline:none;border-color:var(--accent)}
+.search-wrap input::placeholder{color:var(--text-dim)}
+
+/* TEMPLATE STRIP */
+.tmpl-strip{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.tmpl-strip-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);margin-bottom:7px}
+.tmpl-btn{background:var(--surface2);border:1px solid var(--border2);border-radius:20px;color:var(--text-muted);font-size:12px;font-weight:500;padding:4px 12px;transition:all .15s;font-family:var(--font)}
+.tmpl-btn:hover{border-color:var(--accent);color:var(--accent)}
+.tmpl-btn.active{background:var(--green-bg);border-color:var(--green-bd);color:var(--green)}
+
+/* INLINE MEETING FORM */
+.mtg-form-card{background:var(--surface);border:1px solid var(--green-bd);border-top:3px solid var(--green);border-radius:var(--r);padding:24px;margin-bottom:16px;animation:fadeUp .2s ease}
+.mtg-form-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.mtg-form-hd-title{font-size:15px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px}
+.mtg-form-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
+
+/* MEETING CARDS */
+.meeting-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:10px;overflow:hidden;transition:border-color .15s;animation:fadeUp .2s ease}
+.meeting-card:hover{border-color:var(--border2)}
+.meeting-hdr{display:flex;align-items:center;gap:10px;padding:13px 16px;cursor:pointer;user-select:none}
+.date-badge{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:3px 10px;font-size:11px;font-weight:600;color:var(--text-muted);white-space:nowrap;flex-shrink:0}
+.meeting-title-txt{flex:1;font-size:14px;font-weight:600;color:var(--text)}
+.meeting-meta-txt{font-size:12px;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px}
+.modified-tag{font-size:11px;color:var(--text-dim);white-space:nowrap;flex-shrink:0}
+.chevron{color:var(--text-dim);font-size:11px;transition:transform .2s;flex-shrink:0}
+.meeting-card.open .chevron{transform:rotate(180deg)}
+.meeting-body{display:none;border-top:1px solid var(--border);padding:16px}
+.meeting-card.open .meeting-body{display:block}
+.section-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);margin-bottom:8px}
+.notes-text{font-size:13px;color:var(--text-muted);line-height:1.7;white-space:pre-wrap}
+.dec-pill{display:inline-flex;background:var(--blue-bg);border:1px solid var(--blue-bd);border-radius:20px;padding:4px 10px;font-size:12px;color:var(--blue);margin:2px}
+.action-chip{display:flex;align-items:flex-start;gap:8px;padding:6px 10px;background:var(--surface2);border-radius:var(--rs);font-size:12px;color:var(--text-muted);margin-bottom:4px}
+.mtg-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;padding-top:12px;border-top:1px solid var(--border);flex-wrap:wrap}
+
+/* DECISION CARDS */
+.decision-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:10px;animation:fadeUp .2s ease}
+.dec-num{font-size:11px;font-weight:700;background:var(--blue-bg);border:1px solid var(--blue-bd);border-radius:5px;color:var(--blue);padding:2px 8px;flex-shrink:0}
+.dec-text{font-size:14px;font-weight:600;color:var(--text);flex:1}
+.dec-meta{font-size:12px;color:var(--text-dim);display:flex;gap:12px;flex-wrap:wrap;margin:6px 0 4px}
+.dec-rationale{font-size:13px;color:var(--text-muted);line-height:1.65}
+.status-pill{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.3px}
+.s-final{background:var(--green-bg);color:var(--green)}
+.s-open{background:var(--amber-bg);color:var(--amber)}
+.s-superseded{background:var(--surface2);color:var(--text-dim)}
+
+/* AI */
+.ai-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+@media(max-width:900px){.ai-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.ai-grid{grid-template-columns:1fr}}
+.ai-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;display:flex;flex-direction:column;gap:10px;transition:border-color .2s}
+.ai-card:hover{border-color:var(--purple-bd)}
+.ai-card-ico{width:38px;height:38px;background:var(--purple-bg);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:19px}
+.ai-card-title{font-size:14px;font-weight:600;color:var(--text)}
+.ai-card-desc{font-size:12px;color:var(--text-muted);line-height:1.55;flex:1}
+.ai-result-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:14px;animation:fadeUp .3s ease}
+.ai-result-hd{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--purple);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.ai-result-hd button{margin-left:auto}
+.ai-result-text{font-size:13px;color:var(--text-muted);line-height:1.75;white-space:pre-wrap}
+/* Structured text renderer */
+.ai-text-body{font-size:13px;line-height:1.7}
+.ai-sec-hd{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin:16px 0 6px;padding-bottom:5px;border-bottom:1px solid var(--border)}
+.ai-sec-hd:first-child{margin-top:0}
+.ai-para{color:var(--text-muted);margin-bottom:5px}
+.ai-label-line{color:var(--text-muted);margin-bottom:5px}
+.ai-label-line strong{color:var(--text);font-weight:600}
+.ai-bullet{display:flex;gap:8px;color:var(--text-muted);margin-bottom:3px;padding-left:4px}
+.ai-bullet-dot{color:var(--accent);flex-shrink:0;font-size:16px;line-height:1.4}
+.ai-numbered{display:flex;gap:8px;color:var(--text-muted);margin-bottom:3px;padding-left:4px}
+.ai-num{color:var(--text-dim);font-size:11px;font-weight:700;min-width:18px;padding-top:2px;flex-shrink:0}
+.ai-arrow{color:var(--green);font-size:13px;margin-bottom:5px;padding-left:4px}
+.ai-check{display:flex;gap:8px;color:var(--text-muted);margin-bottom:5px;padding-left:4px;align-items:flex-start}
+.ai-check-box{font-size:14px;flex-shrink:0;min-width:18px;color:var(--text-dim)}
+.ai-check-box.checked{color:var(--green)}
+.ai-spacer{height:8px}
+/* Timestamp & copy button */
+.ai-result-ts{font-size:11px;color:var(--text-dim);font-weight:400;margin-left:8px;white-space:nowrap}
+.ai-result-actions{margin-left:auto;display:flex;gap:6px;flex-shrink:0}
+/* Project Summary status cards */
+.sum-grid{margin-bottom:4px}
+.sum-row{padding:10px 0;border-bottom:1px solid var(--border)}
+.sum-row:last-child{border-bottom:none}
+.sum-row-hd{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.sum-row-label{font-size:13px;font-weight:600;color:var(--text)}
+.sum-row-notes{font-size:13px;color:var(--text-muted);line-height:1.55;padding-left:0}
+.sum-act{padding:12px 0;border-top:1px solid var(--border)}
+.sum-act-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);margin-bottom:5px}
+.sum-act-text{font-size:13px;color:var(--text-muted);line-height:1.55}
+.risk-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.risk-row:last-child{border-bottom:none}
+.risk-lvl{font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;text-transform:uppercase;flex-shrink:0;margin-top:2px}
+.r-high{background:var(--red-bg);color:var(--red)}
+.r-medium{background:var(--amber-bg);color:var(--amber)}
+.r-low{background:var(--green-bg);color:var(--green)}
+.risk-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px}
+.risk-detail{font-size:12px;color:var(--text-muted);margin-bottom:3px}
+.risk-mit{font-size:12px;color:var(--green)}
+.spinner-wrap{display:flex;align-items:center;gap:10px;padding:20px 0;color:var(--text-muted);font-size:13px}
+.spinner{width:18px;height:18px;border:2px solid var(--border2);border-top-color:var(--purple);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
+.ask-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:14px}
+.ask-ta{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--rs);color:var(--text);padding:10px 14px;resize:vertical;min-height:80px;font-size:13px;line-height:1.55;margin-bottom:10px;font-family:var(--font);transition:border-color .15s}
+.ask-ta:focus{outline:none;border-color:var(--purple)}
+.ask-ta::placeholder{color:var(--text-dim)}
+.ask-row{display:flex;gap:8px;justify-content:flex-end}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(4px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:24px;animation:fadeIn .15s ease}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:28px;width:100%;max-width:620px;max-height:88vh;overflow-y:auto;box-shadow:var(--shadow);animation:slideUp .2s ease}
+.modal-sm{max-width:420px}
+.modal-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:20px;display:flex;align-items:center;gap:9px}
+.modal-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
+
+/* SETTINGS */
+.settings-section{margin-bottom:24px}
+.settings-section:last-child{margin-bottom:0}
+.settings-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
+.settings-row:last-child{border-bottom:none}
+.settings-row-label{font-size:14px;color:var(--text)}
+.settings-row-sub{font-size:12px;color:var(--text-muted);margin-top:2px}
+.toggle{position:relative;width:42px;height:24px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0;position:absolute}
+.toggle-track{position:absolute;inset:0;background:var(--surface3);border-radius:12px;border:1px solid var(--border2);cursor:pointer;transition:background .2s,border-color .2s}
+.toggle input:checked+.toggle-track{background:var(--accent);border-color:var(--accent)}
+.toggle-track::after{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:2px;left:2px;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.toggle input:checked+.toggle-track::after{transform:translateX(18px)}
+.api-key-wrap{display:flex;gap:8px;width:100%;margin-top:8px}
+.api-key-input{flex:1;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--rs);color:var(--text);padding:8px 10px;font-size:13px;font-family:var(--font)}
+.api-key-input:focus{outline:none;border-color:var(--accent)}
+.api-key-input::placeholder{color:var(--text-dim)}
+.api-key-status{font-size:12px;margin-top:6px;display:flex;align-items:center;gap:5px}
+.api-key-set{color:var(--green)}
+.api-key-unset{color:var(--text-dim)}
+.backup-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+.backup-card:last-child{margin-bottom:0}
+.backup-card-name{font-size:13px;font-weight:600;color:var(--text)}
+.backup-card-meta{font-size:12px;color:var(--text-muted);margin-top:2px}
+.backup-list{max-height:200px;overflow-y:auto;margin-top:8px}
+
+/* AUTOSAVE INDICATOR */
+.autosave-ind{position:fixed;bottom:20px;right:20px;background:var(--green-bg);border:1px solid var(--green-bd);color:var(--green);border-radius:var(--rs);padding:6px 14px;font-size:12px;font-weight:600;opacity:0;transition:opacity .3s;z-index:400;pointer-events:none;display:flex;align-items:center;gap:5px}
+.autosave-ind.visible{opacity:1}
+
+/* EMPTY / MISC */
+.empty{text-align:center;padding:52px 24px;color:var(--text-dim)}
+.empty-ico{font-size:36px;margin-bottom:12px;opacity:.5}
+.empty-msg{font-size:14px;color:var(--text-muted);margin-bottom:4px}
+.empty-sub{font-size:12px;color:var(--text-dim);margin-bottom:16px}
+.toast{position:fixed;bottom:60px;left:50%;transform:translateX(-50%);background:var(--surface3);border:1px solid var(--border2);border-radius:8px;padding:10px 18px;font-size:13px;font-weight:500;color:var(--text);box-shadow:var(--shadow);animation:toastIn .2s ease,toastOut .3s ease 1.7s forwards;z-index:9999;white-space:nowrap}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+@keyframes toastOut{from{opacity:1}to{opacity:0}}
+mark.hl{background:rgba(251,191,36,.22);border-radius:2px;color:var(--amber)}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:3px}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes slideUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* -- ACTION ITEMS ----------------------------------------------------------- */
+.action-item-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:8px;animation:fadeUp .2s ease;transition:border-color .15s}
+.action-item-card:hover{border-color:var(--border2)}
+.action-item-card.psa-done{border-left:3px solid var(--green);opacity:.7}
+.action-item-card.overdue-card{border-left:3px solid var(--red)}
+.ai-card-row{display:flex;align-items:flex-start;gap:10px}
+.ai-id{font-size:11px;font-weight:700;color:var(--text-dim);min-width:38px;padding-top:2px;flex-shrink:0}
+.ai-main{flex:1;min-width:0}
+.ai-desc{font-size:14px;font-weight:600;color:var(--text);line-height:1.4;margin-bottom:4px}
+.ai-meta-row{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--text-dim);align-items:center;margin-bottom:4px}
+.ai-notes-text{font-size:12px;color:var(--text-muted);margin-top:2px}
+.ai-card-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:10px;padding-top:8px;border-top:1px solid var(--border);flex-wrap:wrap;align-items:center}
+.pdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:inline-block}
+.pd-high{background:var(--red)}.pd-medium{background:var(--amber)}.pd-low{background:var(--green)}
+.act-status{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.3px}
+.as-open{background:var(--blue-bg);color:var(--blue)}
+.as-inprogress{background:var(--amber-bg);color:var(--amber)}
+.as-complete{background:var(--green-bg);color:var(--green)}
+.as-cancelled{background:var(--surface2);color:var(--text-dim)}
+.overdue-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--red-bg);color:var(--red);text-transform:uppercase}
+.psa-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--green-bg);color:var(--green);border:1px solid var(--green-bd);display:inline-flex;align-items:center;gap:4px}
+.btn-psa{background:transparent;color:var(--text-dim);border:1px solid var(--border2);border-radius:var(--rs);font-size:11px;font-weight:600;padding:3px 10px;transition:all .15s;font-family:var(--font);cursor:pointer}
+.btn-psa:hover{border-color:var(--green-bd);color:var(--green);background:var(--green-bg)}
+.filter-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.filter-btn{background:var(--surface2);border:1px solid var(--border2);border-radius:20px;color:var(--text-muted);font-size:12px;font-weight:500;padding:4px 12px;transition:all .15s;font-family:var(--font);cursor:pointer}
+.filter-btn:hover{border-color:var(--border3);color:var(--text)}
+.filter-btn.factive{background:var(--green-bg);border-color:var(--green-bd);color:var(--green)}
+.filter-btn.factive.f-overdue{background:var(--red-bg);border-color:var(--red-bd);color:var(--red)}
+/* -- ANALYSIS TAB ----------------------------------------------------------- */
+.analysis-sec{margin-bottom:20px}
+.analysis-sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.analysis-sec-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);display:flex;align-items:center;gap:7px}
+.analysis-entry{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:10px;animation:fadeUp .2s ease}
+.analysis-entry-hd{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.analysis-ts{font-size:11px;color:var(--text-dim)}
+.hidden{display:none!important}
+.tag{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px;background:var(--surface2);color:var(--text-muted);border:1px solid var(--border)}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="hdr-logo" aria-label="Groundwork">
+    <svg viewBox="0 0 96 96" width="26" height="26" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <polygon points="48,16 82,35 48,54 14,35" fill="#34d399" opacity="0.92"/>
+      <polygon points="14,35 48,54 48,84 14,65"  fill="#34d399" opacity="0.42"/>
+      <polygon points="82,35 48,54 48,84 82,65"  fill="#34d399" opacity="0.65"/>
+    </svg>
+  </div>
+  <div><div class="hdr-name">Groundwork</div></div>
+  <div class="hdr-spacer"></div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <input type="file" id="importFile" accept=".json" class="hidden" onchange="importData(event)">
+    <button class="btn-icon" onclick="openSettings()" title="Settings">⚙</button>
+  </div>
+</header>
+
+<!-- TABS -->
+<nav class="tabs" role="tablist">
+  <button class="tab-btn active" data-tab="charter"  onclick="switchTab('charter')"  role="tab">📋 Charter</button>
+  <button class="tab-btn" data-tab="meetings"  onclick="switchTab('meetings')" role="tab">📝 Meetings  <span class="cnt" id="cnt-meetings">0</span></button>
+  <button class="tab-btn" data-tab="decisions" onclick="switchTab('decisions')"role="tab">⚖️ Decisions <span class="cnt" id="cnt-decisions">0</span></button>
+  <button class="tab-btn" data-tab="actions"   onclick="switchTab('actions')"  role="tab">✅ Actions <span class="cnt" id="cnt-actions"></span></button>
+  <button class="tab-btn" data-tab="analysis"  onclick="switchTab('analysis')" role="tab">📊 Analysis</button>
+  <button class="tab-btn" data-tab="ai"        onclick="switchTab('ai')"       role="tab">✦ AI Insights</button>
+</nav>
+
+<!-- PROJECT BAR -->
+<div class="proj-bar-wrap">
+  <div class="proj-bar">
+    <div class="proj-switcher" id="projSwitcher">
+      <button class="proj-current-btn" id="projCurrentBtn" onclick="toggleProjDropdown()">
+        <span class="rag-dot rag-none" id="projBarRag"></span>
+        <span class="proj-btn-name" id="projBtnName">—</span>
+        <span class="proj-type-tag hidden" id="projBtnType"></span>
+        <span class="proj-phase-tag hidden" id="projBtnPhase"></span>
+        <span class="proj-btn-chevron">▼</span>
+      </button>
+      <div class="proj-dropdown hidden" id="projDropdown">
+        <div class="proj-dropdown-list" id="projDropdownList"></div>
+        <div class="proj-dropdown-footer">
+          <button class="btn btn-primary btn-sm" onclick="newProject()">＋ New Project</button>
+          <span class="proj-count-badge" id="projCountBadge"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AUTOSAVE INDICATOR -->
+<div class="autosave-ind" id="autosaveInd">✓ Saved</div>
+
+<!-- MAIN -->
+<main class="main">
+
+<!-- CHARTER -->
+<section class="tab-pane visible" id="pane-charter">
+  <div class="meta-card">
+    <input class="proj-name-input" id="projName" type="text" placeholder="Project Name" autocomplete="off" oninput="sf('name',this.value)">
+    <div class="meta-grid">
+      <div class="field"><label>Project Type</label>
+        <select id="projType" onchange="sf('type',this.value)">
+          <option value="">Select…</option><option>Conversion</option><option>Implementation</option><option>Agile</option><option>Consulting</option>
+        </select></div>
+      <div class="field"><label>Current Phase</label>
+        <select id="projPhase" onchange="sf('phase',this.value)">
+          <option value="">Select…</option><option>Initiation</option><option>Discovery</option><option>Implementation</option><option>Testing</option><option>Go-Live</option><option>Closure</option>
+        </select></div>
+      <div class="field"><label>Billing Model</label>
+        <select id="projBilling" onchange="sf('billing',this.value)">
+          <option value="">Select…</option><option>T&M</option><option>Fixed-Fee</option>
+        </select></div>
+      <div class="field"><label>Project Manager</label><input type="text" id="projPM"      placeholder="Name" oninput="sf('pm',this.value)"></div>
+      <div class="field"><label>Exec Sponsor</label>   <input type="text" id="projSponsor"  placeholder="Name" oninput="sf('sponsor',this.value)"></div>
+      <div class="field"><label>PSCloud / SharePoint</label><input type="url" id="projLink" placeholder="https://…" oninput="sf('link',this.value)"></div>
+      <div class="field"><label>Start Date</label>    <input type="date" id="projStart"  onchange="sf('startDate',this.value)"></div>
+      <div class="field"><label>Target Go-Live</label><input type="date" id="projTarget" onchange="sf('targetDate',this.value)"></div>
+    </div>
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+      <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);margin-bottom:8px">Project Status (RAG)</div>
+      <div class="rag-selector" id="ragSelector">
+        <button class="rag-opt active-none" data-rag="" onclick="setRag('')">— None</button>
+        <button class="rag-opt" data-rag="green" onclick="setRag('green')"><span class="rag-dot rag-green"></span>Green</button>
+        <button class="rag-opt" data-rag="amber" onclick="setRag('amber')"><span class="rag-dot rag-amber"></span>Amber</button>
+        <button class="rag-opt" data-rag="red"   onclick="setRag('red')"  ><span class="rag-dot rag-red"  ></span>Red</button>
+      </div>
+    </div>
+  </div>
+  <div class="two-col">
+    <div class="card"><div class="card-hd">🎯 Scope</div>
+      <div class="field" style="margin:0"><textarea id="scopeText" rows="6" placeholder="What is included in this project?" oninput="scf('scope',this.value)"></textarea></div></div>
+    <div class="card"><div class="card-hd">🚫 Out of Scope</div>
+      <div class="field" style="margin:0"><textarea id="oosText" rows="6" placeholder="What is explicitly excluded?" oninput="scf('outOfScope',this.value)"></textarea></div></div>
+  </div>
+  <div class="card"><div class="card-hd">🏆 Objectives</div>
+    <div class="list-editor" id="list-objectives"></div>
+    <button class="add-btn" onclick="addItem('objectives')">＋ Add objective</button></div>
+  <div class="two-col">
+    <div class="card"><div class="card-hd">💭 Assumptions</div>
+      <div class="list-editor" id="list-assumptions"></div>
+      <button class="add-btn" onclick="addItem('assumptions')">＋ Add assumption</button></div>
+    <div class="card"><div class="card-hd">⛓️ Constraints</div>
+      <div class="list-editor" id="list-constraints"></div>
+      <button class="add-btn" onclick="addItem('constraints')">＋ Add constraint</button></div>
+  </div>
+  <div class="card"><div class="card-hd">✅ Success Criteria</div>
+    <div class="list-editor" id="list-successCriteria"></div>
+    <button class="add-btn" onclick="addItem('successCriteria')">＋ Add success criterion</button></div>
+  <div class="card"><div class="card-hd">📣 Stakeholders</div>
+    <div class="list-editor" id="list-stakeholders"></div>
+    <button class="add-btn" onclick="addItem('stakeholders')">＋ Add stakeholder</button></div>
+</section>
+
+<!-- MEETINGS -->
+<section class="tab-pane hidden" id="pane-meetings">
+  <div class="toolbar">
+    <div class="search-wrap">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="search" id="q-meetings" placeholder="Search meetings, notes, decisions, actions…" oninput="renderMeetings()">
+    </div>
+    <button class="btn btn-primary" id="logMtgBtn" onclick="openMtgModal()">＋ Log Meeting</button>
+  </div>
+  <!-- Inline form -->
+  <div id="meeting-form" class="hidden">
+    <div class="mtg-form-card">
+      <div class="mtg-form-hd">
+        <div class="mtg-form-hd-title">📝 <span id="mtgFormLbl">Log Meeting</span></div>
+        <button class="btn btn-ghost btn-sm" onclick="closeMtgModal()">✕ Discard</button>
+      </div>
+      <input type="hidden" id="mtgId">
+      <!-- Templates -->
+      <div style="margin-bottom:16px">
+        <div class="tmpl-strip-label">Start from template</div>
+        <div class="tmpl-strip" id="tmplStrip">
+          <button class="tmpl-btn active" onclick="applyTemplate('blank',event)">Blank</button>
+          <button class="tmpl-btn" onclick="applyTemplate('status',event)">Status Call</button>
+          <button class="tmpl-btn" onclick="applyTemplate('team',event)">Team Meeting</button>
+          <button class="tmpl-btn" onclick="applyTemplate('sponsor',event)">Sponsor Check-in</button>
+          <button class="tmpl-btn" onclick="applyTemplate('discovery',event)">Discovery Workshop</button>
+          <button class="tmpl-btn" onclick="applyTemplate('kickoff',event)">Project Kickoff</button>
+          <button class="tmpl-btn" onclick="applyTemplate('golive',event)">Go-Live Review</button>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="field"><label>Date</label><input type="date" id="mDate"></div>
+        <div class="field"><label>Duration</label><input type="text" id="mDur" placeholder="e.g. 60 min"></div>
+      </div>
+      <div class="field"><label>Meeting Title</label><input type="text" id="mTitle" placeholder="e.g. Weekly Status Call"></div>
+      <div class="field"><label>Attendees</label><input type="text" id="mAttendees" placeholder="Comma-separated names or roles"></div>
+      <div class="field"><label>Notes</label><textarea id="mNotes" rows="9" placeholder="Key discussion points, topics covered, context…"></textarea></div>
+      <div class="two-col">
+      <div class="field">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+            <label style="margin:0">Decisions Made</label>
+            <div style="display:flex;align-items:center;gap:7px;flex-shrink:0">
+              <span style="font-size:11px;font-weight:500;color:var(--text-muted)">Log to Decisions</span>
+              <label class="toggle"><input type="checkbox" id="mLogDecisions"><span class="toggle-track"></span></label>
+            </div>
+          </div>
+          <textarea id="mDecisions" rows="4" placeholder="One decision per line…"></textarea>
+        </div>
+        <div class="field">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+            <label style="margin:0">Action Items</label>
+            <div style="display:flex;align-items:center;gap:7px;flex-shrink:0">
+              <span style="font-size:11px;font-weight:500;color:var(--text-muted)">Log to Actions</span>
+              <label class="toggle"><input type="checkbox" id="mLogActions"><span class="toggle-track"></span></label>
+            </div>
+          </div>
+          <textarea id="mActions" rows="4" placeholder="Owner: Action (due date)&#10;e.g. Kenneth: Review data mapping by Fri"></textarea>
+        </div>
+      </div>
+      <div class="mtg-form-footer">
+        <button class="btn btn-ghost" onclick="closeMtgModal()">Discard</button>
+        <button class="btn btn-primary" onclick="saveMtg()">Save Meeting</button>
+      </div>
+    </div>
+  </div>
+  <div id="meetings-list"></div>
+</section>
+
+<!-- DECISIONS -->
+<section class="tab-pane hidden" id="pane-decisions">
+  <div class="toolbar">
+    <div class="search-wrap">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="search" id="q-decisions" placeholder="Search decisions…" oninput="renderDecisions()">
+    </div>
+    <button class="btn btn-primary" onclick="openDecModal()">＋ Log Decision</button>
+  </div>
+  <div id="decisions-list"></div>
+</section>
+
+<!-- AI INSIGHTS -->
+<section class="tab-pane hidden" id="pane-ai">
+  <div class="ai-grid">
+    <div class="ai-card"><div class="ai-card-ico">🔍</div><div class="ai-card-title">Risk Analysis</div>
+      <div class="ai-card-desc">Surface potential risks from charter, assumptions, constraints, and meeting notes — each rated with a mitigation idea.</div>
+      <button class="btn btn-ai" onclick="runAI('risks')">Analyze Risks</button></div>
+    <div class="ai-card"><div class="ai-card-ico">📅</div><div class="ai-card-title">Generate Agenda</div>
+      <div class="ai-card-desc">Build a structured agenda for your next meeting based on open decisions, unresolved items, and recent notes.</div>
+      <button class="btn btn-ai" onclick="runAI('agenda')">Generate Agenda</button></div>
+    <div class="ai-card"><div class="ai-card-ico">📊</div><div class="ai-card-title">Project Summary</div>
+      <div class="ai-card-desc">Generate an executive-level status update from your charter, meetings, and decision log.</div>
+      <button class="btn btn-ai" onclick="runAI('summary')">Summarize Status</button></div>
+    <div class="ai-card"><div class="ai-card-ico">📋</div><div class="ai-card-title">Extract Action Items</div>
+      <div class="ai-card-desc">Paste raw meeting notes in the box below and extract structured action items with owners and due dates.</div>
+      <button class="btn btn-ai" onclick="primeExtract()">Extract Actions</button></div>
+    <div class="ai-card"><div class="ai-card-ico">🔀</div><div class="ai-card-title">Change Request</div>
+      <div class="ai-card-desc">Describe a proposed scope change below and get a drafted change request brief with impact analysis.</div>
+      <button class="btn btn-ai" onclick="primeChangeRequest()">Draft Change Request</button></div>
+    <div class="ai-card"><div class="ai-card-ico">🗺️</div><div class="ai-card-title">Scope Review</div>
+      <div class="ai-card-desc">Analyze scope statements and notes to identify potential scope creep, gaps, or misaligned expectations.</div>
+      <button class="btn btn-ai" onclick="runAI('scope')">Review Scope</button></div>
+    <div class="ai-card"><div class="ai-card-ico">📣</div><div class="ai-card-title">Sponsor Update</div>
+      <div class="ai-card-desc">Draft a concise internal project update for your executive sponsor — status, decisions needed, risks, and next steps.</div>
+      <button class="btn btn-ai" onclick="runAI('stakeholder')">Draft Update</button></div>
+    <div class="ai-card"><div class="ai-card-ico">🗒️</div><div class="ai-card-title">Meeting Debrief</div>
+      <div class="ai-card-desc">Paste notes from a just-finished meeting to get a structured summary: decisions, actions, open questions, and a shareable recap.</div>
+      <button class="btn btn-ai" onclick="openDebriefModal()">Debrief Meeting</button></div>
+  </div>
+  <div class="ask-section">
+    <div class="card-hd" style="margin-bottom:12px">✦ Ask Groundwork</div>
+    <textarea class="ask-ta" id="askPrompt" placeholder="Ask anything about this project… or paste raw notes for Extract Actions / Debrief / Change Request."></textarea>
+    <div class="ask-row">
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('askPrompt').value=''">Clear</button>
+      <button class="btn btn-ai" onclick="runAI('ask')">✦ Ask</button>
+    </div>
+  </div>
+  <div id="ai-results"></div>
+</section>
+
+<!-- ACTIONS -->
+<section class="tab-pane hidden" id="pane-actions">
+  <div class="toolbar">
+    <div class="search-wrap">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="search" id="q-actions" placeholder="Search action items…" oninput="renderActions()">
+    </div>
+    <button class="btn btn-primary" onclick="openActionModal()">＋ Add Action</button>
+    <button class="btn btn-secondary" onclick="pushToBusywork()" title="Push open actions to Busywork" style="display:flex;align-items:center;gap:6px;">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      Busywork
+    </button>
+  </div>
+  <div class="filter-bar" id="actionFilterBar">
+    <button class="filter-btn factive"   data-filter="open"       onclick="setActionFilter('open')">Open</button>
+    <button class="filter-btn"           data-filter="inprogress" onclick="setActionFilter('inprogress')">In Progress</button>
+    <button class="filter-btn f-overdue" data-filter="overdue"    onclick="setActionFilter('overdue')">Overdue</button>
+    <button class="filter-btn"           data-filter="complete"   onclick="setActionFilter('complete')">Complete</button>
+    <button class="filter-btn"           data-filter="all"        onclick="setActionFilter('all')">All</button>
+  </div>
+  <div id="actions-list"></div>
+</section>
+
+<!-- ANALYSIS -->
+<section class="tab-pane hidden" id="pane-analysis">
+  <div id="analysis-content"></div>
+</section>
+
+</main>
+
+<!-- ACTION ITEM MODAL -->
+<div id="actionModal" class="overlay hidden" role="dialog" aria-modal="true">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-title">✅ <span id="actionModalLbl">Add Action Item</span></div>
+    <input type="hidden" id="actionId">
+    <div class="field"><label>Action Description *</label>
+      <textarea id="aText" rows="3" placeholder="What needs to be done?"></textarea></div>
+    <div class="two-col">
+      <div class="field"><label>Owner</label><input type="text" id="aOwner" placeholder="Name or role"></div>
+      <div class="field"><label>Due Date</label><input type="date" id="aDue"></div>
+    </div>
+    <div class="two-col">
+      <div class="field"><label>Priority</label>
+        <select id="aPriority"><option>High</option><option selected>Medium</option><option>Low</option></select></div>
+      <div class="field"><label>Status</label>
+        <select id="aStatus"><option selected>Open</option><option>In Progress</option><option>Complete</option><option>Cancelled</option></select></div>
+    </div>
+    <div class="field"><label>Source</label>
+      <input type="text" id="aSource" placeholder="e.g. Status Call 6/3, or Manual"></div>
+    <div class="field"><label>Notes</label>
+      <textarea id="aNotes" rows="2" placeholder="Additional context…"></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeActionModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveAction()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- DEBRIEF MODAL -->
+<div id="debriefModal" class="overlay hidden" role="dialog" aria-modal="true">
+  <div class="modal" style="max-width:660px">
+    <div class="modal-title">🗒️ Meeting Debrief</div>
+    <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">Paste your meeting transcript or notes below, or upload a plain-text file (.txt, .md, .vtt). The AI will produce a structured debrief with a summary, decisions, action items, open questions, and key discussion points.</p>
+    <div class="field">
+      <label>Transcript / Meeting Notes</label>
+      <textarea id="debriefInput" rows="14" placeholder="Paste meeting transcript, notes, or minutes here…" style="resize:vertical"></textarea>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;margin-top:8px;flex-wrap:wrap">
+      <button class="btn btn-secondary btn-sm" onclick="document.getElementById('debriefFile').click()">📎 Upload file (.txt, .md, .vtt)</button>
+      <input type="file" id="debriefFile" accept=".txt,.md,.vtt,.csv" class="hidden" onchange="loadDebriefFile(event)">
+      <span id="debriefFileName" style="font-size:12px;color:var(--text-muted)"></span>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeDebriefModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="runDebriefFromModal()">▶ Run Debrief</button>
+    </div>
+  </div>
+</div>
+
+<!-- DECISION MODAL -->
+<div id="decModal" class="overlay hidden" role="dialog" aria-modal="true">
+  <div class="modal">
+    <div class="modal-title">⚖️ <span id="decModalLbl">Log Decision</span></div>
+    <input type="hidden" id="decId">
+    <div class="two-col">
+      <div class="field"><label>Date</label><input type="date" id="dDate"></div>
+      <div class="field"><label>Made By</label><input type="text" id="dMadeBy" placeholder="Name or role"></div>
+    </div>
+    <div class="field"><label>Decision</label><input type="text" id="dText" placeholder="What was decided?"></div>
+    <div class="field"><label>Rationale</label><textarea id="dRationale" rows="4" placeholder="Why was this decided?"></textarea></div>
+    <div class="field"><label>Impact / Notes</label><textarea id="dImpact" rows="2" placeholder="What does this affect?"></textarea></div>
+    <div class="field"><label>Status</label>
+      <select id="dStatus"><option value="final">Final</option><option value="open">Open / Pending</option><option value="superseded">Superseded</option></select></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeDecModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveDec()">Save Decision</button>
+    </div>
+  </div>
+</div>
+
+<!-- PROJECT MODAL -->
+<div id="projModal" class="overlay hidden" role="dialog" aria-modal="true">
+  <div class="modal modal-sm">
+    <div class="modal-title">📁 <span id="projModalLbl">New Project</span></div>
+    <input type="hidden" id="projModalId">
+    <div class="field"><label>Project Name</label><input type="text" id="projModalName" placeholder="e.g. Acme Corp Implementation" autocomplete="off"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeProjModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveProjModal()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div id="settingsModal" class="overlay hidden" role="dialog" aria-modal="true">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-title">⚙ Settings</div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">AI Features</div>
+      <div style="padding:10px 0">
+        <div class="settings-row-label">Anthropic API Key</div>
+        <div class="settings-row-sub">Stored in your browser only. Required for AI Insights when running outside claude.ai.</div>
+        <div class="api-key-wrap">
+          <input class="api-key-input" type="password" id="apiKeyInput" placeholder="sk-ant-api03-…" autocomplete="off">
+          <button class="btn btn-ghost btn-sm" onclick="toggleApiVis()" id="apiVisBtn">Show</button>
+          <button class="btn btn-primary btn-sm" onclick="saveApiKey()">Save</button>
+        </div>
+        <div class="api-key-status" id="apiKeyStatus">
+          <span class="api-key-unset">○ Not set — AI features will only work inside claude.ai</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">Appearance</div>
+      <div class="settings-row">
+        <div><div class="settings-row-label">Light mode</div><div class="settings-row-sub">Switch between dark navy and light themes</div></div>
+        <label class="toggle"><input type="checkbox" id="lightModeToggle" onchange="applyTheme(this.checked)"><span class="toggle-track"></span></label>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">Backup &amp; Restore</div>
+      <div class="settings-row" style="padding-bottom:14px">
+        <div><div class="settings-row-label">Save backup</div><div class="settings-row-sub">Download a timestamped JSON snapshot of all projects</div></div>
+        <button class="btn btn-secondary btn-sm" onclick="saveBackup()">↓ Save backup</button>
+      </div>
+      <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:10px">
+        <div><div class="settings-row-label">Restore from backup</div><div class="settings-row-sub">Load a .json file — replaces all project data</div></div>
+        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('importFile').click()" style="width:100%">↑ Choose file…</button>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">Saved snapshots
+        <button class="btn btn-ghost btn-sm" onclick="saveLocalBackup()" style="font-size:11px;padding:3px 8px">+ Save now</button>
+      </div>
+      <div class="settings-row-sub" style="margin-bottom:10px">Stored in your browser. Up to 5 kept.</div>
+      <div class="backup-list" id="backupList"></div>
+    </div>
+
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeSettings()">Close</button></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+const KEY        = 'groundwork_v2';
+const PREFS_KEY  = 'groundwork_prefs';
+const BACKUP_KEY = 'groundwork_backups';
+
+let STATE = { activeId:'', projects:[] };
+
+function P() {
+  if (!STATE.projects.length) {
+    const p = blankProject(''); STATE.projects = [p]; STATE.activeId = p.id;
+  }
+  return STATE.projects.find(p=>p.id===STATE.activeId) || STATE.projects[0];
+}
+
+function blankProject(name) {
+  return {
+    id:uid(), name:name||'', type:'', phase:'', billing:'', pm:'', sponsor:'',
+    link:'', startDate:'', targetDate:'', rag:'',
+    charter:{ scope:'', outOfScope:'', objectives:[], assumptions:[], constraints:[], successCriteria:[], stakeholders:[] },
+    meetings:[], decisions:[],
+    actions:[],
+    aiContext:{ risks:null, scopeReviews:[], changeRequests:[] }
+  };
+}
+
+// ── PERSIST ─────────────────────────────────────────────
+function loadState() {
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (raw) { STATE = migrate(JSON.parse(raw)); return; }
+    const old = localStorage.getItem('groundwork_v1');
+    if (old) { STATE = migrate(JSON.parse(old)); return; }
+  } catch(e){}
+  const p = blankProject(''); STATE = { activeId:p.id, projects:[p] };
+}
+
+function migrate(raw) {
+  if (raw&&raw.projects&&Array.isArray(raw.projects)) {
+    raw.projects.forEach(p=>{
+      if (!p.rag) p.rag='';
+      if (!p.charter)             p.charter={};
+      if (!p.charter.scope)       p.charter.scope='';
+      if (!p.charter.outOfScope)  p.charter.outOfScope='';
+      if (!p.charter.objectives)  p.charter.objectives=[];
+      if (!p.charter.assumptions) p.charter.assumptions=[];
+      if (!p.charter.constraints) p.charter.constraints=[];
+      if (!p.charter.successCriteria) p.charter.successCriteria=[];
+      if (!p.charter.stakeholders)    p.charter.stakeholders=[];
+      if (!p.meetings)  p.meetings=[];
+      if (!p.decisions) p.decisions=[];
+      if (!p.actions)   p.actions=[];
+      if (!p.aiContext) p.aiContext={ risks:null, scopeReviews:[], changeRequests:[] };
+      if (!p.aiContext.scopeReviews)   p.aiContext.scopeReviews=[];
+      if (!p.aiContext.changeRequests) p.aiContext.changeRequests=[];
+      p.decisions.forEach(d=>{ if(d.loggedToPSA===undefined){ d.loggedToPSA=false; d.psaDate=""; } });
+    });
+    return raw;
+  }
+  // v1 single-project format
+  const c = raw.charter||{};
+  const p = { id:uid(), name:raw.name||'', type:raw.type||'', phase:raw.phase||'',
+    billing:raw.billing||'', pm:raw.pm||'', sponsor:raw.sponsor||'', link:raw.link||'',
+    startDate:raw.startDate||'', targetDate:raw.targetDate||'', rag:'',
+    charter:{
+      scope:        c.scope||'',
+      outOfScope:   c.outOfScope||'',
+      objectives:   c.objectives||[],
+      assumptions:  c.assumptions||[],
+      constraints:  c.constraints||[],
+      successCriteria: c.successCriteria||[],
+      stakeholders: c.stakeholders||[]
+    },
+    meetings:raw.meetings||[], decisions:raw.decisions||[] };
+  return { activeId:p.id, projects:[p] };
+}
+
+function save() {
+  try { localStorage.setItem(KEY, JSON.stringify(STATE)); showAutosave(); } catch(e){}
+}
+
+// ── AUTOSAVE INDICATOR ──────────────────────────────────
+let _autosaveTimer = null;
+function showAutosave() {
+  const el = document.getElementById('autosaveInd');
+  el.classList.add('visible');
+  clearTimeout(_autosaveTimer);
+  _autosaveTimer = setTimeout(()=>el.classList.remove('visible'), 2000);
+}
+
+// ── FIELD SETTERS ────────────────────────────────────────
+function sf(k,v)  { P()[k]=v; save(); renderProjBar(); }
+function scf(k,v) { P().charter[k]=v; save(); }
+
+// ── RAG ─────────────────────────────────────────────────
+function setRag(val) {
+  P().rag = val; save();
+  renderRagSelector(); renderProjBar();
+  if (!document.getElementById('projDropdown').classList.contains('hidden')) renderProjDropdownList();
+}
+
+function renderRagSelector() {
+  const rag = P().rag||'';
+  document.querySelectorAll('.rag-opt').forEach(btn=>{
+    const bv = btn.getAttribute('data-rag');
+    btn.className = 'rag-opt' + (bv===rag ? ` active-${bv||'none'}` : '');
+  });
+}
+
+// ── API KEY ──────────────────────────────────────────────
+function loadPrefs() { try{return JSON.parse(localStorage.getItem(PREFS_KEY)||'{}');}catch(e){return{};} }
+function savePrefs(p){ localStorage.setItem(PREFS_KEY,JSON.stringify(p)); }
+
+function getApiKey() { return loadPrefs().apiKey||''; }
+
+function saveApiKey() {
+  const key = document.getElementById('apiKeyInput').value.trim();
+  const p = loadPrefs(); p.apiKey = key; savePrefs(p);
+  renderApiKeyStatus(); showToast(key ? 'API key saved' : 'API key cleared');
+}
+
+function toggleApiVis() {
+  const inp = document.getElementById('apiKeyInput');
+  const btn = document.getElementById('apiVisBtn');
+  const isPass = inp.type==='password';
+  inp.type = isPass ? 'text' : 'password';
+  btn.textContent = isPass ? 'Hide' : 'Show';
+}
+
+function renderApiKeyStatus() {
+  const key = getApiKey();
+  const el = document.getElementById('apiKeyStatus');
+  if (!el) return;
+  if (key) {
+    const masked = key.slice(0,12)+'…'+key.slice(-4);
+    el.innerHTML = `<span class="api-key-set">● Key set (${masked})</span>`;
+  } else {
+    el.innerHTML = `<span class="api-key-unset">○ Not set — AI features will only work inside claude.ai</span>`;
+  }
+}
+
+// ── THEME ────────────────────────────────────────────────
+function applyTheme(light) {
+  document.documentElement.classList.toggle('light',light);
+  const p=loadPrefs(); p.lightMode=light; savePrefs(p);
+  document.getElementById('lightModeToggle').checked=light;
+}
+
+// ── SETTINGS ─────────────────────────────────────────────
+function openSettings() {
+  renderBackupList();
+  const prefs = loadPrefs();
+  document.getElementById('lightModeToggle').checked=!!prefs.lightMode;
+  document.getElementById('apiKeyInput').value = prefs.apiKey||'';
+  renderApiKeyStatus();
+  document.getElementById('settingsModal').classList.remove('hidden');
+}
+function closeSettings(){ document.getElementById('settingsModal').classList.add('hidden'); }
+
+// ═══════════════════════════════════════════════════════
+// MEETING TEMPLATES
+// ═══════════════════════════════════════════════════════
+const TEMPLATES = {
+  blank: { title:'', notes:'', decisions:'', actions:'' },
+  status: {
+    title:'Weekly Status — ',
+    notes:`AGENDA\n1. Review action items from last meeting\n2. Status by workstream\n3. Issues & blockers\n4. Upcoming milestones\n\nSTATUS UPDATES\n\n\nOPEN ITEMS & BLOCKERS\n\n\nRISKS & ISSUES\n\n\nUPCOMING MILESTONES\n`,
+    decisions:'', actions:''
+  },
+  team: {
+    title:'Team Meeting — ',
+    notes:`AGENDA\n\n\nDISCUSSION NOTES\n\n\nNEXT STEPS\n`,
+    decisions:'', actions:''
+  },
+  sponsor: {
+    title:'Sponsor Check-in — ',
+    notes:`PROJECT STATUS: [ Green / Amber / Red ]\n\nACCOMPLISHMENTS SINCE LAST UPDATE\n\n\nDECISIONS NEEDED FROM SPONSOR\n\n\nRISKS REQUIRING ATTENTION\n\n\nNEXT MILESTONES & TARGET DATES\n`,
+    decisions:'', actions:''
+  },
+  discovery: {
+    title:'Discovery Workshop — ',
+    notes:`TOPIC:\nPARTICIPANTS:\n\nCURRENT STATE\n\n\nPAIN POINTS & GAPS\n\n\nFUTURE STATE / REQUIREMENTS\n\n\nOPEN QUESTIONS\n`,
+    decisions:'', actions:''
+  },
+  kickoff: {
+    title:'Project Kickoff Meeting',
+    notes:`ATTENDEES:\n\nAGENDA\n1. Introductions\n2. Project overview & objectives\n3. Scope review\n4. Roles & responsibilities\n5. Timeline walkthrough\n6. Communication plan\n7. Q&A\n\nNOTES\n\n\nOPEN ITEMS\n`,
+    decisions:'', actions:''
+  },
+  golive: {
+    title:'Go-Live Readiness Review',
+    notes:`TARGET GO-LIVE DATE:\n\nREADINESS CHECKLIST\n[ ] Technical environment ready\n[ ] Data migration validated\n[ ] User training complete\n[ ] Support plan in place\n[ ] Rollback plan documented\n[ ] Communications sent\n\nOPEN ISSUES / BLOCKERS\n\n\nGO / NO-GO DECISION:\n`,
+    decisions:'', actions:''
+  }
+};
+
+function applyTemplate(id, e) {
+  const t = TEMPLATES[id]; if (!t) return;
+  const currentTitle = document.getElementById('mTitle').value.trim();
+  if (id!=='blank' && currentTitle && !confirm('Apply template? Current title and notes will be replaced.')) return;
+  const dateStr = new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  document.getElementById('mTitle').value = t.title ? t.title + dateStr : '';
+  document.getElementById('mNotes').value = t.notes;
+  document.getElementById('mDecisions').value = t.decisions;
+  document.getElementById('mActions').value = t.actions;
+  document.querySelectorAll('.tmpl-btn').forEach(b=>b.classList.remove('active'));
+  if (e) e.target.classList.add('active');
+  if (id!=='blank') document.getElementById('mTitle').focus();
+}
+
+// ═══════════════════════════════════════════════════════
+// PROJECT MANAGEMENT
+// ═══════════════════════════════════════════════════════
+function newProject() {
+  closeProjDropdown();
+  document.getElementById('projModalId').value='';
+  document.getElementById('projModalLbl').textContent='New Project';
+  document.getElementById('projModalName').value='';
+  document.getElementById('projModal').classList.remove('hidden');
+  setTimeout(()=>document.getElementById('projModalName').focus(),50);
+}
+
+function renameProject(id) {
+  closeProjDropdown();
+  const proj=STATE.projects.find(p=>p.id===id); if(!proj) return;
+  document.getElementById('projModalId').value=id;
+  document.getElementById('projModalLbl').textContent='Rename Project';
+  document.getElementById('projModalName').value=proj.name;
+  document.getElementById('projModal').classList.remove('hidden');
+  setTimeout(()=>document.getElementById('projModalName').focus(),50);
+}
+
+function duplicateProject(id) {
+  closeProjDropdown();
+  const proj=STATE.projects.find(p=>p.id===id); if(!proj) return;
+  const copy=JSON.parse(JSON.stringify(proj));
+  copy.id=uid();
+  copy.name=(proj.name?proj.name+' (copy)':'Copy of project');
+  copy.meetings=[]; copy.decisions=[]; copy.rag='';
+  STATE.projects.push(copy);
+  STATE.activeId=copy.id;
+  save(); renderAll();
+  showToast('Project duplicated — meetings and decisions not copied');
+}
+
+function saveProjModal() {
+  const name=document.getElementById('projModalName').value.trim();
+  if(!name){document.getElementById('projModalName').focus();return;}
+  const id=document.getElementById('projModalId').value;
+  if(id){
+    const proj=STATE.projects.find(p=>p.id===id);
+    if(proj){proj.name=name;save();}
+    renderProjBar(); if(STATE.activeId===id) populateCharterFields();
+  } else {
+    const proj=blankProject(name);
+    STATE.projects.push(proj); STATE.activeId=proj.id; save(); renderAll();
+  }
+  closeProjModal(); showToast(id?'Project renamed':'Project created');
+}
+function closeProjModal(){ document.getElementById('projModal').classList.add('hidden'); }
+
+function deleteProject(id) {
+  if(STATE.projects.length===1){showToast('Cannot delete the only project');return;}
+  const proj=STATE.projects.find(p=>p.id===id);
+  const name=proj?proj.name||'this project':'this project';
+  closeProjDropdown();
+  if(!confirm(`Delete "${name}"?\n\nAll meetings and decisions will be lost.`)) return;
+  STATE.projects=STATE.projects.filter(p=>p.id!==id);
+  if(STATE.activeId===id) STATE.activeId=STATE.projects[0].id;
+  save(); renderAll(); showToast('Project deleted');
+}
+
+function switchProject(id) {
+  if(STATE.activeId===id){closeProjDropdown();return;}
+  STATE.activeId=id; save(); closeProjDropdown(); renderAll();
+}
+
+// ── PROJECT DROPDOWN ─────────────────────────────────────
+function toggleProjDropdown() {
+  const dd=document.getElementById('projDropdown');
+  const btn=document.getElementById('projCurrentBtn');
+  if(!dd.classList.contains('hidden')){closeProjDropdown();return;}
+  renderProjDropdownList();
+  dd.classList.remove('hidden'); btn.classList.add('open');
+}
+function closeProjDropdown() {
+  document.getElementById('projDropdown').classList.add('hidden');
+  document.getElementById('projCurrentBtn').classList.remove('open');
+}
+
+function renderProjDropdownList() {
+  const list=document.getElementById('projDropdownList');
+  document.getElementById('projCountBadge').textContent=`${STATE.projects.length} project${STATE.projects.length!==1?'s':''}`;
+  const ragEmoji={'green':'🟢','amber':'🟡','red':'🔴','':''};
+  list.innerHTML=[...STATE.projects]
+    .sort((a,b)=>(a.name||'').localeCompare(b.name||'',undefined,{sensitivity:'base'}))
+    .map(proj=>{
+    const isActive=proj.id===STATE.activeId;
+    const tags=[proj.type,proj.phase].filter(Boolean);
+    const meta=[tags.join(' · '),(proj.meetings?.length||0)+'m '+(proj.decisions?.length||0)+'d'].filter(Boolean).join(' · ');
+    const ragDot=proj.rag?`<span class="rag-dot rag-${proj.rag}" style="flex-shrink:0"></span>`:`<span class="rag-dot rag-none" style="flex-shrink:0"></span>`;
+    return `<div class="proj-dropdown-item${isActive?' current':''}" onclick="switchProject('${proj.id}')">
+      ${ragDot}
+      <div class="proj-item-info">
+        <div class="proj-item-name">${esc(proj.name||'Unnamed project')}</div>
+        ${meta?`<div class="proj-item-meta">${esc(meta)}</div>`:''}
+      </div>
+      <div class="proj-item-actions" onclick="event.stopPropagation()">
+        <button class="proj-item-btn" onclick="renameProject('${proj.id}')" title="Rename">✏</button>
+        <button class="proj-item-btn" onclick="duplicateProject('${proj.id}')" title="Duplicate">⧉</button>
+        <button class="proj-item-btn del" onclick="deleteProject('${proj.id}')" title="Delete">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderProjBar() {
+  const proj=P(); if(!proj) return;
+  document.getElementById('projBtnName').textContent=proj.name||'Unnamed project';
+  const typeEl=document.getElementById('projBtnType');
+  const phaseEl=document.getElementById('projBtnPhase');
+  const ragEl=document.getElementById('projBarRag');
+  typeEl.textContent=proj.type; typeEl.classList.toggle('hidden',!proj.type);
+  phaseEl.textContent=proj.phase; phaseEl.classList.toggle('hidden',!proj.phase);
+  ragEl.className='rag-dot '+(proj.rag?'rag-'+proj.rag:'rag-none');
+}
+
+// ═══════════════════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════════════════
+function switchTab(tab) {
+  document.querySelectorAll('.tab-pane').forEach(p=>{p.classList.remove('visible');p.classList.add('hidden');});
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  const pane=document.getElementById('pane-'+tab);
+  pane.classList.remove('hidden'); pane.classList.add('visible');
+  document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+  if(tab==='meetings')  renderMeetings();
+  if(tab==='decisions') renderDecisions();
+  if(tab==='actions')   renderActions();
+  if(tab==='analysis')  renderAnalysis();
+  if(tab==='ai')        refreshAIResults();
+  updateCounts();
+}
+
+// ═══════════════════════════════════════════════════════
+// LIST EDITORS
+// ═══════════════════════════════════════════════════════
+const LIST_IDS={objectives:'list-objectives',assumptions:'list-assumptions',constraints:'list-constraints',successCriteria:'list-successCriteria',stakeholders:'list-stakeholders'};
+
+function renderList(k) {
+  const el=document.getElementById(LIST_IDS[k]); if(!el) return;
+  const items=P().charter[k]||[]; el.innerHTML='';
+  items.forEach((v,i)=>{
+    const d=document.createElement('div'); d.className='list-item';
+    d.innerHTML=`<span class="list-num">${i+1}</span>
+      <textarea class="list-ta" rows="1"
+        oninput="P().charter['${k}'][${i}]=this.value;save();ar(this)"
+        onkeydown="liKd(event,'${k}',${i})"
+        placeholder="Enter item…">${esc(v)}</textarea>
+      <button class="list-del" onclick="rmItem('${k}',${i})" title="Remove">✕</button>`;
+    el.appendChild(d);
+    setTimeout(()=>ar(d.querySelector('textarea')),0);
+  });
+}
+function addItem(k) {
+  P().charter[k].push(''); save(); renderList(k);
+  const el=document.getElementById(LIST_IDS[k]);
+  const tas=el.querySelectorAll('.list-ta');
+  if(tas.length) tas[tas.length-1].focus();
+}
+function rmItem(k,i){ P().charter[k].splice(i,1); save(); renderList(k); }
+function liKd(e,k,i){ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();addItem(k);} }
+function ar(ta){ ta.style.height='auto'; ta.style.height=ta.scrollHeight+'px'; }
+
+// ═══════════════════════════════════════════════════════
+// MEETINGS
+// ═══════════════════════════════════════════════════════
+function today(){ return new Date().toISOString().slice(0,10); }
+
+function relativeTime(iso) {
+  if (!iso) return '';
+  const diff = Date.now()-new Date(iso).getTime();
+  if (diff < 0) return 'Just now'; // clock skew / future date
+  const m=Math.floor(diff/60000), h=Math.floor(diff/3600000), d=Math.floor(diff/86400000);
+  if(m<2)  return 'Just now';
+  if(m<60) return `${m}m ago`;
+  if(h<24) return `${h}h ago`;
+  if(d===1)return 'Yesterday';
+  if(d<7)  return `${d}d ago`;
+  return new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+}
+
+function openMtgModal(id=null) {
+  const m=id?P().meetings.find(x=>x.id===id):null;
+  document.getElementById('mtgId').value=id||'';
+  document.getElementById('mtgFormLbl').textContent=id?'Edit Meeting':'Log Meeting';
+  document.getElementById('mDate').value=m?m.date:today();
+  document.getElementById('mDur').value=m?m.dur:'';
+  document.getElementById('mTitle').value=m?m.title:'';
+  document.getElementById('mAttendees').value=m?m.attendees:'';
+  document.getElementById('mNotes').value=m?m.notes:'';
+  document.getElementById('mDecisions').value = m?m.decisions:'';
+  document.getElementById('mActions').value   = m?m.actions:'';
+  document.getElementById('mLogDecisions').checked = false;
+  document.getElementById('mLogActions').checked   = false;
+  // reset template selection
+  document.querySelectorAll('.tmpl-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelector('.tmpl-btn').classList.add('active');
+  document.getElementById('meeting-form').classList.remove('hidden');
+  document.getElementById('logMtgBtn').classList.add('hidden');
+  document.getElementById('meeting-form').scrollIntoView({behavior:'smooth',block:'start'});
+  setTimeout(()=>document.getElementById('mTitle').focus(),100);
+}
+function closeMtgModal() {
+  document.getElementById('meeting-form').classList.add('hidden');
+  document.getElementById('logMtgBtn').classList.remove('hidden');
+}
+
+function saveMtg() {
+  const id=document.getElementById('mtgId').value;
+  const now=new Date().toISOString();
+  const m={
+    id:id||uid(),
+    date:document.getElementById('mDate').value,
+    dur:document.getElementById('mDur').value.trim(),
+    title:document.getElementById('mTitle').value.trim(),
+    attendees:document.getElementById('mAttendees').value.trim(),
+    notes:document.getElementById('mNotes').value.trim(),
+    decisions:document.getElementById('mDecisions').value.trim(),
+    actions:document.getElementById('mActions').value.trim(),
+    updatedAt:now
+  };
+  if(!m.title){alert('Meeting title is required.');return;}
+  if(id){const idx=P().meetings.findIndex(x=>x.id===id);P().meetings[idx]=m;}
+  else  {P().meetings.unshift(m);}
+
+  // Only parse and log to tabs when creating a new meeting, not when editing
+  // (editing could re-log identical items already captured from a previous save)
+  let nd=0, na=0;
+  if (!id) {
+    const source = m.title + (m.date ? ' · ' + m.date : '');
+
+    // Decisions → Decisions tab (only if toggle is on)
+    if (document.getElementById('mLogDecisions').checked) {
+      parseListItems(m.decisions).forEach(text => {
+        P().decisions.unshift({
+          id:uid(), date:m.date||today(), madeBy:'', status:'final',
+          text, rationale:`From meeting: ${source}`, impact:'',
+          loggedToPSA:false, psaDate:''
+        });
+        nd++;
+      });
+    }
+
+    // Actions → Actions tab (only if toggle is on)
+    if (document.getElementById('mLogActions').checked) {
+      const actionNow = now;
+      parseListItems(m.actions).forEach(line => {
+        let owner='', text=line, dueDate='';
+        const ci = line.indexOf(': ');
+        if (ci>0 && ci<25) { owner=line.slice(0,ci).trim(); text=line.slice(ci+2).trim(); }
+        const dm = text.match(/\(Due:\s*([^)]+)\)\s*$/i);
+        if (dm) { dueDate=dm[1].trim(); text=text.slice(0,dm.index).trim(); }
+        P().actions.unshift({
+          id:nextActionId(), text, owner, dueDate,
+          priority:'Medium', status:'Open',
+          source, sourceId:m.id,
+          createdAt:actionNow, updatedAt:actionNow, completedAt:'',
+          loggedToPSA:false, psaDate:'', notes:''
+        });
+        na++;
+      });
+    }
+  }
+
+  save(); closeMtgModal(); renderMeetings(); updateCounts();
+  if (nd||na) {
+    const parts=[];
+    if (nd) parts.push(`${nd} decision${nd>1?'s':''} logged`);
+    if (na) parts.push(`${na} action${na>1?'s':''} logged`);
+    showToast(parts.join(', '));
+  }
+}
+
+function delMtg(id) {
+  if(!confirm('Delete this meeting?')) return;
+  P().meetings=P().meetings.filter(x=>x.id!==id);
+  save(); renderMeetings(); updateCounts();
+}
+
+function renderMeetings() {
+  const q=(document.getElementById('q-meetings').value||'').toLowerCase();
+  const el=document.getElementById('meetings-list');
+  const filtered=P().meetings
+    .filter(m=>!q||[m.title,m.notes,m.attendees,m.decisions,m.actions].join(' ').toLowerCase().includes(q))
+    .sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  if(!filtered.length){
+    el.innerHTML=`<div class="empty">
+      <div class="empty-ico">📝</div>
+      <div class="empty-msg">${q?'No matches found':'No meetings logged yet'}</div>
+      <div class="empty-sub">${q?'Try a different search term':'Log your first meeting to start building your project record'}</div>
+      ${!q?'<button class="btn btn-primary" onclick="openMtgModal()">＋ Log Meeting</button>':''}
+    </div>`; return;
+  }
+  el.innerHTML=filtered.map(m=>{
+    const ds=m.date?new Date(m.date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'—';
+    const atts=m.attendees?m.attendees.split(',').map(a=>a.trim()).filter(Boolean):[];
+    const attPrev=atts.length?atts[0]+(atts.length>1?` +${atts.length-1}`:''):'';
+    const decs=m.decisions?m.decisions.split('\n').filter(d=>d.trim()):[];
+    const acts=m.actions?m.actions.split('\n').filter(a=>a.trim()):[];
+    const mod=relativeTime(m.updatedAt);
+    return `<div class="meeting-card" id="mc-${m.id}">
+      <div class="meeting-hdr" onclick="toggleMtg('${m.id}')">
+        <span class="date-badge">${ds}</span>
+        <span class="meeting-title-txt">${hl(esc(m.title),q)}</span>
+        ${m.dur?`<span class="tag">${esc(m.dur)}</span>`:''}
+        ${attPrev?`<span class="meeting-meta-txt" title="${esc(m.attendees)}">${esc(attPrev)}</span>`:''}
+        ${mod?`<span class="modified-tag">${mod}</span>`:''}
+        <span class="chevron">▼</span>
+      </div>
+      <div class="meeting-body">
+        ${m.attendees?`<div class="section-lbl">👥 Attendees</div><div class="notes-text" style="margin-bottom:12px">${hl(esc(m.attendees),q)}</div>`:''}
+        ${m.notes?`<div class="section-lbl">📄 Notes</div><div class="notes-text" style="margin-bottom:12px">${hl(esc(m.notes),q)}</div>`:''}
+        ${decs.length?`<div class="section-lbl">⚖️ Decisions</div><div style="margin-bottom:12px">${decs.map(d=>`<span class="dec-pill">${hl(esc(d),q)}</span>`).join('')}</div>`:''}
+        ${acts.length?`<div class="section-lbl">✅ Action Items</div><div style="margin-bottom:12px">${acts.map(a=>`<div class="action-chip">${hl(esc(a),q)}</div>`).join('')}</div>`:''}
+        <div class="mtg-footer">
+          <button class="btn btn-ghost btn-sm" onclick="debriefMeeting('${m.id}')">🗒 Debrief</button>
+          <button class="btn btn-ghost btn-sm" onclick="openMtgModal('${m.id}')">✏️ Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="delMtg('${m.id}')">🗑 Delete</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleMtg(id){ document.getElementById('mc-'+id).classList.toggle('open'); }
+
+// ═══════════════════════════════════════════════════════
+// DECISIONS
+// ═══════════════════════════════════════════════════════
+function openDecModal(id=null) {
+  const d=id?P().decisions.find(x=>x.id===id):null;
+  document.getElementById('decId').value=id||'';
+  document.getElementById('decModalLbl').textContent=id?'Edit Decision':'Log Decision';
+  document.getElementById('dDate').value=d?d.date:today();
+  document.getElementById('dMadeBy').value=d?d.madeBy:'';
+  document.getElementById('dText').value=d?d.text:'';
+  document.getElementById('dRationale').value=d?d.rationale:'';
+  document.getElementById('dImpact').value=d?d.impact:'';
+  document.getElementById('dStatus').value=d?d.status:'final';
+  document.getElementById('decModal').classList.remove('hidden');
+  setTimeout(()=>document.getElementById('dText').focus(),50);
+}
+function closeDecModal(){ document.getElementById('decModal').classList.add('hidden'); }
+
+function saveDec() {
+  const id=document.getElementById('decId').value;
+  const d={id:id||uid(),date:document.getElementById('dDate').value,madeBy:document.getElementById('dMadeBy').value.trim(),text:document.getElementById('dText').value.trim(),rationale:document.getElementById('dRationale').value.trim(),impact:document.getElementById('dImpact').value.trim(),status:document.getElementById('dStatus').value};
+  if(!d.text){alert('Decision description is required.');return;}
+  if(id){const idx=P().decisions.findIndex(x=>x.id===id);P().decisions[idx]=d;}
+  else  {P().decisions.unshift(d);}
+  save(); closeDecModal(); renderDecisions(); updateCounts();
+}
+
+function delDec(id) {
+  if(!confirm('Delete this decision?')) return;
+  P().decisions=P().decisions.filter(x=>x.id!==id);
+  save(); renderDecisions(); updateCounts();
+}
+
+function renderDecisions() {
+  const q=(document.getElementById('q-decisions').value||'').toLowerCase();
+  const el=document.getElementById('decisions-list');
+  const filtered=P().decisions.filter(d=>!q||[d.text,d.rationale,d.impact,d.madeBy].join(' ').toLowerCase().includes(q));
+  if(!filtered.length){
+    el.innerHTML=`<div class="empty">
+      <div class="empty-ico">⚖️</div>
+      <div class="empty-msg">${q?'No matches found':'No decisions logged yet'}</div>
+      <div class="empty-sub">${q?'Try a different search term':'Decisions made throughout the project will appear here'}</div>
+      ${!q?'<button class="btn btn-primary" onclick="openDecModal()">＋ Log Decision</button>':''}
+    </div>`; return;
+  }
+  const statusMap={final:'Final',open:'Open',superseded:'Superseded'};
+  el.innerHTML=filtered.map((d,fi)=>{
+    const ds=d.date?new Date(d.date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'—';
+    const globalIdx=P().decisions.findIndex(x=>x.id===d.id);
+    const num='D'+String(globalIdx+1).padStart(2,'0');
+    return `<div class="decision-card">
+      <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px">
+        <span class="dec-num">${num}</span>
+        <div style="flex:1">
+          <div class="dec-text">${hl(esc(d.text),q)}</div>
+          <div class="dec-meta"><span>📅 ${ds}</span>${d.madeBy?`<span>👤 ${esc(d.madeBy)}</span>`:''}<span class="status-pill s-${d.status}">${statusMap[d.status]}</span></div>
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;align-items:center">
+          ${d.loggedToPSA?`<span class="psa-badge">✓ In PSA${d.psaDate?' · '+d.psaDate:''}</span>`:`<button class="btn-psa" onclick="toggleDecisionPSA('${d.id}')">Log to PSA</button>`}
+          <button class="btn btn-ghost btn-sm" onclick="openDecModal('${d.id}')">✏️</button>
+          <button class="btn btn-danger btn-sm" onclick="delDec('${d.id}')">🗑</button>
+        </div>
+      </div>
+      ${d.rationale?`<div class="dec-rationale">${hl(esc(d.rationale),q)}</div>`:''}
+      ${d.impact?`<div class="dec-rationale" style="color:var(--text-dim);font-size:12px;margin-top:4px">Impact: ${hl(esc(d.impact),q)}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// AI
+// ═══════════════════════════════════════════════════════
+function buildCtx() {
+  const proj=P(); const c=proj.charter; const lines=[];
+  if(proj.name)       lines.push(`Project: ${proj.name}`);
+  if(proj.type)       lines.push(`Type: ${proj.type}`);
+  if(proj.phase)      lines.push(`Current Phase: ${proj.phase}`);
+  if(proj.rag)        lines.push(`Status: ${proj.rag.toUpperCase()}`);
+  if(proj.billing)    lines.push(`Billing: ${proj.billing}`);
+  if(proj.pm)         lines.push(`PM: ${proj.pm}`);
+  if(proj.sponsor)    lines.push(`Sponsor: ${proj.sponsor}`);
+  if(proj.startDate)  lines.push(`Start: ${proj.startDate}`);
+  if(proj.targetDate) lines.push(`Target Go-Live: ${proj.targetDate}`);
+  if(c.scope)         lines.push(`\nSCOPE:\n${c.scope}`);
+  if(c.outOfScope)    lines.push(`\nOUT OF SCOPE:\n${c.outOfScope}`);
+  ['objectives','assumptions','constraints','successCriteria','stakeholders'].forEach(k=>{
+    const items=(c[k]||[]).filter(Boolean);
+    if(items.length) lines.push(`\n${k.toUpperCase().replace('SUCCESSCRITERIA','SUCCESS CRITERIA')}:\n${items.map((v,i)=>`${i+1}. ${v}`).join('\n')}`);
+  });
+  if(proj.meetings&&proj.meetings.length){
+    lines.push(`\nMEETING LOG (${proj.meetings.length}):`);
+    proj.meetings.slice(0,12).forEach(m=>{
+      lines.push(`\n[${m.date||'?'}] ${m.title}`);
+      if(m.attendees) lines.push(`Attendees: ${m.attendees}`);
+      if(m.notes)     lines.push(`Notes: ${m.notes}`);
+      if(m.decisions) lines.push(`Decisions: ${m.decisions}`);
+      if(m.actions)   lines.push(`Actions: ${m.actions}`);
+    });
+  }
+  if(proj.decisions&&proj.decisions.length){
+    lines.push(`\nDECISION LOG:`);
+    proj.decisions.forEach((d,i)=>lines.push(`D${i+1}: ${d.text} [${d.status}] ${d.date||''} — ${d.rationale||''}`));
+  }
+  return lines.join('\n');
+}
+
+const PROMPTS={
+  risks:       ctx=>({system:`Analyze project risks and return ONLY a JSON array. Each object must have exactly these keys: {"issueName":"short descriptive name","issueDescription":"1-2 sentence explanation of the risk","potentialImpact":"specific impact on scope, schedule, budget, or quality if risk occurs","likelihood":"High"|"Medium"|"Low","mitigationPlan":"concrete actions to prevent or reduce the risk"}. ONLY valid JSON, no markdown.`,user:`Identify risks:\n\n${ctx}`}),
+  agenda:      ctx=>({system:`Generate a structured next-meeting agenda as plain text with time-boxed sections. Tie items to actual project content. Be specific.`,user:`Next meeting agenda:\n\n${ctx}`}),
+  summary:     ctx=>({system:`You are a project status analyst. Return ONLY a valid JSON object with these exact keys — no markdown, no preamble, no extra text:
+{
+  "projectStatus":      "Green" | "Amber" | "Red",
+  "projectStatusNotes": "string ≤250 chars",
+  "scheduleStatus":     "Green" | "Amber" | "Red",
+  "scheduleStatusNotes":"string ≤250 chars",
+  "financialStatus":    "Green" | "Amber" | "Red",
+  "financialStatusNotes":"string ≤250 chars",
+  "scopeStatus":        "Green" | "Amber" | "Red",
+  "scopeStatusNotes":   "string ≤250 chars",
+  "last30Days":         "string ≤250 chars — key accomplishments and activities",
+  "next30Days":         "string ≤250 chars — upcoming milestones and planned activities"
+}
+Rules: Status values must be exactly "Green", "Amber", or "Red". Each notes/activity field must be under 250 characters. For Amber or Red statuses, include the specific issue, the actions required, and timing to return to Green. Base your assessment on the charter, phase, meeting history, and decision log.`,user:`Generate a project status report for:\n\n${ctx}`}),
+  extract:     notes=>({system:`Extract action items from meeting notes. Return ONLY JSON array: [{"owner":"name or TBD","action":"specific action","due":"date or null","priority":"high"|"medium"|"low"}]. ONLY valid JSON.`,user:notes}),
+  changerequest:(ctx,change)=>({system:`Draft a formal change request brief: Change Title, Description, Justification, Scope Impact, Timeline Impact, Resource/Cost Impact, Risks of Implementing, Risks of Not Implementing, Recommendation, Approvals Required. Plain structured text.`,user:`PROJECT CONTEXT:\n${ctx}\n\nPROPOSED CHANGE:\n${change}`}),
+  scope:       ctx=>({system:`Review project scope and identify: scope creep risks, gaps, ambiguous boundaries, and clarification recommendations. Clear structured text.`,user:`Scope review:\n\n${ctx}`}),
+  stakeholder: ctx=>({system:`Draft a concise internal project update email (150-200 words) for the executive sponsor. Direct professional tone. Include: current phase, accomplishments, decisions needed, top risks, next milestones, and a clear ask if action needed. Include subject line.`,user:`Draft sponsor update:\n\n${ctx}`}),
+  debrief:     (ctx,notes)=>({system:`You are a project coordinator writing a structured meeting debrief. Use these EXACT section headers (written in ALL CAPS) in this order:
+
+MEETING DATE
+The date of the meeting in YYYY-MM-DD format. Extract from the transcript if mentioned. If not identifiable, write "Not identified".
+
+MEETING DURATION
+The meeting duration (e.g. "60 min", "1.5 hours"). Extract from the transcript if mentioned. If not identifiable, write "Not identified".
+
+ATTENDEES
+List every participant identified in the transcript — names and/or roles. If no names are identifiable, write "Not identified".
+
+MEETING SUMMARY
+2-3 sentences on the meeting purpose and outcome.
+
+DECISIONS MADE
+One decision per line starting with a dash. Write "None" if no decisions were made.
+
+ACTION ITEMS
+One per line: "Owner: Action item (Due: date if mentioned)". Write "None" if no action items.
+
+OPEN QUESTIONS
+One per line starting with a dash. Write "None" if none.
+
+KEY DISCUSSION POINTS
+Brief bullet points of the main topics covered.
+
+Be concise and scannable. Use only the section headers above — no extra headers or sub-headers.`,user:`PROJECT CONTEXT:\n${ctx}\n\nMEETING TRANSCRIPT / NOTES:\n${notes}`}),
+  ask:         (ctx,q)=>({system:`You are an intelligent project assistant. Answer using the project data provided. Be specific and concise.`,user:`PROJECT DATA:\n${ctx}\n\nQUESTION: ${q}`})
+};
+
+const AI_LABELS={risks:'Risk Analysis',agenda:'Meeting Agenda',summary:'Project Summary',extract:'Extracted Action Items',changerequest:'Change Request Brief',scope:'Scope Review',stakeholder:'Sponsor Update',debrief:'Meeting Debrief',ask:'Answer'};
+
+// ── SINGLETON vs LOG tool classification ─────────────────────
+// Singleton tools: replace existing output when re-run
+// Log tools: append new timestamped entry each run
+const SINGLETON_TYPES = new Set(['risks', 'summary', 'scope']);
+
+// Debrief input is staged here by the modal before runAI is called
+let _pendingDebriefText = '';
+// One AbortController per resultId so any in-flight request can be cancelled
+const _abortControllers = {};
+
+async function runAI(type) {
+  const ctx = buildCtx();
+
+  if (!ctx.trim() && !['extract','ask','debrief','changerequest'].includes(type)) {
+    const rid = SINGLETON_TYPES.has(type) ? type : uid();
+    pushAIResult(type, rid, null, '⚠️ No project data found. Add charter details or log meetings first.');
+    return;
+  }
+  if (type === 'ask') {
+    const q = document.getElementById('askPrompt').value.trim();
+    if (!q) { document.getElementById('askPrompt').focus(); return; }
+  }
+  if (type === 'debrief') {
+    if (!_pendingDebriefText.trim()) { openDebriefModal(); return; }
+  }
+  if (['extract','changerequest'].includes(type)) {
+    const n = document.getElementById('askPrompt').value.trim();
+    if (!n) {
+      const ph = {
+        extract:       'Paste raw meeting notes here, then click Extract Actions…',
+        changerequest: 'Describe the proposed change here, then click Draft Change Request…'
+      };
+      document.getElementById('askPrompt').placeholder = ph[type];
+      document.getElementById('askPrompt').focus();
+      return;
+    }
+  }
+
+  const resultId = SINGLETON_TYPES.has(type) ? type : uid();
+  if (_abortControllers[resultId]) _abortControllers[resultId].abort();
+  const controller = new AbortController();
+  _abortControllers[resultId] = controller;
+  pushAILoading(type, resultId);
+
+  const headers = {'Content-Type':'application/json','anthropic-version':'2023-06-01'};
+  const apiKey = getApiKey();
+  if (apiKey) {
+    headers['x-api-key'] = apiKey;
+    headers['anthropic-dangerous-direct-browser-access'] = 'true';
+  }
+
+  try {
+    let cfg;
+    if (type === 'extract')          cfg = PROMPTS.extract(document.getElementById('askPrompt').value.trim());
+    else if (type === 'debrief')     cfg = PROMPTS.debrief(ctx, _pendingDebriefText);
+    else if (type === 'changerequest') cfg = PROMPTS.changerequest(ctx, document.getElementById('askPrompt').value.trim());
+    else if (type === 'ask')         cfg = PROMPTS.ask(ctx, document.getElementById('askPrompt').value.trim());
+    else                             cfg = PROMPTS[type](ctx);
+
+    const MODELS = {
+      risks:         'claude-sonnet-4-20250514',
+      summary:       'claude-sonnet-4-20250514',
+      scope:         'claude-sonnet-4-20250514',
+      changerequest: 'claude-sonnet-4-20250514',
+      agenda:        'claude-haiku-4-5-20251001',
+      extract:       'claude-haiku-4-5-20251001',
+      stakeholder:   'claude-haiku-4-5-20251001',
+      debrief:       'claude-haiku-4-5-20251001',
+      ask:           'claude-haiku-4-5-20251001',
+    };
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST', headers, signal: controller.signal,
+      body: JSON.stringify({model: MODELS[type]||'claude-haiku-4-5-20251001', max_tokens:1500, system:cfg.system, messages:[{role:'user',content:cfg.user}]})
+    });
+    const data = await res.json();
+    if (data.error) { pushAIResult(type, resultId, null, `API error: ${data.error.message}`); return; }
+    pushAIResult(type, resultId, (data.content||[]).map(c=>c.text||'').join(''));
+  } catch(err) {
+    if (err.name === 'AbortError') {
+      const el = document.getElementById('air-' + resultId);
+      if (el) el.remove();
+      if (SINGLETON_TYPES.has(type)) {
+        delete getProjectAI(STATE.activeId)[type];
+      } else {
+        const store = getProjectAI(STATE.activeId);
+        if (Array.isArray(store[type])) {
+          store[type] = store[type].filter(e => e.resultId !== resultId);
+          if (!store[type].length) delete store[type];
+        }
+      }
+      showToast('Cancelled');
+      return;
+    }
+    pushAIResult(type, resultId, null, `Error: ${err.message}`);
+  } finally {
+    delete _abortControllers[resultId];
+    if (type === 'debrief') _pendingDebriefText = '';
+  }
+}
+
+// ── PER-PROJECT AI RESULT STORE ──────────────────────────────
+// Singleton: _aiStore[pid][type] = { raw, err, ts }
+// Log:       _aiStore[pid][type] = [{ resultId, raw, err, ts }, ...]
+const _aiStore = {};
+
+function getProjectAI(pid) {
+  if (!_aiStore[pid]) _aiStore[pid] = {};
+  return _aiStore[pid];
+}
+
+function pushAILoading(type, resultId) {
+  let el = document.getElementById('air-' + resultId);
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'air-' + resultId;
+    el.className = 'ai-result-block';
+    document.getElementById('ai-results').prepend(el);
+  }
+  el.innerHTML = `
+    <div class="ai-result-hd">✦ ${AI_LABELS[type]}
+      <div class="ai-result-actions">
+        <button class="btn btn-danger btn-sm" onclick="cancelAI('${resultId}')">◼ Stop</button>
+      </div>
+    </div>
+    <div class="spinner-wrap"><div class="spinner"></div>Analyzing project data…</div>`;
+}
+
+function pushAIResult(type, resultId, text, err=null) {
+  const pid = STATE.activeId;
+  const ts  = new Date().toISOString();
+  const store = getProjectAI(pid);
+
+  if (SINGLETON_TYPES.has(type)) {
+    store[type] = { raw: text, err, ts };
+  } else {
+    if (!Array.isArray(store[type])) store[type] = [];
+    // Remove any previous entry with same resultId (replace on re-render)
+    store[type] = store[type].filter(e => e.resultId !== resultId);
+    store[type].unshift({ resultId, raw: text, err, ts });
+  }
+
+  _renderResult(type, resultId, text, err, ts, pid);
+  if (!err && text && pid===STATE.activeId) {
+    if (type==='risks') {
+      P().aiContext.risks={raw:text,ts,resultId}; save();
+    } else if (type==='scope') {
+      P().aiContext.scopeReviews.unshift({id:resultId,raw:text,ts});
+      if(P().aiContext.scopeReviews.length>20)P().aiContext.scopeReviews.length=20;
+      save();
+    } else if (type==='changerequest') {
+      P().aiContext.changeRequests.unshift({id:resultId,raw:text,ts});
+      if(P().aiContext.changeRequests.length>20)P().aiContext.changeRequests.length=20;
+      save();
+    }
+    if(document.querySelector('.tab-btn.active')?.dataset.tab==='analysis')renderAnalysis();
+  }
+}
+
+function _renderResult(type, resultId, text, err, ts, pid) {
+  if (pid !== STATE.activeId) return;
+
+  let el = document.getElementById('air-' + resultId);
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'air-' + resultId;
+    el.className = 'ai-result-block';
+    document.getElementById('ai-results').prepend(el);
+  }
+
+  let body;
+  if (err) {
+    body = `<div style="color:var(--red);font-size:13px">${esc(err)}</div>`;
+  } else if (type==='risks') {
+    body = renderRisks(text);
+  } else if (type==='extract') {
+    body = renderExtracted(text);
+  } else if (type==='summary') {
+    body = renderSummary(text);
+  } else {
+    body = renderTextResult(text);
+  }
+
+  const isSingleton = SINGLETON_TYPES.has(type);
+  const tsLabel = (!isSingleton && ts)
+    ? new Date(ts).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})
+    : '';
+
+  const dismissFn = isSingleton
+    ? `dismissSingleton('${type}')`
+    : `dismissLogEntry('${type}','${resultId}')`;
+
+  const extraBtn = (!err && type==='debrief')
+    ? `<button class="btn btn-secondary btn-sm" onclick="saveDebriefAsMeeting('${resultId}')">Save Meeting</button>`
+    : '';
+
+  el.innerHTML = `
+    <div class="ai-result-hd">✦ ${AI_LABELS[type]}${tsLabel ? `<span class="ai-result-ts">${tsLabel}</span>` : ''}
+      <div class="ai-result-actions">
+        ${extraBtn}
+        ${!err ? `<button class="btn btn-secondary btn-sm" onclick="copyAIResult('${type}','${resultId}')">⎘ Copy</button>` : ''}
+        <button class="btn btn-ghost btn-sm" onclick="${dismissFn}">✕</button>
+      </div>
+    </div>
+    ${body}`;
+}
+
+function dismissSingleton(type) {
+  delete getProjectAI(STATE.activeId)[type];
+  const el = document.getElementById('air-' + type);
+  if (el) el.remove();
+}
+
+function dismissLogEntry(type, resultId) {
+  const store = getProjectAI(STATE.activeId);
+  if (Array.isArray(store[type])) {
+    store[type] = store[type].filter(e => e.resultId !== resultId);
+    if (!store[type].length) delete store[type];
+  }
+  const el = document.getElementById('air-' + resultId);
+  if (el) el.remove();
+}
+
+// Re-render stored results for the active project
+function refreshAIResults() {
+  document.getElementById('ai-results').innerHTML = '';
+  const store = getProjectAI(STATE.activeId);
+  const pid   = STATE.activeId;
+
+  // Render singletons first (prepend → they appear at bottom of results)
+  ['scope','summary','risks'].forEach(type => {
+    const e = store[type];
+    if (e) _renderResult(type, type, e.raw, e.err, e.ts, pid);
+  });
+
+  // Collect log entries, sort oldest→newest so prepend puts newest at top
+  const logEntries = [];
+  Object.keys(store).forEach(type => {
+    if (!SINGLETON_TYPES.has(type) && Array.isArray(store[type])) {
+      store[type].forEach(e => logEntries.push({type, ...e}));
+    }
+  });
+  logEntries.sort((a,b) => new Date(a.ts)-new Date(b.ts));
+  logEntries.forEach(({type, resultId, raw, err, ts}) => {
+    _renderResult(type, resultId, raw, err, ts, pid);
+  });
+}
+
+// ── JSON HELPER — strips markdown fences before parsing ─────
+function parseAIJson(raw) {
+  const stripped = raw.replace(/^```(?:json)?\s*/i,'').replace(/\s*```\s*$/,'').trim();
+  return JSON.parse(stripped);
+}
+
+// ── RISK RENDERER ────────────────────────────────────────────
+function renderRisks(raw) {
+  try {
+    const risks = parseAIJson(raw);
+    if (!Array.isArray(risks)) throw new Error('not array');
+    return risks.map(r => {
+      const lh  = (r.likelihood||r.level||'').toLowerCase();
+      const cls = lh==='high' ? 'r-high' : lh==='medium' ? 'r-medium' : lh==='low' ? 'r-low' : '';
+      const lbl = r.likelihood || r.level || '?';
+      return `<div class="risk-row">
+        <span class="risk-lvl ${cls}" style="white-space:nowrap">${esc(lbl)}</span>
+        <div style="flex:1;min-width:0">
+          <div class="risk-title">${esc(r.issueName||r.risk||r.title||'')}</div>
+          <div class="risk-detail" style="margin-top:3px">${esc(r.issueDescription||r.detail||r.description||'')}</div>
+          ${r.potentialImpact ? `<div class="risk-detail" style="margin-top:4px"><strong style="color:var(--text-muted)">Impact:</strong> ${esc(r.potentialImpact)}</div>` : ''}
+          <div class="risk-mit" style="margin-top:4px"><strong>Mitigation:</strong> ${esc(r.mitigationPlan||r.mitigation||r.recommendation||'')}</div>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    return renderTextResult(raw);
+  }
+}
+
+// ── ACTION ITEM RENDERER ─────────────────────────────────────
+function renderExtracted(raw) {
+  const clr = {high:'var(--red)',medium:'var(--amber)',low:'var(--green)'};
+  try {
+    const items = parseAIJson(raw);
+    if (!Array.isArray(items)) throw new Error('not array');
+    return items.map(a => `
+      <div class="action-chip" style="margin-bottom:6px;align-items:flex-start">
+        <span style="color:${clr[(a.priority||'').toLowerCase()]||'var(--text-muted)'};font-size:16px;line-height:1.2;flex-shrink:0">☐</span>
+        <div style="flex:1">
+          <div style="font-size:13px;color:var(--text);font-weight:500">${esc(a.action||a.text||'')}</div>
+          <div style="font-size:11px;color:var(--text-dim);margin-top:3px;display:flex;gap:12px;flex-wrap:wrap">
+            ${a.owner ? `<span>👤 ${esc(a.owner)}</span>` : ''}
+            ${a.due   ? `<span>📅 ${esc(a.due)}</span>`   : ''}
+            ${a.priority ? `<span style="color:${clr[a.priority.toLowerCase()]||'var(--text-dim)'}">● ${esc(a.priority)}</span>` : ''}
+          </div>
+        </div>
+      </div>`).join('');
+  } catch(e) {
+    return renderTextResult(raw);
+  }
+}
+
+// ── PROJECT SUMMARY RENDERER ─────────────────────────────────
+function renderSummary(raw) {
+  try {
+    const d = parseAIJson(raw);
+    if (typeof d !== 'object' || !d.projectStatus) throw new Error('invalid');
+
+    const ragPill = val => {
+      const v = (val||'').toLowerCase();
+      const cls = v==='red' ? 'r-high' : v==='amber' ? 'r-medium' : v==='green' ? 'r-low' : '';
+      const label = val || '—';
+      return `<span class="risk-lvl ${cls}" style="font-size:10px;letter-spacing:.5px">${esc(label)}</span>`;
+    };
+
+    const statusRows = [
+      { label:'Project Status',  rag:d.projectStatus,  notes:d.projectStatusNotes  },
+      { label:'Schedule Status', rag:d.scheduleStatus, notes:d.scheduleStatusNotes },
+      { label:'Financial Status',rag:d.financialStatus,notes:d.financialStatusNotes},
+      { label:'Scope Status',    rag:d.scopeStatus,    notes:d.scopeStatusNotes    },
+    ];
+
+    const rowsHtml = statusRows.map(r=>`
+      <div class="sum-row">
+        <div class="sum-row-hd">${ragPill(r.rag)}<span class="sum-row-label">${esc(r.label)}</span></div>
+        <div class="sum-row-notes">${esc(r.notes||'—')}</div>
+      </div>`).join('');
+
+    const actHtml = `
+      <div class="sum-act"><div class="sum-act-label">Last 30 Days</div><div class="sum-act-text">${esc(d.last30Days||'—')}</div></div>
+      <div class="sum-act"><div class="sum-act-label">Next 30 Days</div><div class="sum-act-text">${esc(d.next30Days||'—')}</div></div>`;
+
+    return `<div class="sum-grid">${rowsHtml}</div>${actHtml}`;
+  } catch(e) {
+    return renderTextResult(raw);
+  }
+}
+
+// ── PLAIN TEXT RENDERER — structured, readable ───────────────
+function renderTextResult(text) {
+  if (!text) return '';
+  const lines = text.split('\n');
+  let html = '';
+
+  function isHeader(s) {
+    if (s.length > 72 || s.length < 3) return false;
+    if (s.endsWith('.') || s.endsWith(',')) return false;
+    const letters = s.replace(/[^a-zA-Z]/g,'');
+    if (letters.length < 3) return false;
+    return (s.match(/[A-Z]/g)||[]).length / letters.length > 0.72;
+  }
+
+  for (const raw of lines) {
+    const line = raw.trimEnd();
+    const t = line.trim();
+
+    if (!t) { html += '<div class="ai-spacer"></div>'; continue; }
+
+    // Checkbox [ ] or [x]
+    if (/^\[[\sx]\]/i.test(t)) {
+      const checked = /^\[[xX]\]/.test(t);
+      const content = t.slice(3).trim();
+      html += `<div class="ai-check"><span class="ai-check-box${checked?' checked':''}">${checked?'✓':'☐'}</span><span>${esc(content)}</span></div>`;
+      continue;
+    }
+
+    // Numbered list
+    if (/^\d{1,2}[.)]\s/.test(t)) {
+      const m = t.match(/^(\d{1,2}[.)]\s*)(.*)/);
+      html += `<div class="ai-numbered"><span class="ai-num">${esc(m[1].trim())}</span><span>${esc(m[2])}</span></div>`;
+      continue;
+    }
+
+    // Bullets
+    if (/^[-•●*]\s/.test(t)) {
+      html += `<div class="ai-bullet"><span class="ai-bullet-dot">·</span><span>${esc(t.slice(2).trim())}</span></div>`;
+      continue;
+    }
+
+    // Arrow lines (recommendations, mitigations)
+    if (t.startsWith('→') || t.startsWith('->')) {
+      html += `<div class="ai-arrow">${esc(t)}</div>`;
+      continue;
+    }
+
+    // Section header (all-caps heuristic)
+    if (isHeader(t)) {
+      html += `<div class="ai-sec-hd">${esc(t)}</div>`;
+      continue;
+    }
+
+    // Label: Value lines (e.g. "Subject: Weekly Status")
+    const labelMatch = t.match(/^([A-Za-z][A-Za-z\s]{1,28}):\s(.+)/);
+    if (labelMatch) {
+      html += `<div class="ai-label-line"><strong>${esc(labelMatch[1])}:</strong> ${esc(labelMatch[2])}</div>`;
+      continue;
+    }
+
+    html += `<div class="ai-para">${esc(t)}</div>`;
+  }
+
+  return `<div class="ai-text-body">${html}</div>`;
+}
+
+// ── COPY TO CLIPBOARD ────────────────────────────────────────
+function copyAIResult(type, resultId) {
+  const store = getProjectAI(STATE.activeId);
+  let raw;
+
+  if (SINGLETON_TYPES.has(type)) {
+    raw = store[type]?.raw;
+  } else {
+    const entries = Array.isArray(store[type]) ? store[type] : [];
+    raw = entries.find(e => e.resultId === resultId)?.raw;
+  }
+  if (!raw) return;
+
+  let text = '';
+
+  if (type === 'risks') {
+    try {
+      const risks = parseAIJson(raw);
+      text = `RISK ANALYSIS — ${P().name||'Project'}\n${'─'.repeat(50)}\n\n`;
+      risks.forEach(r => {
+        text += `Issue: ${r.issueName||r.risk||r.title||''}\n`;
+        text += `Description: ${r.issueDescription||r.detail||r.description||''}\n`;
+        text += `Potential Impact: ${r.potentialImpact||'\u2014'}\n`;
+        text += `Likelihood: ${r.likelihood||r.level||'?'}\n`;
+        text += `Mitigation Plan: ${r.mitigationPlan||r.mitigation||r.recommendation||''}\n\n`;
+      });
+    } catch(e) { text = raw; }
+
+  } else if (type === 'summary') {
+    try {
+      const d = parseAIJson(raw);
+      text = `PROJECT STATUS SUMMARY — ${P().name||'Project'}\n${'─'.repeat(50)}\n\n`;
+      const rows = [
+        ['PROJECT STATUS',   d.projectStatus,  d.projectStatusNotes  ],
+        ['SCHEDULE STATUS',  d.scheduleStatus, d.scheduleStatusNotes ],
+        ['FINANCIAL STATUS', d.financialStatus,d.financialStatusNotes],
+        ['SCOPE STATUS',     d.scopeStatus,    d.scopeStatusNotes    ],
+      ];
+      rows.forEach(([label, rag, notes]) => {
+        text += `${label}: ${rag||'—'}\n${notes||''}\n\n`;
+      });
+      text += `LAST 30 DAYS\n${d.last30Days||'—'}\n\nNEXT 30 DAYS\n${d.next30Days||'—'}\n`;
+    } catch(e) { text = raw; }
+
+  } else if (type === 'extract') {
+    try {
+      const items = parseAIJson(raw);
+      text = `ACTION ITEMS\n${'─'.repeat(50)}\n\n`;
+      items.forEach(a => {
+        text += `☐  ${a.action||a.text||''}\n`;
+        const meta = [
+          a.owner    ? `Owner: ${a.owner}`       : '',
+          a.due      ? `Due: ${a.due}`            : '',
+          a.priority ? `Priority: ${a.priority}`  : ''
+        ].filter(Boolean).join('  |  ');
+        if (meta) text += `   ${meta}\n`;
+        text += '\n';
+      });
+    } catch(e) { text = raw; }
+
+  } else {
+    text = raw;
+  }
+
+  copyToClipboard(text.trim());
+}
+
+function copyToClipboard(text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(()=>showToast('Copied to clipboard')).catch(()=>fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+}
+
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); showToast('Copied to clipboard'); }
+  catch(e) { showToast('Copy failed — select and copy manually'); }
+  document.body.removeChild(ta);
+}
+
+// ── DEBRIEF → MEETING ────────────────────────────────────────
+function extractDebriefSections(text) {
+  // Split debrief text into labelled sections by detecting ALL-CAPS headers
+  const sections = {};
+  let current = null;
+  const buf = [];
+
+  function flush() { if (current) sections[current] = buf.join('\n').trim(); }
+
+  for (const line of text.split('\n')) {
+    const t = line.trim();
+    const letters = t.replace(/[^a-zA-Z]/g,'');
+    const isHdr = t.length >= 3 && t.length <= 72 && !t.endsWith('.')
+      && letters.length >= 3
+      && (t.match(/[A-Z]/g)||[]).length / letters.length > 0.72;
+
+    if (isHdr) { flush(); current = t; buf.length = 0; }
+    else if (current) buf.push(line);
+  }
+  flush();
+  return sections;
+}
+
+function saveDebriefAsMeeting(resultId) {
+  const store = getProjectAI(STATE.activeId);
+  const entries = Array.isArray(store.debrief) ? store.debrief : [];
+  const entry = entries.find(e => e.resultId === resultId) || entries[0];
+  if (!entry || !entry.raw) { showToast('No debrief to save'); return; }
+
+  const sections = extractDebriefSections(entry.raw);
+
+  function findSection(keyword) {
+    const key = Object.keys(sections).find(k => k.toUpperCase().includes(keyword));
+    if (!key) return '';
+    const val = sections[key].trim();
+    const empty = ['none','not identified','-','n/a',''];
+    return empty.includes(val.toLowerCase()) ? '' : val;
+  }
+
+  const attendeesRaw = findSection('ATTEND');
+  const decisionsRaw = findSection('DECISION');
+  const actionsRaw   = findSection('ACTION');
+  const dateRaw      = findSection('MEETING DATE');
+  const durationRaw  = findSection('DURATION');
+  const notes        = entry.raw;
+
+  // Normalise attendees to a comma-separated string for the Attendees field
+  const attendeeText = parseAttendeeList(attendeesRaw);
+
+  // Parse decisions and log each as a formal entry in the Decisions register
+  const decisionLines = parseListItems(decisionsRaw);
+  decisionLines.forEach(text => {
+    P().decisions.unshift({
+      id: uid(), date: today(), madeBy: '', status: 'final',
+      text, rationale: 'Logged from meeting debrief.', impact: '', loggedToPSA:false, psaDate:''
+    });
+  });
+
+  // Parse action items and log each to the Actions tab
+  const actionLines = parseListItems(actionsRaw);
+  const now = new Date().toISOString();
+  actionLines.forEach(line => {
+    // Parse "Owner: Action text (Due: date)" format
+    let owner = '', text = line, dueDate = '';
+    const colonIdx = line.indexOf(': ');
+    if (colonIdx > 0 && colonIdx < 25) {
+      owner = line.slice(0, colonIdx).trim();
+      text  = line.slice(colonIdx + 2).trim();
+    }
+    const dueMatch = text.match(/\(Due:\s*([^)]+)\)\s*$/i);
+    if (dueMatch) {
+      dueDate = dueMatch[1].trim();
+      text    = text.slice(0, dueMatch.index).trim();
+    }
+    P().actions.unshift({
+      id: nextActionId(), text, owner, dueDate,
+      priority: 'Medium', status: 'Open',
+      source: 'Meeting Debrief', sourceId: '',
+      createdAt: now, updatedAt: now, completedAt: '',
+      loggedToPSA: false, psaDate: '', notes: ''
+    });
+  });
+
+  if (decisionLines.length || actionLines.length) { save(); updateCounts(); }
+
+  switchTab('meetings');
+  setTimeout(() => {
+    openMtgModal();
+    // Use extracted date if valid YYYY-MM-DD, otherwise default to today
+    const extractedDate = dateRaw && /^\d{4}-\d{2}-\d{2}$/.test(dateRaw.trim()) ? dateRaw.trim() : today();
+    document.getElementById('mDate').value      = extractedDate;
+    document.getElementById('mDur').value       = durationRaw || '';
+    document.getElementById('mTitle').value     = '';
+    document.getElementById('mAttendees').value = attendeeText;
+    document.getElementById('mNotes').value     = notes;
+    document.getElementById('mDecisions').value = decisionsRaw;
+    document.getElementById('mActions').value   = actionsRaw;
+    document.getElementById('mTitle').focus();
+    const nd = decisionLines.length, na = actionLines.length;
+    const parts = [];
+    if (nd) parts.push(`${nd} decision${nd>1?'s':''} logged`);
+    if (na) parts.push(`${na} action${na>1?'s':''} logged`);
+    showToast(`Debrief loaded${parts.length ? ' · ' + parts.join(', ') : ''} — add a title and save`);
+  }, 80);
+}
+
+// Strip bullet/number markers and return clean non-empty strings
+function parseListItems(text) {
+  if (!text) return [];
+  return text.split('\n')
+    .map(l => l.replace(/^[\s\-\u2022\u25cf\u25aa*\d.)\]]+/, '').trim())
+    .filter(l => l && l.toLowerCase() !== 'none');
+}
+
+// Normalise a bullet list or comma string of attendee names into "A, B, C" format
+function parseAttendeeList(text) {
+  if (!text) return '';
+  const lines = text.split('\n')
+    .map(l => l.replace(/^[\s\-\u2022\u25cf\u25aa*]+/, '').trim())
+    .filter(Boolean);
+  // Multi-line → join; single line that's already comma-separated → return as-is
+  return lines.length > 1 ? lines.join(', ') : lines[0] || '';
+}
+
+function primeExtract(){document.getElementById('askPrompt').focus();document.getElementById('askPrompt').scrollIntoView({behavior:'smooth',block:'center'});}
+// ── DEBRIEF MODAL ────────────────────────────────────────────
+function openDebriefModal(meeting=null) {
+  const ta = document.getElementById('debriefInput');
+  document.getElementById('debriefFileName').textContent = '';
+  if (meeting) {
+    const parts = [];
+    if (meeting.title)     parts.push(`Meeting: ${meeting.title}`);
+    if (meeting.date)      parts.push(`Date: ${meeting.date}`);
+    if (meeting.attendees) parts.push(`Attendees: ${meeting.attendees}`);
+    if (meeting.notes)     parts.push(`\nNotes:\n${meeting.notes}`);
+    if (meeting.decisions) parts.push(`\nDecisions:\n${meeting.decisions}`);
+    if (meeting.actions)   parts.push(`\nAction Items:\n${meeting.actions}`);
+    ta.value = parts.join('\n');
+  } else {
+    ta.value = '';
+  }
+  document.getElementById('debriefModal').classList.remove('hidden');
+  setTimeout(() => ta.focus(), 60);
+}
+
+function closeDebriefModal() {
+  document.getElementById('debriefModal').classList.add('hidden');
+}
+
+function loadDebriefFile(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    document.getElementById('debriefInput').value = ev.target.result;
+    document.getElementById('debriefFileName').textContent = '📄 ' + file.name;
+  };
+  reader.onerror = () => showToast('Could not read file');
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+function runDebriefFromModal() {
+  const text = document.getElementById('debriefInput').value.trim();
+  if (!text) { document.getElementById('debriefInput').focus(); return; }
+  _pendingDebriefText = text;
+  closeDebriefModal();
+  switchTab('ai');
+  runAI('debrief');
+}
+
+function cancelAI(resultId) {
+  const ctrl = _abortControllers[resultId];
+  if (ctrl) ctrl.abort();
+}
+
+// Called from Meetings tab — opens debrief modal pre-filled with the meeting's content
+function debriefMeeting(meetingId) {
+  const m = P().meetings.find(x => x.id === meetingId);
+  if (m) openDebriefModal(m);
+}
+function primeChangeRequest(){document.getElementById('askPrompt').placeholder='Describe the proposed change — what is changing, why, and any known impacts…';document.getElementById('askPrompt').focus();document.getElementById('askPrompt').scrollIntoView({behavior:'smooth',block:'center'});}
+
+// ═══════════════════════════════════════════════════════
+// BACKUPS
+// ═══════════════════════════════════════════════════════
+function loadBackups(){try{return JSON.parse(localStorage.getItem(BACKUP_KEY)||'[]');}catch(e){return[];}}
+function storeBackups(l){localStorage.setItem(BACKUP_KEY,JSON.stringify(l));}
+
+function saveBackup(){
+  const blob=new Blob([JSON.stringify(STATE,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=`groundwork-all-projects-${today()}.json`;a.click();
+  showToast('Backup downloaded');
+}
+function saveLocalBackup(){
+  const backups=loadBackups();
+  backups.unshift({id:uid(),ts:new Date().toISOString(),label:`${STATE.projects.length} project${STATE.projects.length!==1?'s':''}`,data:JSON.parse(JSON.stringify(STATE))});
+  if(backups.length>5) backups.length=5;
+  storeBackups(backups); renderBackupList(); showToast('Snapshot saved');
+}
+function restoreLocalBackup(id){
+  const entry=loadBackups().find(b=>b.id===id);if(!entry)return;
+  const ts=new Date(entry.ts).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
+  if(!confirm(`Restore snapshot from ${ts}?\n\nThis replaces all current project data.`)) return;
+  STATE=JSON.parse(JSON.stringify(entry.data));save();renderAll();closeSettings();showToast('Backup restored');
+}
+function deleteLocalBackup(id){storeBackups(loadBackups().filter(b=>b.id!==id));renderBackupList();}
+function renderBackupList(){
+  const backups=loadBackups();const el=document.getElementById('backupList');
+  if(!backups.length){el.innerHTML=`<div style="font-size:12px;color:var(--text-dim);padding:8px 0">No snapshots yet. Click "Save now" to create one.</div>`;return;}
+  el.innerHTML=backups.map(b=>{
+    const ts=new Date(b.ts).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
+    return `<div class="backup-card"><div style="flex:1;min-width:0"><div class="backup-card-name">${esc(b.label)}</div><div class="backup-card-meta">${ts}</div></div><div style="display:flex;gap:6px;flex-shrink:0"><button class="btn btn-secondary btn-sm" onclick="restoreLocalBackup('${b.id}')">Restore</button><button class="btn btn-danger btn-sm" onclick="deleteLocalBackup('${b.id}')">✕</button></div></div>`;
+  }).join('');
+}
+function importData(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{try{const imp=JSON.parse(ev.target.result);if(!confirm('Restore this backup? All current data will be replaced.'))return;STATE=migrate(imp);save();renderAll();closeSettings();showToast('Backup restored');}catch(err){alert('Invalid Groundwork backup file.');}};
+  r.readAsText(f);e.target.value='';
+}
+
+// ═══════════════════════════════════════════════════════
+// COUNTS & RENDER
+// ═══════════════════════════════════════════════════════
+function updateCounts(){
+  document.getElementById('cnt-meetings').textContent=(P().meetings||[]).length;
+  document.getElementById('cnt-decisions').textContent=(P().decisions||[]).length;
+  const openAct=(P().actions||[]).filter(a=>!a.loggedToPSA&&a.status!=='Complete'&&a.status!=='Cancelled').length;
+  const el=document.getElementById('cnt-actions');if(el)el.textContent=openAct?openAct:'';
+}
+
+function populateCharterFields(){
+  const proj=P();
+  const fv=(id,val)=>{const el=document.getElementById(id);if(el)el.value=val||'';};
+  fv('projName',proj.name);fv('projType',proj.type);fv('projPhase',proj.phase);
+  fv('projBilling',proj.billing);fv('projPM',proj.pm);fv('projSponsor',proj.sponsor);
+  fv('projLink',proj.link);fv('projStart',proj.startDate);fv('projTarget',proj.targetDate);
+  fv('scopeText',proj.charter.scope);fv('oosText',proj.charter.outOfScope);
+  ['objectives','assumptions','constraints','successCriteria','stakeholders'].forEach(k=>renderList(k));
+  renderRagSelector();
+}
+
+function renderAll(){
+  populateCharterFields();
+  const activeTab = document.querySelector('.tab-btn.active')?.dataset.tab;
+  if (activeTab==='meetings')  renderMeetings();
+  if (activeTab==='decisions') renderDecisions();
+  if (activeTab==='actions')   renderActions();
+  if (activeTab==='analysis')  renderAnalysis();
+  if (activeTab==='ai')        refreshAIResults();
+  renderProjBar();
+  updateCounts();
+}
+
+// ═══════════════════════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════════════════════
+
+// ================================================================
+// ACTION ITEMS
+// ================================================================
+let _actionFilter = 'open';
+
+function setActionFilter(f) {
+  _actionFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('factive', b.dataset.filter===f));
+  renderActions();
+}
+
+function nextActionId() {
+  const nums = (P().actions||[]).map(a => parseInt((a.id||'A0').slice(1))||0);
+  return 'A' + String((nums.length ? Math.max(...nums) : 0) + 1).padStart(3,'0');
+}
+
+function isOverdue(a) {
+  if (!a.dueDate) return false;
+  if (a.loggedToPSA || a.status==='Complete' || a.status==='Cancelled') return false;
+  return a.dueDate < today();
+}
+
+function renderActions() {
+  const q  = (document.getElementById('q-actions')?.value||'').toLowerCase();
+  const el = document.getElementById('actions-list');
+  if (!el) return;
+  const all = P().actions||[];
+
+  const filtered = all.filter(a => {
+    const mq = !q || [a.text,a.owner,a.notes,a.source].join(' ').toLowerCase().includes(q);
+    if (!mq) return false;
+    if (_actionFilter==='open')       return a.status==='Open' && !a.loggedToPSA;
+    if (_actionFilter==='inprogress') return a.status==='In Progress' && !a.loggedToPSA;
+    if (_actionFilter==='overdue')    return isOverdue(a);
+    if (_actionFilter==='complete')   return a.status==='Complete' || a.loggedToPSA;
+    return true;
+  });
+
+  const pOrd = {High:0,Medium:1,Low:2};
+  filtered.sort((a,b) => {
+    const ad = a.loggedToPSA||a.status==='Complete'||a.status==='Cancelled';
+    const bd = b.loggedToPSA||b.status==='Complete'||b.status==='Cancelled';
+    if (ad!==bd) return ad?1:-1;
+    const pd = (pOrd[a.priority]||1)-(pOrd[b.priority]||1);
+    if (pd!==0) return pd;
+    if (a.dueDate&&b.dueDate) return a.dueDate.localeCompare(b.dueDate);
+    return a.dueDate?-1:b.dueDate?1:0;
+  });
+
+  if (!filtered.length) {
+    el.innerHTML = `<div class="empty">
+      <div class="empty-ico">&#x2705;</div>
+      <div class="empty-msg">${q?'No matches found':_actionFilter==='all'?'No action items yet':'No items in this view'}</div>
+      <div class="empty-sub">${q?'Try a different search':_actionFilter==='all'?'Add your first action item':'Try switching filters'}</div>
+      ${!q&&_actionFilter==='all'?'<button class="btn btn-primary" onclick="openActionModal()">&#xff0b; Add Action</button>':''}
+    </div>`;
+    return;
+  }
+
+  const pDot = p => {
+    const cls = {High:'pd-high',Medium:'pd-medium',Low:'pd-low'}[p]||'';
+    return `<span class="pdot ${cls}" title="${esc(p||'')}"></span>`;
+  };
+  const sCls = s => ({'Open':'as-open','In Progress':'as-inprogress','Complete':'as-complete','Cancelled':'as-cancelled'}[s]||'as-open');
+
+  el.innerHTML = filtered.map(a => {
+    const od  = isOverdue(a);
+    const due = a.dueDate ? new Date(a.dueDate+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '';
+    const cr  = a.createdAt ? relativeTime(a.createdAt) : '';
+    const psaBtn = a.loggedToPSA
+      ? `<span class="psa-badge">&#x2713; In PSA${a.psaDate?' &middot; '+a.psaDate:''}</span>`
+      : `<button class="btn-psa" onclick="toggleActionPSA('${a.id}')">Log to PSA</button>`;
+    return `<div class="action-item-card${a.loggedToPSA?' psa-done':od?' overdue-card':''}">
+      <div class="ai-card-row">
+        <span class="ai-id">${esc(a.id)}</span>
+        <div class="ai-main">
+          <div class="ai-desc">${hl(esc(a.text),q)}</div>
+          <div class="ai-meta-row">
+            ${pDot(a.priority)}
+            <span class="act-status ${sCls(a.status)}">${esc(a.status)}</span>
+            ${od?'<span class="overdue-tag">Overdue</span>':''}
+            ${a.owner?`<span>&#128100; ${hl(esc(a.owner),q)}</span>`:''}
+            ${due?`<span>&#128197; ${esc(due)}</span>`:''}
+            ${a.source?`<span>&#128204; ${hl(esc(a.source),q)}</span>`:''}
+            ${cr?`<span style="margin-left:auto;color:var(--text-dim)">${cr}</span>`:''}
+          </div>
+          ${a.notes?`<div class="ai-notes-text">${hl(esc(a.notes),q)}</div>`:''}
+        </div>
+      </div>
+      <div class="ai-card-footer">
+        ${psaBtn}
+        <button class="btn btn-ghost btn-sm" onclick="openActionModal('${a.id}')">&#x270f;&#xfe0f; Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="delAction('${a.id}')">&#x1f5d1; Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openActionModal(id=null) {
+  const a = id ? P().actions.find(x=>x.id===id) : null;
+  document.getElementById('actionId').value    = id||'';
+  document.getElementById('actionModalLbl').textContent = id?'Edit Action Item':'Add Action Item';
+  document.getElementById('aText').value       = a?a.text:'';
+  document.getElementById('aOwner').value      = a?a.owner:'';
+  document.getElementById('aDue').value        = a?a.dueDate:'';
+  document.getElementById('aPriority').value   = a?a.priority:'Medium';
+  document.getElementById('aStatus').value     = a?a.status:'Open';
+  document.getElementById('aSource').value     = a?a.source:'Manual';
+  document.getElementById('aNotes').value      = a?a.notes:'';
+  document.getElementById('actionModal').classList.remove('hidden');
+  setTimeout(()=>document.getElementById('aText').focus(),50);
+}
+function closeActionModal(){ document.getElementById('actionModal').classList.add('hidden'); }
+
+function saveAction() {
+  const id   = document.getElementById('actionId').value;
+  const text = document.getElementById('aText').value.trim();
+  if (!text){ document.getElementById('aText').focus(); return; }
+  const now  = new Date().toISOString();
+  const stat = document.getElementById('aStatus').value;
+  if (id) {
+    const idx = P().actions.findIndex(x=>x.id===id);
+    const ex  = P().actions[idx];
+    P().actions[idx] = { ...ex, text,
+      owner:document.getElementById('aOwner').value.trim(),
+      dueDate:document.getElementById('aDue').value,
+      priority:document.getElementById('aPriority').value,
+      status:stat,
+      source:document.getElementById('aSource').value.trim(),
+      notes:document.getElementById('aNotes').value.trim(),
+      updatedAt:now,
+      completedAt:stat==='Complete'&&ex.status!=='Complete'?now:ex.completedAt
+    };
+  } else {
+    P().actions.unshift({ id:nextActionId(), text,
+      owner:document.getElementById('aOwner').value.trim(),
+      dueDate:document.getElementById('aDue').value,
+      priority:document.getElementById('aPriority').value,
+      status:stat,
+      source:document.getElementById('aSource').value.trim(),
+      notes:document.getElementById('aNotes').value.trim(),
+      createdAt:now, updatedAt:now, completedAt:'',
+      loggedToPSA:false, psaDate:''
+    });
+  }
+  save(); closeActionModal(); renderActions(); updateCounts();
+}
+
+function delAction(id) {
+  if (!confirm('Delete this action item?')) return;
+  P().actions = P().actions.filter(x=>x.id!==id);
+  save(); renderActions(); updateCounts();
+}
+
+function toggleActionPSA(id) {
+  const a = P().actions.find(x=>x.id===id); if (!a) return;
+  if (!confirm(`Mark "${a.text.slice(0,60)}" as Logged to PSA?\n\nThis will mark it as complete.`)) return;
+  a.loggedToPSA=true; a.psaDate=today(); a.status='Complete';
+  a.completedAt=new Date().toISOString(); a.updatedAt=a.completedAt;
+  save(); renderActions(); updateCounts(); showToast('Logged to PSA');
+}
+
+function toggleDecisionPSA(id) {
+  const d = P().decisions.find(x=>x.id===id); if (!d) return;
+  if (!confirm(`Mark "${d.text.slice(0,60)}" as Logged to PSA?`)) return;
+  d.loggedToPSA=true; d.psaDate=today();
+  save(); renderDecisions(); showToast('Decision logged to PSA');
+}
+
+// ================================================================
+// ANALYSIS TAB
+// ================================================================
+function renderAnalysis() {
+  const el = document.getElementById('analysis-content');
+  if (!el) return;
+  const ctx = P().aiContext || {};
+
+  function secHtml(title, icon, data, type, singleton) {
+    const has = singleton ? !!data : !!(data&&data.length);
+    const empty = `<div class="empty" style="padding:24px">
+      <div class="empty-ico">${icon}</div>
+      <div class="empty-msg">No ${title.toLowerCase()} saved yet</div>
+      <div class="empty-sub">Run the tool in AI Insights &mdash; results auto-save here</div>
+      <button class="btn btn-ghost btn-sm" onclick="switchTab('ai')">Go to AI Insights</button>
+    </div>`;
+
+    let items = '';
+    if (singleton) {
+      if (data) {
+        const ts = data.ts ? new Date(data.ts).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'}) : '';
+        const body = type==='risks' ? renderRisks(data.raw) : renderTextResult(data.raw);
+        items = `<div class="analysis-entry">
+          <div class="analysis-entry-hd">
+            <span class="analysis-ts">Last run: ${ts}</span>
+            <button class="btn btn-danger btn-sm" style="margin-left:auto" onclick="delAnalysisItem('${type}',null)">&#x2715; Remove</button>
+          </div>${body}</div>`;
+      }
+    } else {
+      items = (data||[]).map(e => {
+        const ts = e.ts ? new Date(e.ts).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'}) : '';
+        return `<div class="analysis-entry">
+          <div class="analysis-entry-hd">
+            <span class="analysis-ts">${ts}</span>
+            <button class="btn btn-danger btn-sm" style="margin-left:auto" onclick="delAnalysisItem('${type}','${e.id}')">&#x2715; Remove</button>
+          </div>${renderTextResult(e.raw)}</div>`;
+      }).join('');
+    }
+
+    return `<div class="analysis-sec">
+      <div class="analysis-sec-hd">
+        <div class="analysis-sec-title">${icon} ${esc(title)}</div>
+        <button class="btn btn-ghost btn-sm" onclick="switchTab('ai')">Re-run &rarr;</button>
+      </div>
+      ${has ? items : empty}
+    </div>`;
+  }
+
+  el.innerHTML =
+    secHtml('Risk Analysis',   '&#x1f50d;', ctx.risks,          'risks',          true) +
+    secHtml('Scope Reviews',   '&#x1f5fa;', ctx.scopeReviews,   'scopeReviews',   false) +
+    secHtml('Change Requests', '&#x1f500;', ctx.changeRequests, 'changeRequests', false);
+}
+
+function delAnalysisItem(type, id) {
+  if (!confirm('Remove this entry?')) return;
+  if (type==='risks')          P().aiContext.risks = null;
+  else if (type==='scopeReviews')   P().aiContext.scopeReviews   = P().aiContext.scopeReviews.filter(e=>e.id!==id);
+  else if (type==='changeRequests') P().aiContext.changeRequests = P().aiContext.changeRequests.filter(e=>e.id!==id);
+  save(); renderAnalysis();
+}
+
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
+function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function hl(text,q){if(!q)return text;const re=new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`,'gi');return text.replace(re,'<mark class="hl">$1</mark>');}
+function showToast(msg){const t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),2100);}
+
+// ── Busywork Integration ─────────────────────────────────
+// Pushes open action items from the current project into Busywork
+// via the shared localStorage key. Works because both tools are
+// on the same origin in The Works monorepo.
+function pushToBusywork() {
+  const proj = P();
+  const open = (proj.actions || []).filter(a =>
+    a.status !== 'Complete' && a.status !== 'Cancelled'
+  );
+  if (!open.length) { showToast('No open actions to push'); return; }
+  const payload = open.map(a => ({
+    title:       a.text,
+    dueDate:     a.dueDate || null,
+    owner:       a.owner || null,
+    source:      a.source || null,
+    projectName: proj.name || null
+  }));
+  localStorage.setItem('busywork_incoming', JSON.stringify(payload));
+  showToast(`${open.length} action${open.length > 1 ? 's' : ''} pushed to Busywork`);
+}
+
+// ── KEYBOARD & CLICK-OUTSIDE ──────────────────────────────
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){closeDecModal();closeProjModal();closeSettings();closeProjDropdown();closeDebriefModal();closeActionModal();}
+});
+document.querySelectorAll('.overlay').forEach(o=>{
+  o.addEventListener('click',e=>{if(e.target===o){closeDecModal();closeProjModal();closeSettings();closeDebriefModal();closeActionModal();}});
+});
+document.addEventListener('click',e=>{
+  const sw=document.getElementById('projSwitcher');
+  if(sw&&!sw.contains(e.target)) closeProjDropdown();
+});
+
+// ── SERVICE WORKER ────────────────────────────────────────
+if('serviceWorker'in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
+
+// ── INIT ─────────────────────────────────────────────────
+loadState();
+const _prefs=loadPrefs();
+if(_prefs.lightMode) applyTheme(true);
+renderAll();
+</script>
+</body>
+</html>
