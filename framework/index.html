@@ -115,7 +115,7 @@
     .proj-bar {
       padding: 9px 18px; display: flex; gap: 8px; align-items: center;
       background: var(--surface); border-bottom: 1px solid var(--border);
-      position: sticky; top: 0; z-index: 68;
+      position: sticky; top: 38px; z-index: 68;
     }
     .proj-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--text-d); flex-shrink: 0; }
     .proj-select {
@@ -169,7 +169,7 @@
       padding: 10px 18px; display: flex; gap: 9px;
       align-items: center; background: var(--surface);
       border-bottom: 1px solid var(--border);
-      position: sticky; top: 0; z-index: 64; flex-wrap: wrap;
+      position: sticky; top: 38px; z-index: 64; flex-wrap: wrap;
     }
     #trackerToolbar { top: var(--tracker-toolbar-top, 50px); }
     .search-wrap { position: relative; flex: 1; min-width: 140px; max-width: 240px; }
@@ -334,7 +334,7 @@
 
     /* phase bar */
     .phase-bar { padding:6px 18px; background:var(--surface); border-bottom:1px solid var(--border); display:flex; align-items:center; gap:2px; overflow-x:auto; flex-shrink:0;
-                 position:sticky; top:var(--phase-bar-top,50px); z-index:66; }
+                 position:sticky; top:var(--phase-bar-top,88px); z-index:66; }
     .phase-bar-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--text-d); margin-right:8px; flex-shrink:0; }
     .phase-sep { color:var(--text-d); font-size:10px; margin:0 3px; flex-shrink:0; }
     .phase-step { display:flex; align-items:center; gap:5px; padding:3px 9px 3px 4px; border-radius:20px; white-space:nowrap; font-size:11px; font-weight:500; flex-shrink:0; }
@@ -384,7 +384,7 @@
     .dash-toolbar {
       padding: 10px 18px; display: flex; gap: 9px; align-items: center;
       background: var(--surface); border-bottom: 1px solid var(--border);
-      position: sticky; top: 0; z-index: 60;
+      position: sticky; top: 38px; z-index: 60;
     }
     .dash-toolbar-label { font-size: 12px; font-weight: 600; color: var(--text-m); white-space: nowrap; }
     .dash { padding: 18px; display: flex; flex-direction: column; gap: 14px; }
@@ -567,8 +567,34 @@
       .proj-label { display: none; }
     }
   </style>
+<style>
+/* ── The Works suite nav bar ──────────────────────────────── */
+.tw-nav{height:38px;background:#0d1117;border-bottom:1px solid #1c2333;display:flex;align-items:center;gap:8px;padding:0 16px;font-family:'DM Sans',system-ui,sans-serif;flex-shrink:0;box-sizing:border-box}
+.tw-nav-home{display:flex;align-items:center;gap:7px;text-decoration:none;transition:opacity .15s}
+.tw-nav-home:hover{opacity:.75}
+.tw-nav-mark{width:20px;height:20px;background:#3b9eff;border-radius:5px;display:grid;place-items:center;font-size:11px;flex-shrink:0;line-height:1}
+.tw-nav-name{font-size:12px;font-weight:600;color:#e2e8f0;letter-spacing:-.1px;white-space:nowrap}
+.tw-nav-sep{font-size:13px;color:#374151}
+.tw-nav-tool{font-size:12px;font-weight:600;white-space:nowrap}
+.tw-nav-spacer{flex:1}
+.tw-nav-back{font-size:11px;font-weight:500;color:#718096;text-decoration:none;padding:4px 10px;border-radius:6px;border:1px solid #2d3748;transition:color .15s,border-color .15s;white-space:nowrap;font-family:'DM Sans',system-ui,sans-serif}
+.tw-nav-back:hover{color:#e2e8f0;border-color:#4a5568}
+/* ────────────────────────────────────────────────────────── */
+</style>
 </head>
 <body>
+<!-- The Works suite nav -->
+<div class="tw-nav">
+  <a class="tw-nav-home" href="../">
+    <div class="tw-nav-mark">⚙</div>
+    <span class="tw-nav-name">The Works</span>
+  </a>
+  <span class="tw-nav-sep">/</span>
+  <span class="tw-nav-tool" style="color:#f59e0b">Framework</span>
+  <div class="tw-nav-spacer"></div>
+  <a class="tw-nav-back" href="../">← Dashboard</a>
+</div>
+
 <div id="app">
 
   <!-- HEADER -->

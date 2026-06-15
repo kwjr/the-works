@@ -41,7 +41,7 @@ button{cursor:pointer;font-family:var(--font)}
 textarea,input,select{font-family:var(--font);font-size:14px}
 
 /* HEADER */
-.hdr{background:var(--bg2);border-bottom:1px solid var(--border);height:54px;padding:0 24px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:300}
+.hdr{background:var(--bg2);border-bottom:1px solid var(--border);height:54px;padding:0 24px;display:flex;align-items:center;gap:14px;position:sticky;top:38px;z-index:300}
 .hdr-logo{width:32px;height:32px;background:#0c1526;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;border:1px solid rgba(52,211,153,0.25)}
 html.light .hdr-logo{background:#0c1526;border-color:rgba(52,211,153,0.40)}
 .hdr-name{font-size:16px;font-weight:700;color:var(--text);line-height:1.1}
@@ -50,7 +50,7 @@ html.light .hdr-logo{background:#0c1526;border-color:rgba(52,211,153,0.40)}
 .btn-icon:hover{background:var(--surface3);color:var(--text)}
 
 /* TABS */
-.tabs{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;display:flex;gap:0;overflow-x:auto;position:sticky;top:54px;z-index:290}
+.tabs{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;display:flex;gap:0;overflow-x:auto;position:sticky;top:92px;z-index:290}
 .tab-btn{background:none;border:none;color:var(--text-muted);font-size:13px;font-weight:500;padding:14px 18px 12px;display:flex;align-items:center;gap:7px;white-space:nowrap;transition:color .15s;border-bottom:2px solid transparent}
 .tab-btn:hover{color:var(--text)}
 .tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
@@ -58,7 +58,7 @@ html.light .hdr-logo{background:#0c1526;border-color:rgba(52,211,153,0.40)}
 .tab-btn.active .cnt{background:var(--green-bg);color:var(--green)}
 
 /* PROJECT BAR */
-.proj-bar-wrap{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;position:sticky;top:107px;z-index:280}
+.proj-bar-wrap{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;position:sticky;top:145px;z-index:280}
 .proj-bar{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:10px;height:46px}
 .proj-switcher{position:relative;display:flex;align-items:center;flex:1;min-width:0}
 .proj-current-btn{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--rs);padding:6px 12px;color:var(--text);font-size:13px;font-weight:600;transition:all .15s;max-width:380px;min-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -372,8 +372,34 @@ mark.hl{background:rgba(251,191,36,.22);border-radius:2px;color:var(--amber)}
 .hidden{display:none!important}
 .tag{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px;background:var(--surface2);color:var(--text-muted);border:1px solid var(--border)}
 </style>
+<style>
+/* ── The Works suite nav bar ──────────────────────────────── */
+.tw-nav{height:38px;background:#0d1117;border-bottom:1px solid #1c2333;display:flex;align-items:center;gap:8px;padding:0 16px;font-family:'DM Sans',system-ui,sans-serif;flex-shrink:0;box-sizing:border-box}
+.tw-nav-home{display:flex;align-items:center;gap:7px;text-decoration:none;transition:opacity .15s}
+.tw-nav-home:hover{opacity:.75}
+.tw-nav-mark{width:20px;height:20px;background:#3b9eff;border-radius:5px;display:grid;place-items:center;font-size:11px;flex-shrink:0;line-height:1}
+.tw-nav-name{font-size:12px;font-weight:600;color:#e2e8f0;letter-spacing:-.1px;white-space:nowrap}
+.tw-nav-sep{font-size:13px;color:#374151}
+.tw-nav-tool{font-size:12px;font-weight:600;white-space:nowrap}
+.tw-nav-spacer{flex:1}
+.tw-nav-back{font-size:11px;font-weight:500;color:#718096;text-decoration:none;padding:4px 10px;border-radius:6px;border:1px solid #2d3748;transition:color .15s,border-color .15s;white-space:nowrap;font-family:'DM Sans',system-ui,sans-serif}
+.tw-nav-back:hover{color:#e2e8f0;border-color:#4a5568}
+/* ────────────────────────────────────────────────────────── */
+</style>
 </head>
 <body>
+<!-- The Works suite nav -->
+<div class="tw-nav">
+  <a class="tw-nav-home" href="../">
+    <div class="tw-nav-mark">⚙</div>
+    <span class="tw-nav-name">The Works</span>
+  </a>
+  <span class="tw-nav-sep">/</span>
+  <span class="tw-nav-tool" style="color:#34d399">Groundwork</span>
+  <div class="tw-nav-spacer"></div>
+  <a class="tw-nav-back" href="../">← Dashboard</a>
+</div>
+
 
 <!-- HEADER -->
 <header class="hdr">

@@ -70,14 +70,15 @@
 
   /* ── Top nav bar ── */
   .topbar {
-    background: var(--hyland-navy);
+    background: #161b22;
+    border-bottom: 1px solid #1c2333;
     padding: 0 1.5rem;
     height: 52px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     position: sticky;
-    top: 0;
+    top: 38px;
     z-index: 50;
   }
 
@@ -1188,8 +1189,34 @@
   }
   .btn-add-proj:hover { background: var(--hyland-navy-mid); }
 </style>
+<style>
+/* ── The Works suite nav bar ──────────────────────────────── */
+.tw-nav{height:38px;background:#0d1117;border-bottom:1px solid #1c2333;display:flex;align-items:center;gap:8px;padding:0 16px;font-family:'DM Sans',system-ui,sans-serif;flex-shrink:0;box-sizing:border-box}
+.tw-nav-home{display:flex;align-items:center;gap:7px;text-decoration:none;transition:opacity .15s}
+.tw-nav-home:hover{opacity:.75}
+.tw-nav-mark{width:20px;height:20px;background:#3b9eff;border-radius:5px;display:grid;place-items:center;font-size:11px;flex-shrink:0;line-height:1}
+.tw-nav-name{font-size:12px;font-weight:600;color:#e2e8f0;letter-spacing:-.1px;white-space:nowrap}
+.tw-nav-sep{font-size:13px;color:#374151}
+.tw-nav-tool{font-size:12px;font-weight:600;white-space:nowrap}
+.tw-nav-spacer{flex:1}
+.tw-nav-back{font-size:11px;font-weight:500;color:#718096;text-decoration:none;padding:4px 10px;border-radius:6px;border:1px solid #2d3748;transition:color .15s,border-color .15s;white-space:nowrap;font-family:'DM Sans',system-ui,sans-serif}
+.tw-nav-back:hover{color:#e2e8f0;border-color:#4a5568}
+/* ────────────────────────────────────────────────────────── */
+</style>
 </head>
 <body>
+<!-- The Works suite nav -->
+<div class="tw-nav">
+  <a class="tw-nav-home" href="../">
+    <div class="tw-nav-mark">⚙</div>
+    <span class="tw-nav-name">The Works</span>
+  </a>
+  <span class="tw-nav-sep">/</span>
+  <span class="tw-nav-tool" style="color:#EC5CBB">Clockwork</span>
+  <div class="tw-nav-spacer"></div>
+  <a class="tw-nav-back" href="../">← Dashboard</a>
+</div>
+
 
 <!-- Top navigation bar -->
 <div class="topbar">
