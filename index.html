@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Works</title>
-<meta name="description" content="The Works — A professional services productivity suite for project managers.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%230d1117'/><text y='24' x='4' font-size='22'>⚙</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
@@ -12,526 +11,619 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg:       #0d1117;
-  --surface:  #161b22;
-  --surface2: #1f2937;
-  --border:   #2d3748;
-  --text:     #e2e8f0;
-  --muted:    #718096;
-  --accent:   #3b9eff;
-  --green:    #22c55e;
-  --amber:    #f59e0b;
+  --bg:      #0d1117;
+  --surface: #161b22;
+  --surf2:   #1c2333;
+  --surf3:   #21293a;
+  --border:  #2d3748;
+  --bord2:   #374151;
+  --text:    #e2e8f0;
+  --muted:   #718096;
+  --dim:     #4a5568;
+  --green:   #22c55e;
+  --green-bg:rgba(34,197,94,.10);
+  --green-bd:rgba(34,197,94,.25);
+  --amber:   #f59e0b;
+  --amber-bg:rgba(245,158,11,.10);
+  --amber-bd:rgba(245,158,11,.25);
+  --red:     #ef4444;
+  --red-bg:  rgba(239,68,68,.10);
+  --red-bd:  rgba(239,68,68,.25);
+  --blue:    #3b9eff;
   --font: 'DM Sans', system-ui, sans-serif;
-  --r: 12px;
+  --r: 10px;
 }
 
-html, body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--font);
-  min-height: 100vh;
-  line-height: 1.6;
-}
+html, body { background: var(--bg); color: var(--text); font-family: var(--font); min-height: 100vh; }
 
-/* ── Layout ── */
-.wrap {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 0 24px;
-}
-
-/* ── Header ── */
-header {
+/* ── Top bar ── */
+.topbar {
   background: var(--surface);
   border-bottom: 1px solid var(--border);
-  padding: 18px 0;
-}
-.header-inner {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-.logo-mark {
-  width: 40px;
-  height: 40px;
-  background: var(--accent);
-  border-radius: 10px;
-  display: grid;
-  place-items: center;
-  font-size: 20px;
-  flex-shrink: 0;
-}
-.logo-text h1 {
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: -0.3px;
-  line-height: 1.2;
-}
-.logo-text p {
-  font-size: 13px;
-  color: var(--muted);
-  font-weight: 400;
-}
-
-/* ── Hero ── */
-.hero {
-  padding: 56px 0 48px;
-  text-align: center;
-}
-.hero h2 {
-  font-size: clamp(28px, 5vw, 42px);
-  font-weight: 700;
-  letter-spacing: -0.5px;
-  line-height: 1.2;
-  margin-bottom: 14px;
-}
-.hero h2 span { color: var(--accent); }
-.hero p {
-  font-size: 16px;
-  color: var(--muted);
-  max-width: 520px;
-  margin: 0 auto;
-}
-
-/* ── Tool grid ── */
-.tools-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
-  gap: 16px;
-  margin-bottom: 56px;
-}
-@media (max-width: 500px) {
-  .tools-grid { grid-template-columns: 1fr; }
-}
-
-.tool-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  transition: border-color 0.15s, transform 0.15s;
-  text-decoration: none;
-  color: inherit;
-  position: relative;
-  overflow: hidden;
-}
-.tool-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-  background: var(--card-accent);
-  opacity: 0.8;
-}
-.tool-card:hover {
-  border-color: var(--card-accent);
-  transform: translateY(-2px);
-}
-.tool-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.tool-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
-  background: var(--card-bg);
-  display: grid;
-  place-items: center;
-  font-size: 22px;
-  flex-shrink: 0;
-}
-.tool-name {
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: -0.2px;
-}
-.tool-tag {
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--card-accent);
-  background: var(--card-bg);
-  border: 1px solid var(--card-accent);
-  border-radius: 20px;
-  padding: 2px 8px;
-  margin-left: auto;
-  opacity: 0.85;
-}
-.tool-desc {
-  font-size: 14px;
-  color: var(--muted);
-  line-height: 1.5;
-  flex: 1;
-}
-.tool-features {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-.tool-chip {
-  font-size: 12px;
-  color: var(--muted);
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 3px 8px;
-}
-.tool-footer {
+  padding: 0 24px;
+  height: 52px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-top: 8px;
-  border-top: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
-.tool-open {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+.topbar-left { display: flex; align-items: center; gap: 10px; }
+.logo-mark {
+  width: 28px; height: 28px;
+  background: var(--blue);
+  border-radius: 7px;
+  display: grid; place-items: center;
   font-size: 14px;
-  font-weight: 600;
-  color: var(--card-accent);
-  text-decoration: none;
-  padding: 7px 16px;
-  background: var(--card-bg);
-  border: 1px solid var(--card-accent);
-  border-radius: 8px;
-  transition: opacity 0.15s;
 }
-.tool-open:hover { opacity: 0.8; }
+.logo-name { font-size: 15px; font-weight: 700; letter-spacing: -.2px; }
+.topbar-date { font-size: 12px; color: var(--muted); }
 
-/* Individual tool card theming */
-.card-clockwork {
-  --card-accent: #EC5CBB;
-  --card-bg: rgba(236,92,187,0.08);
+/* ── Main layout ── */
+.layout {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px 24px 40px;
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  grid-template-rows: auto auto 1fr;
+  gap: 16px;
 }
-.card-busywork {
-  --card-accent: #3b9eff;
-  --card-bg: rgba(59,158,255,0.08);
-}
-.card-framework {
-  --card-accent: #f59e0b;
-  --card-bg: rgba(245,158,11,0.08);
-}
-.card-groundwork {
-  --card-accent: #34d399;
-  --card-bg: rgba(52,211,153,0.08);
+@media (max-width: 720px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { grid-row: auto; }
 }
 
-/* ── Migration section ── */
-.section {
-  margin-bottom: 56px;
+/* ── Stats strip ── */
+.stats-strip {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
 }
-.section-header {
+@media (max-width: 600px) { .stats-strip { grid-template-columns: repeat(2, 1fr); } }
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.stat-label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+.stat-value { font-size: 26px; font-weight: 700; line-height: 1; letter-spacing: -.5px; }
+.stat-sub   { font-size: 11px; color: var(--muted); }
+.stat-red   { color: var(--red); }
+.stat-amber { color: var(--amber); }
+.stat-green { color: var(--green); }
+.stat-blue  { color: var(--blue); }
+
+/* ── Sidebar (tool launchers) ── */
+.sidebar { display: flex; flex-direction: column; gap: 8px; }
+
+.tool-btn {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 20px;
-}
-.section-header h2 {
-  font-size: 20px;
-  font-weight: 700;
-}
-.section-header .badge {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--amber);
-  background: rgba(245,158,11,0.1);
-  border: 1px solid rgba(245,158,11,0.25);
-  border-radius: 20px;
-  padding: 2px 8px;
-}
-
-.migration-intro {
-  font-size: 14px;
-  color: var(--muted);
-  margin-bottom: 20px;
-  line-height: 1.6;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--amber);
-  border-radius: var(--r);
-  padding: 16px 20px;
-}
-
-.migration-steps {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
-  gap: 16px;
-}
-@media (max-width: 500px) {
-  .migration-steps { grid-template-columns: 1fr; }
-}
-
-.migration-card {
+  padding: 11px 14px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--r);
-  padding: 20px;
+  text-decoration: none;
+  color: var(--text);
+  transition: border-color .15s, background .15s;
+  position: relative;
+  overflow: hidden;
 }
-.migration-card h3 {
-  font-size: 15px;
-  font-weight: 600;
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.tool-btn::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--tb-accent);
+  opacity: .7;
 }
-.migration-card h3 .dot {
-  width: 8px; height: 8px;
-  border-radius: 50%;
+.tool-btn:hover { border-color: var(--tb-accent); background: var(--surf2); }
+.tool-btn-icon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  background: var(--tb-bg);
+  display: grid; place-items: center;
+  font-size: 16px;
   flex-shrink: 0;
 }
-.migration-card ol {
-  padding-left: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.migration-card li {
-  font-size: 13px;
-  color: var(--muted);
-  line-height: 1.5;
-}
-.migration-card li code {
-  font-size: 12px;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 1px 5px;
-  color: var(--text);
-  font-family: 'SFMono-Regular', Consolas, monospace;
-}
-.migration-card li strong { color: var(--text); }
+.tool-btn-info { flex: 1; min-width: 0; }
+.tool-btn-name { font-size: 13px; font-weight: 600; }
+.tool-btn-tag  { font-size: 11px; color: var(--muted); }
+.tool-btn-arr  { font-size: 14px; color: var(--dim); }
 
-/* ── Footer ── */
-footer {
-  border-top: 1px solid var(--border);
-  padding: 28px 0;
-  margin-top: 16px;
-}
-.footer-inner {
+.tb-clockwork  { --tb-accent: #EC5CBB; --tb-bg: rgba(236,92,187,.09); }
+.tb-busywork   { --tb-accent: #3b9eff; --tb-bg: rgba(59,158,255,.09); }
+.tb-framework  { --tb-accent: #f59e0b; --tb-bg: rgba(245,158,11,.09); }
+.tb-groundwork { --tb-accent: #34d399; --tb-bg: rgba(52,211,153,.09); }
+
+/* ── Main content area ── */
+.main { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+
+/* ── Section headers ── */
+.sec-hd {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  color: var(--muted);
+  margin-bottom: 8px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
 }
-.footer-inner p {
-  font-size: 13px;
-  color: var(--muted);
+
+/* ── Project table ── */
+.proj-table {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
 }
-.footer-links {
+.proj-table-row {
+  display: grid;
+  grid-template-columns: 1fr 70px 80px 80px 80px;
+  align-items: center;
+  padding: 0 16px;
+  min-height: 44px;
+  border-bottom: 1px solid var(--border);
+  gap: 8px;
+}
+.proj-table-row:last-child { border-bottom: none; }
+.proj-table-hd {
+  background: var(--surf2);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  color: var(--dim);
+  min-height: 34px;
+}
+.proj-name { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.proj-type { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.proj-col  { font-size: 12px; font-weight: 600; text-align: center; }
+
+.rag-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .3px;
+  border-radius: 20px;
+  padding: 2px 9px;
+  width: 56px;
+}
+.rag-green  { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-bd); }
+.rag-amber  { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-bd); }
+.rag-red    { background: var(--red-bg);   color: var(--red);   border: 1px solid var(--red-bd);   }
+.rag-none   { background: var(--surf3);    color: var(--dim);   border: 1px solid var(--border);    }
+
+.num-red    { color: var(--red); }
+.num-amber  { color: var(--amber); }
+.num-green  { color: var(--green); }
+.num-dim    { color: var(--dim); }
+
+/* ── Attention items ── */
+.attention-list { display: flex; flex-direction: column; gap: 6px; }
+.attn-item {
   display: flex;
-  gap: 16px;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 10px 14px;
 }
-.footer-links a {
-  font-size: 13px;
-  color: var(--muted);
-  text-decoration: none;
-  transition: color 0.15s;
+.attn-item.sev-red    { border-left: 3px solid var(--red);   }
+.attn-item.sev-amber  { border-left: 3px solid var(--amber); }
+.attn-item.sev-blue   { border-left: 3px solid var(--blue);  }
+.attn-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+.attn-dot-red   { background: var(--red);   }
+.attn-dot-amber { background: var(--amber); }
+.attn-dot-blue  { background: var(--blue);  }
+.attn-body { flex: 1; min-width: 0; }
+.attn-title { font-size: 13px; font-weight: 500; line-height: 1.4; }
+.attn-meta  { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.attn-src   {
+  font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .4px;
+  color: var(--dim);
+  flex-shrink: 0;
+  margin-top: 3px;
 }
-.footer-links a:hover { color: var(--text); }
+
+/* ── Empty states ── */
+.empty { font-size: 13px; color: var(--dim); padding: 16px; text-align: center;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); }
+.no-data { color: var(--dim); font-size: 12px; }
+
+/* ── Footer ── */
+.page-footer { grid-column: 1/-1; text-align: center; font-size: 12px; color: var(--dim); padding-top: 8px; }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="wrap header-inner">
+<div class="topbar">
+  <div class="topbar-left">
     <div class="logo-mark">⚙</div>
-    <div class="logo-text">
-      <h1>The Works</h1>
-      <p>Professional Services PM Suite</p>
+    <span class="logo-name">The Works</span>
+  </div>
+  <span class="topbar-date" id="topbar-date"></span>
+</div>
+
+<div class="layout">
+
+  <!-- Stats strip -->
+  <div class="stats-strip">
+    <div class="stat-card">
+      <div class="stat-label">Open Actions</div>
+      <div class="stat-value stat-blue" id="stat-actions">—</div>
+      <div class="stat-sub" id="stat-actions-sub"></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Tasks Due Today</div>
+      <div class="stat-value" id="stat-tasks">—</div>
+      <div class="stat-sub" id="stat-tasks-sub"></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Projects at Risk</div>
+      <div class="stat-value" id="stat-risk">—</div>
+      <div class="stat-sub" id="stat-risk-sub"></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Time Logged Today</div>
+      <div class="stat-value stat-blue" id="stat-time">—</div>
+      <div class="stat-sub" id="stat-time-sub"></div>
     </div>
   </div>
-</header>
 
-<main>
-  <div class="wrap">
+  <!-- Sidebar: tool launchers -->
+  <aside class="sidebar">
+    <div class="sec-hd">Tools</div>
+    <a class="tool-btn tb-clockwork"  href="./clockwork/">
+      <div class="tool-btn-icon">⏱</div>
+      <div class="tool-btn-info"><div class="tool-btn-name">Clockwork</div><div class="tool-btn-tag">Time tracking</div></div>
+      <span class="tool-btn-arr">›</span>
+    </a>
+    <a class="tool-btn tb-busywork"   href="./busywork/">
+      <div class="tool-btn-icon">✅</div>
+      <div class="tool-btn-info"><div class="tool-btn-name">Busywork</div><div class="tool-btn-tag">Tasks & actions</div></div>
+      <span class="tool-btn-arr">›</span>
+    </a>
+    <a class="tool-btn tb-framework"  href="./framework/">
+      <div class="tool-btn-icon">📋</div>
+      <div class="tool-btn-info"><div class="tool-btn-name">Framework</div><div class="tool-btn-tag">Governance</div></div>
+      <span class="tool-btn-arr">›</span>
+    </a>
+    <a class="tool-btn tb-groundwork" href="./groundwork/">
+      <div class="tool-btn-icon">🗺</div>
+      <div class="tool-btn-info"><div class="tool-btn-name">Groundwork</div><div class="tool-btn-tag">Planning & AI</div></div>
+      <span class="tool-btn-arr">›</span>
+    </a>
+  </aside>
 
-    <section class="hero">
-      <h2>Everything you need to<br><span>run your projects.</span></h2>
-      <p>Four integrated tools for time tracking, task management, artifact governance, and project planning — built for professional services PMs.</p>
-    </section>
+  <!-- Main content -->
+  <div class="main">
 
-    <!-- Tool Cards -->
-    <div class="tools-grid" style="margin-bottom: 56px;">
-
-      <a class="tool-card card-clockwork" href="./clockwork/">
-        <div class="tool-header">
-          <div class="tool-icon">⏱</div>
-          <div>
-            <div class="tool-name">Clockwork</div>
-          </div>
-          <span class="tool-tag">Time</span>
+    <!-- Project health table -->
+    <div>
+      <div class="sec-hd">
+        <span>Projects</span>
+        <span id="proj-count" class="no-data"></span>
+      </div>
+      <div class="proj-table" id="proj-table">
+        <div class="proj-table-row proj-table-hd">
+          <div>Project</div>
+          <div style="text-align:center">Status</div>
+          <div style="text-align:center">Actions</div>
+          <div style="text-align:center">Tasks</div>
+          <div style="text-align:center">Artifacts</div>
         </div>
-        <p class="tool-desc">Dual-timer billable time tracking with PSA checkbox workflow, per-project weekly targets, and AI-powered task description cleanup.</p>
-        <div class="tool-features">
-          <span class="tool-chip">Dual timers</span>
-          <span class="tool-chip">PSA workflow</span>
-          <span class="tool-chip">Weekly targets</span>
-          <span class="tool-chip">AI cleanup</span>
-          <span class="tool-chip">CSV export</span>
-        </div>
-        <div class="tool-footer">
-          <span class="tool-open" href="./clockwork/">Open Clockwork →</span>
-        </div>
-      </a>
-
-      <a class="tool-card card-busywork" href="./busywork/">
-        <div class="tool-header">
-          <div class="tool-icon">✅</div>
-          <div>
-            <div class="tool-name">Busywork</div>
-          </div>
-          <span class="tool-tag">Tasks</span>
-        </div>
-        <p class="tool-desc">Task and action item tracking with Eisenhower Matrix prioritization, Dashboard, Today, and Matrix views, and a 14-day completion trend.</p>
-        <div class="tool-features">
-          <span class="tool-chip">Eisenhower Matrix</span>
-          <span class="tool-chip">Today view</span>
-          <span class="tool-chip">Task pool</span>
-          <span class="tool-chip">Trend chart</span>
-          <span class="tool-chip">Groundwork import</span>
-        </div>
-        <div class="tool-footer">
-          <span class="tool-open" href="./busywork/">Open Busywork →</span>
-        </div>
-      </a>
-
-      <a class="tool-card card-framework" href="./framework/">
-        <div class="tool-header">
-          <div class="tool-icon">📋</div>
-          <div>
-            <div class="tool-name">Framework</div>
-          </div>
-          <span class="tool-tag">Governance</span>
-        </div>
-        <p class="tool-desc">Project artifact tracker covering 86 standard artifacts across 17 folders, four project types, health scoring, and phase-aware auto-staling.</p>
-        <div class="tool-features">
-          <span class="tool-chip">86 artifacts</span>
-          <span class="tool-chip">Health scoring</span>
-          <span class="tool-chip">4 project types</span>
-          <span class="tool-chip">Phase-aware</span>
-          <span class="tool-chip">Cadence mgmt</span>
-        </div>
-        <div class="tool-footer">
-          <span class="tool-open" href="./framework/">Open Framework →</span>
-        </div>
-      </a>
-
-      <a class="tool-card card-groundwork" href="./groundwork/">
-        <div class="tool-header">
-          <div class="tool-icon">🗺</div>
-          <div>
-            <div class="tool-name">Groundwork</div>
-          </div>
-          <span class="tool-tag">Planning</span>
-        </div>
-        <p class="tool-desc">Project planning and AI insights hub. Charter, meetings, action items, decisions, and eight AI tools for risk analysis, summaries, and more.</p>
-        <div class="tool-features">
-          <span class="tool-chip">Project charter</span>
-          <span class="tool-chip">Meeting log</span>
-          <span class="tool-chip">AI insights</span>
-          <span class="tool-chip">Risk analysis</span>
-          <span class="tool-chip">PSA logging</span>
-        </div>
-        <div class="tool-footer">
-          <span class="tool-open" href="./groundwork/">Open Groundwork →</span>
-        </div>
-      </a>
-
+        <div id="proj-rows"></div>
+      </div>
     </div>
 
-    <!-- Migration Guide -->
-    <section class="section" id="migrate">
-      <div class="section-header">
-        <h2>Migrating from separate installs?</h2>
-        <span class="badge">One-time setup</span>
-      </div>
-
-      <div class="migration-intro">
-        Each tool stores data in your browser's localStorage, tied to its origin URL. Because this is a new URL, your tools will start fresh — but your old data is safe at the previous addresses. Follow the steps below for each tool to export and re-import your data. You only need to do this once.
-      </div>
-
-      <div class="migration-steps">
-
-        <div class="migration-card">
-          <h3>
-            <span class="dot" style="background:#EC5CBB"></span>
-            Clockwork
-          </h3>
-          <ol>
-            <li>Visit your <strong>old Clockwork URL</strong></li>
-            <li>Open <strong>Settings</strong> → scroll to <strong>Data Management</strong></li>
-            <li>Click <strong>Download Backup</strong> — saves a <code>.json</code> file</li>
-            <li>Open <strong>Clockwork</strong> here and go to <strong>Settings → Data Management</strong></li>
-            <li>Click <strong>Restore from Backup</strong> and select the file</li>
-          </ol>
-        </div>
-
-        <div class="migration-card">
-          <h3>
-            <span class="dot" style="background:#3b9eff"></span>
-            Busywork
-          </h3>
-          <ol>
-            <li>Visit your <strong>old Busywork URL</strong></li>
-            <li>Open <strong>Settings</strong> (gear icon) → <strong>Export Data</strong></li>
-            <li>Save the <code>.json</code> backup file</li>
-            <li>Open <strong>Busywork</strong> here and go to <strong>Settings → Import Data</strong></li>
-            <li>Select the file — all tasks and projects will be restored</li>
-          </ol>
-        </div>
-
-        <div class="migration-card">
-          <h3>
-            <span class="dot" style="background:#f59e0b"></span>
-            Framework
-          </h3>
-          <ol>
-            <li>Visit your <strong>old Framework URL</strong></li>
-            <li>Click the <strong>⬇ Download Backup</strong> button in the toolbar</li>
-            <li>Save the <code>.json</code> backup file</li>
-            <li>Open <strong>Framework</strong> here and click <strong>⬆ Restore Backup</strong></li>
-            <li>Select the file — all projects and artifact states will be restored</li>
-          </ol>
-        </div>
-
-        <div class="migration-card">
-          <h3>
-            <span class="dot" style="background:#34d399"></span>
-            Groundwork
-          </h3>
-          <ol>
-            <li>Visit your <strong>old Groundwork URL</strong></li>
-            <li>Open <strong>Settings</strong> → click <strong>↓ Save backup</strong></li>
-            <li>Save the <code>.json</code> backup file</li>
-            <li>Open <strong>Groundwork</strong> here and click <strong>↑ Choose file…</strong></li>
-            <li>Select the file — charter, meetings, actions, and decisions are restored</li>
-          </ol>
-        </div>
-
-      </div>
-    </section>
+    <!-- Attention items -->
+    <div>
+      <div class="sec-hd">Needs Attention</div>
+      <div id="attention-list"></div>
+    </div>
 
   </div>
-</main>
 
-<footer>
-  <div class="wrap footer-inner">
-    <p>The Works · Hyland Professional Services</p>
-    <nav class="footer-links">
-      <a href="./clockwork/">Clockwork</a>
-      <a href="./busywork/">Busywork</a>
-      <a href="./framework/">Framework</a>
-      <a href="./groundwork/">Groundwork</a>
-    </nav>
-  </div>
-</footer>
+  <div class="page-footer">The Works · Hyland Professional Services</div>
 
+</div>
+
+<script>
+// ── Helpers ──────────────────────────────────────────────
+function ls(key) {
+  try { return JSON.parse(localStorage.getItem(key) || 'null'); } catch(e) { return null; }
+}
+function today() {
+  const d = new Date();
+  return d.getFullYear() + '-' +
+    String(d.getMonth()+1).padStart(2,'0') + '-' +
+    String(d.getDate()).padStart(2,'0');
+}
+function fmtMins(m) {
+  const h = Math.floor(m / 60), mn = m % 60;
+  return h > 0 ? `${h}h${mn > 0 ? ` ${mn}m` : ''}` : `${mn}m`;
+}
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── Date header ──────────────────────────────────────────
+document.getElementById('topbar-date').textContent =
+  new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
+
+// ── Load all data ────────────────────────────────────────
+const todayStr   = today();
+const gwRaw      = ls('groundwork_v2');
+const bwRaw      = ls('fieldwork_v3');
+const fwRaw      = ls('framework-v2');
+const cwRaw      = ls('time_tracker_v2');
+const registry   = ls('theworks_projects') || [];
+
+// ── Groundwork data ──────────────────────────────────────
+const gwProjects = gwRaw?.projects || [];
+
+let totalOpenActions  = 0;
+let totalOverdueActs  = 0;
+
+const gwByName = {};
+gwProjects.forEach(p => {
+  const actions = p.actions || [];
+  const open    = actions.filter(a => a.status !== 'Complete' && a.status !== 'Cancelled');
+  const overdue = open.filter(a => a.dueDate && a.dueDate < todayStr);
+  totalOpenActions  += open.length;
+  totalOverdueActs  += overdue.length;
+  gwByName[p.name] = { rag: p.rag || '', open, overdue, decisions: p.decisions || [], phase: p.type || '' };
+});
+
+// ── Busywork data ────────────────────────────────────────
+const bwTasks    = bwRaw?.tasks    || [];
+const bwProjects = bwRaw?.projects || [];
+const bwProjName = id => bwProjects.find(p => p.id === id)?.name || '';
+
+const bwDueToday   = bwTasks.filter(t => !t.completed && t.dueDate === todayStr);
+const bwOverdue    = bwTasks.filter(t => !t.completed && t.dueDate && t.dueDate < todayStr);
+const bwOpenTotal  = bwTasks.filter(t => !t.completed).length;
+
+const bwByProjName = {};
+bwTasks.filter(t => !t.completed).forEach(t => {
+  const name = bwProjName(t.projectId);
+  if (!bwByProjName[name]) bwByProjName[name] = { open: 0, dueToday: 0, overdue: 0 };
+  bwByProjName[name].open++;
+  if (t.dueDate === todayStr)          bwByProjName[name].dueToday++;
+  if (t.dueDate && t.dueDate < todayStr) bwByProjName[name].overdue++;
+});
+
+// ── Framework data ───────────────────────────────────────
+const fwProjects = Object.values(fwRaw?.projects || {}).filter(p => !p.archived);
+const fwByName   = {};
+fwProjects.forEach(p => {
+  const entries = Object.values(p.tracker || {});
+  fwByName[p.name] = {
+    red:   entries.filter(e => e.health === 'red').length,
+    amber: entries.filter(e => e.health === 'amber').length,
+  };
+});
+
+let projAtRisk = 0, projRed = 0;
+gwProjects.forEach(p => {
+  const r = (p.rag || '').toLowerCase();
+  if (r === 'red')   { projRed++; projAtRisk++; }
+  if (r === 'amber') projAtRisk++;
+});
+// Also count fw-only red/amber if not in groundwork
+fwProjects.forEach(p => {
+  const inGW = gwProjects.some(g => g.name === p.name);
+  if (!inGW) {
+    const d = fwByName[p.name];
+    if (d && (d.red > 0 || d.amber > 0)) projAtRisk++;
+  }
+});
+
+// ── Clockwork data ───────────────────────────────────────
+const cwLog      = cwRaw?.log || [];
+const cwToday    = cwLog.filter(e => e.date === todayStr);
+const cwMinsToday = cwToday.reduce((s, e) => s + (e.minutes || 0), 0);
+const cwBillMins  = cwToday.filter(e => e.billable).reduce((s, e) => s + (e.minutes || 0), 0);
+
+// ── Stats strip ──────────────────────────────────────────
+function setStatValue(id, val, cls) {
+  const el = document.getElementById(id);
+  el.textContent = val;
+  if (cls) el.className = 'stat-value ' + cls;
+}
+function setStatSub(id, text) {
+  document.getElementById(id).textContent = text;
+}
+
+// Open actions
+setStatValue('stat-actions', totalOpenActions === 0 && !gwRaw ? '—' : totalOpenActions,
+  totalOverdueActs > 0 ? 'stat-red' : 'stat-blue');
+setStatSub('stat-actions', totalOverdueActs > 0 ? `${totalOverdueActs} overdue` : (gwRaw ? 'across all projects' : 'No Groundwork data'));
+
+// Tasks due today
+setStatValue('stat-tasks', !bwRaw ? '—' : bwDueToday.length,
+  bwDueToday.length > 0 ? 'stat-amber' : 'stat-green');
+setStatSub('stat-tasks', !bwRaw ? 'No Busywork data'
+  : bwOverdue.length > 0 ? `+ ${bwOverdue.length} overdue`
+  : `${bwOpenTotal} open total`);
+
+// Projects at risk
+setStatValue('stat-risk', (!gwRaw && !fwRaw) ? '—' : projAtRisk,
+  projRed > 0 ? 'stat-red' : projAtRisk > 0 ? 'stat-amber' : 'stat-green');
+setStatSub('stat-risk', projRed > 0 ? `${projRed} red` : projAtRisk > 0 ? 'amber or worse' : (gwRaw || fwRaw ? 'all clear' : 'No data'));
+
+// Time logged today
+setStatValue('stat-time', cwMinsToday === 0 && !cwRaw ? '—' : fmtMins(cwMinsToday), 'stat-blue');
+setStatSub('stat-time', !cwRaw ? 'No Clockwork data'
+  : `${fmtMins(cwBillMins)} billable`);
+
+// ── Project rows ─────────────────────────────────────────
+// Build unified project list from: registry + gwProjects + fwProjects
+const seenNames = new Set();
+const allProjects = [];
+
+// Start from groundwork (richest data)
+gwProjects.forEach(p => {
+  seenNames.add(p.name);
+  allProjects.push({ name: p.name, source: 'gw' });
+});
+// Add framework-only projects
+fwProjects.forEach(p => {
+  if (!seenNames.has(p.name)) {
+    seenNames.add(p.name);
+    allProjects.push({ name: p.name, source: 'fw' });
+  }
+});
+// Add registry-only (newly synced, not yet in either)
+registry.forEach(r => {
+  if (!seenNames.has(r.name)) {
+    seenNames.add(r.name);
+    allProjects.push({ name: r.name, source: 'reg' });
+  }
+});
+
+document.getElementById('proj-count').textContent = allProjects.length ? `${allProjects.length} projects` : '';
+
+let projRowsHTML = '';
+if (!allProjects.length) {
+  projRowsHTML = '<div class="empty">No projects found — open any tool to create one.</div>';
+} else {
+  allProjects.forEach(proj => {
+    const gw  = gwByName[proj.name]  || {};
+    const bw  = bwByProjName[proj.name] || {};
+    const fw  = fwByName[proj.name]  || {};
+    const rag = (gw.rag || '').toLowerCase();
+
+    const ragHTML = rag === 'green' ? '<span class="rag-pill rag-green">GREEN</span>'
+                  : rag === 'amber' ? '<span class="rag-pill rag-amber">AMBER</span>'
+                  : rag === 'red'   ? '<span class="rag-pill rag-red">RED</span>'
+                  : '<span class="rag-pill rag-none">—</span>';
+
+    const openActs  = gw.open   ? gw.open.length   : 0;
+    const overdueActs = gw.overdue ? gw.overdue.length : 0;
+    const actsHTML = openActs > 0
+      ? `<span class="proj-col ${overdueActs > 0 ? 'num-red' : 'num-amber'}">${openActs}${overdueActs > 0 ? ` <span style="font-size:10px;font-weight:400">(${overdueActs} OD)</span>` : ''}</span>`
+      : `<span class="proj-col num-dim">—</span>`;
+
+    const bwOpen = bw.open || 0;
+    const bwOD   = bw.overdue || 0;
+    const tasksHTML = bwOpen > 0
+      ? `<span class="proj-col ${bwOD > 0 ? 'num-red' : 'num-amber'}">${bwOpen}${bwOD > 0 ? ` <span style="font-size:10px;font-weight:400">(${bwOD} OD)</span>` : ''}</span>`
+      : `<span class="proj-col num-dim">—</span>`;
+
+    const fwRed = fw.red || 0, fwAmber = fw.amber || 0;
+    const artIssues = fwRed + fwAmber;
+    const artHTML = artIssues > 0
+      ? `<span class="proj-col ${fwRed > 0 ? 'num-red' : 'num-amber'}">${artIssues}</span>`
+      : `<span class="proj-col num-dim">—</span>`;
+
+    projRowsHTML += `
+      <div class="proj-table-row">
+        <div>
+          <div class="proj-name">${esc(proj.name)}</div>
+          ${gw.phase ? `<div class="proj-type">${esc(gw.phase)}</div>` : ''}
+        </div>
+        <div style="text-align:center">${ragHTML}</div>
+        <div>${actsHTML}</div>
+        <div>${tasksHTML}</div>
+        <div>${artHTML}</div>
+      </div>`;
+  });
+}
+document.getElementById('proj-rows').innerHTML = projRowsHTML;
+
+// ── Attention items ──────────────────────────────────────
+const items = [];
+
+// Overdue Groundwork actions
+gwProjects.forEach(p => {
+  (gwByName[p.name]?.overdue || []).slice(0, 3).forEach(a => {
+    items.push({
+      sev: 'red',
+      src: 'Groundwork',
+      title: a.text,
+      meta: `[${p.name}] · Due ${a.dueDate}${a.owner ? ' · ' + a.owner : ''}`
+    });
+  });
+});
+
+// Red RAG projects
+gwProjects.forEach(p => {
+  if ((p.rag || '').toLowerCase() === 'red') {
+    items.push({ sev: 'red', src: 'Groundwork', title: `${p.name} is RED`, meta: `${p.type || ''} · ${p.phase || ''}`.replace(/^·\s*|·\s*$/, '').trim() || 'No type/phase set' });
+  }
+});
+
+// Framework red artifacts
+fwProjects.forEach(p => {
+  const d = fwByName[p.name];
+  if (d && d.red > 0) {
+    items.push({ sev: 'red', src: 'Framework', title: `${p.name}: ${d.red} red artifact${d.red > 1 ? 's' : ''}`, meta: 'Governance health critical' });
+  }
+});
+
+// Overdue Busywork tasks
+bwOverdue.slice(0, 4).forEach(t => {
+  items.push({ sev: 'amber', src: 'Busywork', title: t.title, meta: `Due ${t.dueDate}${bwProjName(t.projectId) ? ' · ' + bwProjName(t.projectId) : ''}` });
+});
+
+// Amber RAG
+gwProjects.forEach(p => {
+  if ((p.rag || '').toLowerCase() === 'amber') {
+    items.push({ sev: 'amber', src: 'Groundwork', title: `${p.name} is AMBER`, meta: `${p.type || ''} · ${p.phase || ''}`.replace(/^·\s*|·\s*$/, '').trim() || 'Review status' });
+  }
+});
+
+// Framework amber artifacts
+fwProjects.forEach(p => {
+  const d = fwByName[p.name];
+  if (d && d.amber > 0 && d.red === 0) {
+    items.push({ sev: 'amber', src: 'Framework', title: `${p.name}: ${d.amber} amber artifact${d.amber > 1 ? 's' : ''}`, meta: 'Governance health needs attention' });
+  }
+});
+
+// Tasks due today
+bwDueToday.slice(0, 3).forEach(t => {
+  items.push({ sev: 'blue', src: 'Busywork', title: t.title, meta: `Due today${bwProjName(t.projectId) ? ' · ' + bwProjName(t.projectId) : ''}` });
+});
+
+const attnEl = document.getElementById('attention-list');
+if (!items.length) {
+  const hasAnyData = gwRaw || bwRaw || fwRaw || cwRaw;
+  attnEl.innerHTML = `<div class="empty">${hasAnyData ? '✓ Nothing needs attention right now.' : 'Open the tools and add your project data to see insights here.'}</div>`;
+} else {
+  // Sort: red first, then amber, then blue; cap at 12
+  items.sort((a,b) => {
+    const order = { red: 0, amber: 1, blue: 2 };
+    return (order[a.sev] ?? 3) - (order[b.sev] ?? 3);
+  });
+  attnEl.innerHTML = `<div class="attention-list">${
+    items.slice(0, 12).map(item => `
+      <div class="attn-item sev-${item.sev}">
+        <div class="attn-dot attn-dot-${item.sev}"></div>
+        <div class="attn-body">
+          <div class="attn-title">${esc(item.title)}</div>
+          <div class="attn-meta">${esc(item.meta)}</div>
+        </div>
+        <div class="attn-src">${esc(item.src)}</div>
+      </div>`).join('')
+  }</div>`;
+}
+</script>
 </body>
 </html>
