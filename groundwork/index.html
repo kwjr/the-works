@@ -209,6 +209,21 @@ html.light .hdr-logo{background:#0c1526;border-color:rgba(52,211,153,0.40)}
 .ai-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
 @media(max-width:900px){.ai-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:520px){.ai-grid{grid-template-columns:1fr}}
+/* Weekly Pulse hero card */
+.pulse-card{grid-column:1/-1;background:linear-gradient(135deg,rgba(245,158,11,.08) 0%,rgba(251,191,36,.05) 100%);border:1px solid rgba(245,158,11,.3);border-radius:var(--r);padding:22px 24px;display:flex;align-items:center;gap:20px;transition:border-color .2s}
+.pulse-card:hover{border-color:rgba(245,158,11,.55)}
+.pulse-card-ico{width:48px;height:48px;background:rgba(245,158,11,.12);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.pulse-card-body{flex:1;min-width:0}
+.pulse-card-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px;display:flex;align-items:center;gap:10px}
+.pulse-card-title .pulse-badge{font-size:10px;font-weight:600;color:var(--amber);background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.25);border-radius:20px;padding:2px 8px;letter-spacing:.3px}
+.pulse-card-desc{font-size:13px;color:var(--text-muted);line-height:1.5}
+.pulse-card-actions{display:flex;gap:8px;flex-shrink:0}
+.btn-pulse{background:rgba(245,158,11,.12);color:var(--amber);border:1px solid rgba(245,158,11,.35);border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s,border-color .15s;white-space:nowrap}
+.btn-pulse:hover{background:rgba(245,158,11,.2);border-color:rgba(245,158,11,.55)}
+/* Pulse result block styling */
+.pulse-result-hd{background:linear-gradient(135deg,rgba(245,158,11,.1),rgba(251,191,36,.06));border-bottom:1px solid rgba(245,158,11,.2);border-radius:var(--r) var(--r) 0 0;padding:12px 16px;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.8px}
+.pulse-week-label{font-size:11px;font-weight:500;color:var(--text-muted);text-transform:none;letter-spacing:0;margin-left:4px}
+.pulse-result-body{padding:4px 4px 0}
 .ai-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;display:flex;flex-direction:column;gap:10px;transition:border-color .2s}
 .ai-card:hover{border-color:var(--purple-bd)}
 .ai-card-ico{width:38px;height:38px;background:var(--purple-bg);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:19px}
@@ -556,6 +571,20 @@ mark.hl{background:rgba(251,191,36,.22);border-radius:2px;color:var(--amber)}
 <!-- AI INSIGHTS -->
 <section class="tab-pane hidden" id="pane-ai">
   <div class="ai-grid">
+    <!-- Weekly Pulse — suite-level hero card -->
+    <div class="pulse-card">
+      <div class="pulse-card-ico">📡</div>
+      <div class="pulse-card-body">
+        <div class="pulse-card-title">
+          Weekly Project Pulse
+          <span class="pulse-badge">ALL PROJECTS</span>
+        </div>
+        <div class="pulse-card-desc">Cross-project weekly review — what's overdue, what's at risk, what meetings need prep, what emails need to go out, and proactive recommendations for the week ahead. Reads data from Groundwork, Busywork, and Framework.</div>
+      </div>
+      <div class="pulse-card-actions">
+        <button class="btn-pulse" onclick="runAI('pulse')">📡 Run Weekly Pulse</button>
+      </div>
+    </div>
     <div class="ai-card"><div class="ai-card-ico">🔍</div><div class="ai-card-title">Risk Analysis</div>
       <div class="ai-card-desc">Surface potential risks from charter, assumptions, constraints, and meeting notes — each rated with a mitigation idea.</div>
       <button class="btn btn-ai" onclick="runAI('risks')">Analyze Risks</button></div>
@@ -768,6 +797,35 @@ const BACKUP_KEY = 'groundwork_backups';
 
 let STATE = { activeId:'', projects:[] };
 
+// ── The Works · Shared Project Registry ──────────────────
+// Canonical key shared across all tools on this origin.
+// Append-only: each tool only adds/updates its own entries.
+const TW_PROJ_KEY = 'theworks_projects';
+function twReadReg() { try { return JSON.parse(localStorage.getItem(TW_PROJ_KEY)||'[]'); } catch(e){ return []; } }
+function twAddToReg(id, name) {
+  const r = twReadReg();
+  if (!r.find(x => x.id === id)) {
+    r.push({ id, name, createdAt: new Date().toISOString().slice(0,10) });
+    localStorage.setItem(TW_PROJ_KEY, JSON.stringify(r));
+  }
+}
+function twUpdateInReg(id, name) {
+  const r = twReadReg();
+  const e = r.find(x => x.id === id);
+  if (e && e.name !== name) { e.name = name; localStorage.setItem(TW_PROJ_KEY, JSON.stringify(r)); }
+}
+function twSyncFromRegistry() {
+  const r = twReadReg();
+  let changed = false;
+  r.forEach(rp => {
+    const ex = STATE.projects.find(p => p.id === rp.id);
+    if (!ex) { STATE.projects.push(blankProject(rp.name, rp.id)); changed = true; }
+    else if (ex.name !== rp.name) { ex.name = rp.name; changed = true; }
+  });
+  if (changed) save();
+}
+// ─────────────────────────────────────────────────────────
+
 function P() {
   if (!STATE.projects.length) {
     const p = blankProject(''); STATE.projects = [p]; STATE.activeId = p.id;
@@ -775,9 +833,9 @@ function P() {
   return STATE.projects.find(p=>p.id===STATE.activeId) || STATE.projects[0];
 }
 
-function blankProject(name) {
+function blankProject(name, existingId) {
   return {
-    id:uid(), name:name||'', type:'', phase:'', billing:'', pm:'', sponsor:'',
+    id:existingId||uid(), name:name||'', type:'', phase:'', billing:'', pm:'', sponsor:'',
     link:'', startDate:'', targetDate:'', rag:'',
     charter:{ scope:'', outOfScope:'', objectives:[], assumptions:[], constraints:[], successCriteria:[], stakeholders:[] },
     meetings:[], decisions:[],
@@ -1011,11 +1069,12 @@ function saveProjModal() {
   const id=document.getElementById('projModalId').value;
   if(id){
     const proj=STATE.projects.find(p=>p.id===id);
-    if(proj){proj.name=name;save();}
+    if(proj){proj.name=name;save();twUpdateInReg(id,name);}
     renderProjBar(); if(STATE.activeId===id) populateCharterFields();
   } else {
     const proj=blankProject(name);
     STATE.projects.push(proj); STATE.activeId=proj.id; save(); renderAll();
+    twAddToReg(proj.id, proj.name);
   }
   closeProjModal(); showToast(id?'Project renamed':'Project created');
 }
@@ -1403,6 +1462,120 @@ function buildCtx() {
   return lines.join('\n');
 }
 
+// ── WEEKLY PULSE — cross-tool context builder ─────────────────
+function buildPulseCtx() {
+  const today = new Date();
+  const todayStr = today.toISOString().slice(0, 10);
+  const dow = today.getDay(); // 0=Sun
+  const mOff = dow === 0 ? -6 : 1 - dow;
+  const mon = new Date(today); mon.setDate(today.getDate() + mOff);
+  const sun = new Date(mon);   sun.setDate(mon.getDate() + 6);
+  const weekStart = mon.toISOString().slice(0, 10);
+  const weekEnd   = sun.toISOString().slice(0, 10);
+  const twoWeeksOut = new Date(sun); twoWeeksOut.setDate(sun.getDate() + 7);
+  const twoWeeksStr = twoWeeksOut.toISOString().slice(0, 10);
+  const twoWeeksAgo = new Date(today); twoWeeksAgo.setDate(today.getDate() - 14);
+  const twoWeeksAgoStr = twoWeeksAgo.toISOString().slice(0, 10);
+
+  const lines = [];
+  lines.push(`TODAY: ${todayStr} (${today.toLocaleDateString('en-US',{weekday:'long'})})`);
+  lines.push(`CURRENT WEEK: ${weekStart} → ${weekEnd}`);
+  lines.push('');
+
+  // ── Groundwork: all projects ──
+  lines.push('=== GROUNDWORK: ALL PROJECTS ===');
+  STATE.projects.forEach(p => {
+    lines.push(`\n--- ${p.name||'Unnamed'} ---`);
+    const meta = [p.type, p.phase ? `Phase: ${p.phase}` : '', p.rag ? `Status: ${p.rag.toUpperCase()}` : '', p.pm ? `PM: ${p.pm}` : '', p.sponsor ? `Sponsor: ${p.sponsor}` : '', p.targetDate ? `Target Go-Live: ${p.targetDate}` : ''].filter(Boolean);
+    if (meta.length) lines.push(meta.join(' | '));
+
+    // Target date proximity
+    if (p.targetDate) {
+      const diff = Math.floor((new Date(p.targetDate+' 12:00') - today) / 86400000);
+      if      (diff < 0)   lines.push(`⚠️ GO-LIVE DATE PASSED ${Math.abs(diff)} DAYS AGO`);
+      else if (diff <= 14) lines.push(`⚠️ GO-LIVE IN ${diff} DAYS`);
+      else if (diff <= 30) lines.push(`📅 Go-live in ${diff} days`);
+    }
+
+    // Actions
+    const acts = p.actions || [];
+    const overdue = acts.filter(a => a.status!=='Complete'&&a.status!=='Cancelled'&&a.dueDate&&a.dueDate<todayStr);
+    const dueWeek = acts.filter(a => a.status!=='Complete'&&a.status!=='Cancelled'&&a.dueDate&&a.dueDate>=todayStr&&a.dueDate<=weekEnd);
+    const openNoDue = acts.filter(a => a.status!=='Complete'&&a.status!=='Cancelled'&&!a.dueDate);
+    if (overdue.length) {
+      lines.push(`OVERDUE Actions (${overdue.length}):`);
+      overdue.forEach(a => lines.push(`  - [OVERDUE since ${a.dueDate}] ${a.text} — Owner: ${a.owner||'TBD'}, Priority: ${a.priority||'?'}`));
+    }
+    if (dueWeek.length) {
+      lines.push(`Due this week (${dueWeek.length}):`);
+      dueWeek.forEach(a => lines.push(`  - [Due ${a.dueDate}] ${a.text} — Owner: ${a.owner||'TBD'}`));
+    }
+    if (openNoDue.length) lines.push(`Open actions with no due date: ${openNoDue.length}`);
+
+    // Recent meetings (last 14 days) + upcoming meetings (next 14 days)
+    const meetings = p.meetings || [];
+    const recentMtg = meetings.filter(m => m.date && m.date >= twoWeeksAgoStr && m.date <= todayStr).sort((a,b)=>b.date.localeCompare(a.date));
+    const upcomingMtg = meetings.filter(m => m.date && m.date > todayStr && m.date <= twoWeeksStr).sort((a,b)=>a.date.localeCompare(b.date));
+    if (recentMtg.length) {
+      lines.push(`Recent meetings (last 14 days):`);
+      recentMtg.forEach(m => {
+        lines.push(`  - [${m.date}] ${m.title}${m.attendees?' ('+m.attendees+')':''}`);
+        if (m.actions && m.actions.trim()) lines.push(`    Actions noted: ${m.actions.trim().slice(0,200)}`);
+      });
+    }
+    if (upcomingMtg.length) {
+      lines.push(`Upcoming meetings (next 14 days):`);
+      upcomingMtg.forEach(m => lines.push(`  - [${m.date}] ${m.title}${m.attendees?' ('+m.attendees+')':''}`));
+    }
+
+    // Open decisions
+    const openDec = (p.decisions||[]).filter(d=>d.status==='Open');
+    if (openDec.length) {
+      lines.push(`Open decisions (${openDec.length}):`);
+      openDec.slice(0,5).forEach(d => lines.push(`  - [${d.date||'?'}] ${d.text}`));
+    }
+  });
+
+  // ── Busywork: tasks ──
+  try {
+    const bw = JSON.parse(localStorage.getItem('fieldwork_v3')||'{}');
+    const tasks = (bw.tasks||[]);
+    const projs = (bw.projects||[]);
+    const pName = id => projs.find(p=>p.id===id)?.name || id;
+    const overdue = tasks.filter(t=>!t.completed&&t.dueDate&&t.dueDate<todayStr);
+    const dueWeek = tasks.filter(t=>!t.completed&&t.dueDate&&t.dueDate>=todayStr&&t.dueDate<=weekEnd);
+    const q1 = tasks.filter(t=>!t.completed&&t.urgent&&t.important&&(!t.dueDate||t.dueDate>weekEnd));
+    if (overdue.length||dueWeek.length||q1.length) {
+      lines.push('\n=== BUSYWORK: TASKS ===');
+      if (overdue.length) { lines.push(`Overdue tasks (${overdue.length}):`); overdue.slice(0,10).forEach(t=>lines.push(`  - [OVERDUE ${t.dueDate}] ${t.title} [${pName(t.projectId)}]`)); }
+      if (dueWeek.length) { lines.push(`Due this week (${dueWeek.length}):`); dueWeek.slice(0,10).forEach(t=>lines.push(`  - [Due ${t.dueDate}] ${t.title} [${pName(t.projectId)}]`)); }
+      if (q1.length)      { lines.push(`Urgent+Important with no near due date (${q1.length}):`); q1.slice(0,6).forEach(t=>lines.push(`  - ${t.title} [${pName(t.projectId)}]`)); }
+    }
+  } catch(e) {}
+
+  // ── Framework: governance health ──
+  try {
+    const fw = JSON.parse(localStorage.getItem('framework-v2')||'{}');
+    const fwProjs = Object.values(fw.projects||{}).filter(p=>!p.archived);
+    const withIssues = fwProjs.map(p=>{
+      const entries = Object.values(p.tracker||{});
+      return { name:p.name, red:entries.filter(e=>e.health==='red').length, amber:entries.filter(e=>e.health==='amber').length };
+    }).filter(p=>p.red||p.amber);
+    if (withIssues.length) {
+      lines.push('\n=== FRAMEWORK: GOVERNANCE HEALTH ===');
+      withIssues.forEach(p=>{
+        const parts=[];
+        if(p.red)   parts.push(`${p.red} red artifact${p.red>1?'s':''}`);
+        if(p.amber) parts.push(`${p.amber} amber artifact${p.amber>1?'s':''}`);
+        lines.push(`  - ${p.name}: ${parts.join(', ')}`);
+      });
+    }
+  } catch(e) {}
+
+  return lines.join('\n');
+}
+// ─────────────────────────────────────────────────────────
+
 const PROMPTS={
   risks:       ctx=>({system:`Analyze project risks and return ONLY a JSON array. Each object must have exactly these keys: {"issueName":"short descriptive name","issueDescription":"1-2 sentence explanation of the risk","potentialImpact":"specific impact on scope, schedule, budget, or quality if risk occurs","likelihood":"High"|"Medium"|"Low","mitigationPlan":"concrete actions to prevent or reduce the risk"}. ONLY valid JSON, no markdown.`,user:`Identify risks:\n\n${ctx}`}),
   agenda:      ctx=>({system:`Generate a structured next-meeting agenda as plain text with time-boxed sections. Tie items to actual project content. Be specific.`,user:`Next meeting agenda:\n\n${ctx}`}),
@@ -1451,15 +1624,44 @@ KEY DISCUSSION POINTS
 Brief bullet points of the main topics covered.
 
 Be concise and scannable. Use only the section headers above — no extra headers or sub-headers.`,user:`PROJECT CONTEXT:\n${ctx}\n\nMEETING TRANSCRIPT / NOTES:\n${notes}`}),
-  ask:         (ctx,q)=>({system:`You are an intelligent project assistant. Answer using the project data provided. Be specific and concise.`,user:`PROJECT DATA:\n${ctx}\n\nQUESTION: ${q}`})
+  ask:         (ctx,q)=>({system:`You are an intelligent project assistant. Answer using the project data provided. Be specific and concise.`,user:`PROJECT DATA:\n${ctx}\n\nQUESTION: ${q}`}),
+  pulse:       ctx=>({
+    system:`You are a seasoned professional services PM generating a weekly pulse review. Your audience is a PS PM managing multiple implementation projects who wants an actionable, prioritized view for the week ahead.
+
+Use EXACTLY these section headers in this order (write them IN ALL CAPS on their own line):
+
+WEEKLY PULSE
+One sentence framing: overall posture this week, how many active projects, anything that stands out at a glance.
+
+NEEDS IMMEDIATE ATTENTION
+Items requiring action today or already overdue. Be specific: name the project in [brackets], state the item, state what action is needed. Bullet points. Write "None" if clear.
+
+THIS WEEK'S PRIORITIES
+Actionable priorities organized by project. Include due actions, scheduled meetings, and milestones due this week. Use [Project Name] prefixes so the PM can scan quickly.
+
+WATCH LIST
+Projects or items showing risk signals — amber status, approaching deadlines, stale open decisions, governance gaps. Explain specifically WHY each is on the watch list.
+
+MEETINGS TO PREPARE FOR
+For any meetings this week: what to prepare, what to review beforehand, who to pre-brief. If no meetings are logged, suggest which conversations would be valuable to schedule.
+
+COMMUNICATIONS NEEDED
+Specific outbound communications this week — sponsor updates, client check-ins, decision notifications, risk escalations. Name the project and the recipient type.
+
+PROACTIVE RECOMMENDATIONS
+2-3 forward-looking recommendations based on patterns you see in the data. Surface things the PM might not have prioritized but should act on soon.
+
+Rules: Be direct and specific. Use [Project Name] in brackets throughout. Avoid generic advice. Keep each section scannable with bullet points. If a section is genuinely empty, write "None identified."`,
+    user:`Generate my weekly project pulse:\n\n${ctx}`
+  })
 };
 
-const AI_LABELS={risks:'Risk Analysis',agenda:'Meeting Agenda',summary:'Project Summary',extract:'Extracted Action Items',changerequest:'Change Request Brief',scope:'Scope Review',stakeholder:'Sponsor Update',debrief:'Meeting Debrief',ask:'Answer'};
+const AI_LABELS={risks:'Risk Analysis',agenda:'Meeting Agenda',summary:'Project Summary',extract:'Extracted Action Items',changerequest:'Change Request Brief',scope:'Scope Review',stakeholder:'Sponsor Update',debrief:'Meeting Debrief',ask:'Answer',pulse:'Weekly Pulse'};
 
 // ── SINGLETON vs LOG tool classification ─────────────────────
 // Singleton tools: replace existing output when re-run
 // Log tools: append new timestamped entry each run
-const SINGLETON_TYPES = new Set(['risks', 'summary', 'scope']);
+const SINGLETON_TYPES = new Set(['risks', 'summary', 'scope', 'pulse']);
 
 // Debrief input is staged here by the modal before runAI is called
 let _pendingDebriefText = '';
@@ -1467,9 +1669,9 @@ let _pendingDebriefText = '';
 const _abortControllers = {};
 
 async function runAI(type) {
-  const ctx = buildCtx();
+  const ctx = type === 'pulse' ? buildPulseCtx() : buildCtx();
 
-  if (!ctx.trim() && !['extract','ask','debrief','changerequest'].includes(type)) {
+  if (!ctx.trim() && !['extract','ask','debrief','changerequest','pulse'].includes(type)) {
     const rid = SINGLETON_TYPES.has(type) ? type : uid();
     pushAIResult(type, rid, null, '⚠️ No project data found. Add charter details or log meetings first.');
     return;
@@ -1520,15 +1722,17 @@ async function runAI(type) {
       summary:       'claude-sonnet-4-20250514',
       scope:         'claude-sonnet-4-20250514',
       changerequest: 'claude-sonnet-4-20250514',
+      pulse:         'claude-sonnet-4-20250514',
       agenda:        'claude-haiku-4-5-20251001',
       extract:       'claude-haiku-4-5-20251001',
       stakeholder:   'claude-haiku-4-5-20251001',
       debrief:       'claude-haiku-4-5-20251001',
       ask:           'claude-haiku-4-5-20251001',
     };
+    const maxTokens = type === 'pulse' ? 2500 : 1500;
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST', headers, signal: controller.signal,
-      body: JSON.stringify({model: MODELS[type]||'claude-haiku-4-5-20251001', max_tokens:1500, system:cfg.system, messages:[{role:'user',content:cfg.user}]})
+      body: JSON.stringify({model: MODELS[type]||'claude-haiku-4-5-20251001', max_tokens:maxTokens, system:cfg.system, messages:[{role:'user',content:cfg.user}]})
     });
     const data = await res.json();
     if (data.error) { pushAIResult(type, resultId, null, `API error: ${data.error.message}`); return; }
@@ -1574,13 +1778,16 @@ function pushAILoading(type, resultId) {
     el.className = 'ai-result-block';
     document.getElementById('ai-results').prepend(el);
   }
+  const loadingMsg = type === 'pulse'
+    ? 'Scanning all projects across Groundwork, Busywork, and Framework…'
+    : 'Analyzing project data…';
   el.innerHTML = `
     <div class="ai-result-hd">✦ ${AI_LABELS[type]}
       <div class="ai-result-actions">
         <button class="btn btn-danger btn-sm" onclick="cancelAI('${resultId}')">◼ Stop</button>
       </div>
     </div>
-    <div class="spinner-wrap"><div class="spinner"></div>Analyzing project data…</div>`;
+    <div class="spinner-wrap"><div class="spinner"></div>${loadingMsg}</div>`;
 }
 
 function pushAIResult(type, resultId, text, err=null) {
@@ -1634,6 +1841,8 @@ function _renderResult(type, resultId, text, err, ts, pid) {
     body = renderExtracted(text);
   } else if (type==='summary') {
     body = renderSummary(text);
+  } else if (type==='pulse') {
+    body = `<div class="pulse-result-body">${renderTextResult(text)}</div>`;
   } else {
     body = renderTextResult(text);
   }
@@ -1650,6 +1859,26 @@ function _renderResult(type, resultId, text, err, ts, pid) {
   const extraBtn = (!err && type==='debrief')
     ? `<button class="btn btn-secondary btn-sm" onclick="saveDebriefAsMeeting('${resultId}')">Save Meeting</button>`
     : '';
+
+  // Pulse gets a special amber header with the week range
+  if (type === 'pulse') {
+    const now = new Date();
+    const dow = now.getDay();
+    const mon = new Date(now); mon.setDate(now.getDate() + (dow===0?-6:1-dow));
+    const sun = new Date(mon); sun.setDate(mon.getDate()+6);
+    const fmt = d => d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    const weekLabel = `Week of ${fmt(mon)} – ${fmt(sun)}`;
+    el.innerHTML = `
+      <div class="pulse-result-hd">📡 Weekly Pulse
+        <span class="pulse-week-label">· ${weekLabel}</span>
+        <div class="ai-result-actions" style="margin-left:auto">
+          ${!err ? `<button class="btn btn-secondary btn-sm" onclick="copyAIResult('${type}','${resultId}')">⎘ Copy</button>` : ''}
+          <button class="btn btn-ghost btn-sm" onclick="${dismissFn}">✕</button>
+        </div>
+      </div>
+      ${body}`;
+    return;
+  }
 
   el.innerHTML = `
     <div class="ai-result-hd">✦ ${AI_LABELS[type]}${tsLabel ? `<span class="ai-result-ts">${tsLabel}</span>` : ''}
@@ -2473,8 +2702,14 @@ document.addEventListener('click',e=>{
 // ── SERVICE WORKER ────────────────────────────────────────
 if('serviceWorker'in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
 
+// ── Cross-tool project sync ───────────────────────────────
+window.addEventListener('storage', e => {
+  if (e.key === TW_PROJ_KEY && e.newValue) { twSyncFromRegistry(); renderProjBar(); updateCounts(); }
+});
+
 // ── INIT ─────────────────────────────────────────────────
 loadState();
+twSyncFromRegistry();
 const _prefs=loadPrefs();
 if(_prefs.lightMode) applyTheme(true);
 renderAll();

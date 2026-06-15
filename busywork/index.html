@@ -2256,6 +2256,35 @@ function seedTasks() {
 //  UTILS
 // ═══════════════════════════════════════
 function uid()       { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+
+// ── The Works · Shared Project Registry ──────────────────
+const TW_PROJ_KEY = 'theworks_projects';
+function twReadReg() { try { return JSON.parse(localStorage.getItem(TW_PROJ_KEY)||'[]'); } catch(e){ return []; } }
+function twAddToReg(id, name) {
+  const r = twReadReg();
+  if (!r.find(x => x.id === id)) {
+    r.push({ id, name, createdAt: new Date().toISOString().slice(0,10) });
+    localStorage.setItem(TW_PROJ_KEY, JSON.stringify(r));
+  }
+}
+function twUpdateInReg(id, name) {
+  const r = twReadReg();
+  const e = r.find(x => x.id === id);
+  if (e && e.name !== name) { e.name = name; localStorage.setItem(TW_PROJ_KEY, JSON.stringify(r)); }
+}
+function twSyncFromRegistry() {
+  const r = twReadReg();
+  let changed = false;
+  r.forEach(rp => {
+    const ex = S.projects.find(p => p.id === rp.id);
+    if (!ex) {
+      S.projects.push({ id: rp.id, name: rp.name, color: COLORS[S.projects.length % COLORS.length], isSystem: false, startDate: rp.createdAt || todayStr() });
+      changed = true;
+    } else if (ex.name !== rp.name) { ex.name = rp.name; changed = true; }
+  });
+  if (changed) save();
+}
+// ─────────────────────────────────────────────────────────
 function todayStr() {
   const d = new Date();
   const y = d.getFullYear();
@@ -3185,16 +3214,18 @@ function saveProject() {
     if (p) {
       p.name=name; p.color=S.selColor;
       p.startDate = document.getElementById('proj-start-date')?.value || p.startDate || '';
+      twUpdateInReg(p.id, name);
     }
   } else {
     const newId = uid();
     const startDate = document.getElementById('proj-start-date')?.value || todayStr();
     S.projects.push({ id:newId, name, color:S.selColor, isSystem:false, startDate });
+    twAddToReg(newId, name);
     const addDefaults = document.getElementById('proj-defaults-toggle')?.classList.contains('on');
     if (addDefaults) {
       addDefaultTasksToProject(newId);
       save(); closeProjModal(); render();
-      showToast(`“${name}” created with ${DEFAULT_PROJECT_TASKS.length} default tasks ✓`, false);
+      showToast(`"${name}" created with ${DEFAULT_PROJECT_TASKS.length} default tasks ✓`, false);
       return;
     }
   }
@@ -3734,7 +3765,13 @@ function renderTrendsSection() {
 // ── Boot ────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
   load();
+  twSyncFromRegistry();
   render();
+});
+
+// ── Cross-tool project sync ───────────────────────────────
+window.addEventListener('storage', e => {
+  if (e.key === TW_PROJ_KEY && e.newValue) { twSyncFromRegistry(); render(); }
 });
 
 // ── Service worker ────────────────────────────────

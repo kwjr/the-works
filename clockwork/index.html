@@ -1611,10 +1611,44 @@ const STORAGE_KEY = 'time_tracker_v2';
 const DAY_NAMES   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
 const DEFAULT_PROJECTS = [
-  { id: 1, name: 'Internal / Admin',                    billable: false },
-  { id: 2, name: 'Internal / Professional Development', billable: false },
-  { id: 3, name: 'Internal / PTO',                      billable: false },
+  { id: 1, name: 'Internal / Admin',                    billable: false, localOnly: true },
+  { id: 2, name: 'Internal / Professional Development', billable: false, localOnly: true },
+  { id: 3, name: 'Internal / PTO',                      billable: false, localOnly: true },
 ];
+
+// ── UID + The Works · Shared Project Registry ─────────────
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+const TW_PROJ_KEY = 'theworks_projects';
+function twReadReg() { try { return JSON.parse(localStorage.getItem(TW_PROJ_KEY)||'[]'); } catch(e){ return []; } }
+function twAddToReg(id, name) {
+  const r = twReadReg();
+  if (!r.find(x => x.id === id)) {
+    r.push({ id, name, createdAt: new Date().toISOString().slice(0,10) });
+    localStorage.setItem(TW_PROJ_KEY, JSON.stringify(r));
+  }
+}
+function twUpdateInReg(id, name) {
+  const r = twReadReg();
+  const e = r.find(x => x.id === id);
+  if (e && e.name !== name) { e.name = name; localStorage.setItem(TW_PROJ_KEY, JSON.stringify(r)); }
+}
+function twSyncFromRegistry() {
+  const r = twReadReg();
+  let changed = false;
+  r.forEach(rp => {
+    const ex = state.projects.find(p => p.id === rp.id);
+    if (!ex) {
+      state.projects.push({ id: rp.id, name: rp.name, billable: true });
+      changed = true;
+    } else if (ex.name !== rp.name) {
+      ex.name = rp.name;
+      state.log.forEach(e => { if (e.projectId === rp.id) e.projectName = rp.name; });
+      changed = true;
+    }
+  });
+  if (changed) { saveState(); populateSelects(); }
+}
+// ─────────────────────────────────────────────────────────
 
 // ── App state ─────────────────────────────────
 let state = {
@@ -2627,8 +2661,9 @@ function confirmModal() {
   const name = document.getElementById('new-proj-name').value.trim();
   if (!name) { document.getElementById('new-proj-name').focus(); return; }
   const billable = document.getElementById('new-proj-type').value === 'true';
-  const id = state.nextId++;
+  const id = uid();
   state.projects.push({ id, name, billable });
+  twAddToReg(id, name);
   state.activeProject[0] = id;
   saveState(); populateSelects(); closeModal();
 }
@@ -2656,6 +2691,7 @@ function exportCSV() {
 function init() {
   loadTheme();
   loadState();
+  twSyncFromRegistry();
   document.getElementById('date-label').textContent =
     new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
   populateSelects();
@@ -2720,6 +2756,7 @@ function renameProject(id) {
   if (!proj || name === proj.name) return;
   proj.name = name;
   state.log.forEach(e => { if (e.projectId === id) e.projectName = name; });
+  twUpdateInReg(id, name);
   saveState();
   populateSelects();
 }
@@ -2895,8 +2932,9 @@ function addProjectFromSettings() {
   const name     = document.getElementById('settings-new-proj-name').value.trim();
   if (!name) { document.getElementById('settings-new-proj-name').focus(); return; }
   const billable = document.getElementById('settings-new-proj-type').value === 'true';
-  const id       = state.nextId++;
+  const id       = uid();
   state.projects.push({ id, name, billable });
+  twAddToReg(id, name);
   saveState();
   populateSelects();
   renderSettingsProjects();
@@ -2925,6 +2963,13 @@ function loadTheme() {
 
 // ── Start ─────────────────────────────────────
 init();
+
+// ── Cross-tool project sync ───────────────────
+window.addEventListener('storage', e => {
+  if (e.key === TW_PROJ_KEY && e.newValue) {
+    twSyncFromRegistry();
+  }
+});
 
 // ── File System Backup ────────────────────────
 const BACKUP_META_KEY = 'ett_backup_meta';

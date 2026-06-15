@@ -1060,6 +1060,42 @@ const FOLDERS = [...new Set(ARTS.map(a => a.folder))];
 const STORE_KEY = 'framework-v2';
 const LEGACY_KEY = 'framework-v1';
 
+// ── The Works · Shared Project Registry ──────────────────
+const TW_PROJ_KEY = 'theworks_projects';
+function twReadReg() { try { return JSON.parse(localStorage.getItem(TW_PROJ_KEY)||'[]'); } catch(e){ return []; } }
+function twAddToReg(id, name) {
+  const r = twReadReg();
+  if (!r.find(x => x.id === id)) {
+    r.push({ id, name, createdAt: new Date().toISOString().slice(0,10) });
+    localStorage.setItem(TW_PROJ_KEY, JSON.stringify(r));
+  }
+}
+function twUpdateInReg(id, name) {
+  const r = twReadReg();
+  const e = r.find(x => x.id === id);
+  if (e && e.name !== name) { e.name = name; localStorage.setItem(TW_PROJ_KEY, JSON.stringify(r)); }
+}
+function twSyncFromRegistry() {
+  const r = twReadReg();
+  let changed = false;
+  r.forEach(rp => {
+    if (!S.projects[rp.id]) {
+      const p = { id: rp.id, name: rp.name, type: 'All', billing: 'T&M',
+        startDate: rp.createdAt || today(), pm: '', currentPhase: null,
+        pscCloud: false, sharePoint: false, notes: '',
+        createdAt: rp.createdAt || today(), tracker: {}, history: [], customArts: [] };
+      S.projects[rp.id] = p;
+      initProjectTracker(rp.id);
+      changed = true;
+    } else if (S.projects[rp.id].name !== rp.name) {
+      S.projects[rp.id].name = rp.name;
+      changed = true;
+    }
+  });
+  if (changed) { save(); renderProjectSelect(); }
+}
+// ─────────────────────────────────────────────────────────
+
 const DEF = {
   version: 2,
   activeProjectId: null,
@@ -2417,7 +2453,9 @@ function saveProjModal() {
     S.projects[id] = { id, name, type, billing, startDate, pm, currentPhase: phase, pscCloud, sharePoint, notes, createdAt: today(), tracker: {}, history: [], customArts: [] };
     S.activeProjectId = id;
     initProjectTracker(id);
+    twAddToReg(id, name);
   }
+  if (editingProjId) twUpdateInReg(editingProjId, name);
   save(); closeProjModal(); renderAll();
 }
 
@@ -2559,6 +2597,7 @@ function renderAll() {
 // ═══════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
   load();
+  twSyncFromRegistry();
   applyTheme();
 
   // Tab switching
@@ -2680,6 +2719,11 @@ document.addEventListener('DOMContentLoaded', () => {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js').catch(() => {});
   }
+});
+
+// ── Cross-tool project sync ───────────────────────────────
+window.addEventListener('storage', e => {
+  if (e.key === TW_PROJ_KEY && e.newValue) { twSyncFromRegistry(); renderAll(); }
 });
 </script>
 </body>
