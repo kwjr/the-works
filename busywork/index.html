@@ -401,6 +401,9 @@ function loadAll(){
     try{taskStates[p.id]=JSON.parse(localStorage.getItem("cs_ts_"+p.id)||"{}")}
     catch(e){taskStates[p.id]={}}
   });
+  // Publish weighted overall % for every project immediately on load
+  // so the dashboard always has accurate values without needing Busywork to be open.
+  publishAllPcts();
 }
 function doAdd(name){
   var id="p"+Date.now();projects.push({id:id,name:name});
@@ -442,6 +445,26 @@ function phaseCounts(i){
   return{eN:eN,dN:dN,eW:eW,dW:dW}
 }
 function calcProg(i){var c=phaseCounts(i);return c.eW?c.dW/c.eW:0}
+
+// Calculate the weighted overall % for any project's task states (not just current).
+// Mirrors calcOv() exactly but accepts a states map instead of using curProjId.
+function calcOvForStates(states){
+  var eW=0,dW=0;
+  DATA.forEach(function(sec){allTasks(sec).forEach(function(t){
+    var sts=states[t.id]||"Not Started";
+    if(sts==="N/A")return;var w=tw(t);eW+=w;if(sts==="Complete")dW+=w;
+  })});
+  return eW?dW/eW:0;
+}
+// Publish cs_ov_[projId] for every project so the dashboard always has fresh values.
+function publishAllPcts(){
+  projects.forEach(function(p){
+    var states=taskStates[p.id]||{};
+    var pct=Math.round(calcOvForStates(states)*100);
+    try{localStorage.setItem("cs_ov_"+p.id,String(pct));}catch(e){}
+  });
+}
+
 function calcOv(){
   var eW=0,dW=0;
   DATA.forEach(function(sec){allTasks(sec).forEach(function(t){

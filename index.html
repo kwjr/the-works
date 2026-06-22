@@ -409,13 +409,11 @@ bwProjects.forEach(p => {
   bwInProgressTotal += inProgress;
   bwOpenTotal       += open;
 
-  // Use the weighted overall % Busywork writes to cs_ov_[projId] on every render.
-  // This exactly matches what the ov-pct display shows (weighted by task hours,
-  // N/A tasks excluded). Falls back to a simple count if the key isn't populated yet.
+  // Use the weighted overall % Busywork writes to cs_ov_[projId] on every load and
+  // on every task state change. This exactly matches the ov-pct display in Busywork.
+  // Shows — until the user has opened Busywork at least once with this version.
   const storedPct = ls('cs_ov_' + p.id);
-  const ovPct = storedPct !== null
-    ? parseInt(storedPct, 10)
-    : (stateVals.length - na > 0 ? Math.round(complete / (stateVals.length - na) * 100) : null);
+  const ovPct = storedPct !== null ? parseInt(storedPct, 10) : null;
 
   bwByProjName[p.name] = { blocked, inProgress, complete, na, total: stateVals.length, open, ovPct };
 });
