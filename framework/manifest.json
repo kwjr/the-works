@@ -5,9 +5,12 @@
   "start_url": "./index.html",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#161b22",
-  "theme_color": "#161b22",
-  "categories": ["productivity", "business"],
+  "background_color": "#0d1117",
+  "theme_color": "#f59e0b",
+  "categories": [
+    "productivity",
+    "business"
+  ],
   "icons": [
     {
       "src": "icon-32.png",
@@ -33,14 +36,24 @@
       "short_name": "Tracker",
       "description": "Open the artifact tracker",
       "url": "./index.html",
-      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     },
     {
       "name": "Dashboard",
       "short_name": "Dashboard",
       "description": "Open the portfolio dashboard",
       "url": "./index.html",
-      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ]
 }

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#0c1526">
+<meta name="theme-color" content="#0d1117">
 <title>Groundwork</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" sizes="32x32" href="groundwork-icon-32.png">
@@ -11,15 +11,35 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:#0c1526; --bg2:#101c2e; --surface:#162238; --surface2:#1c2d48; --surface3:#243658;
-  --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.12); --border3:rgba(255,255,255,0.18);
-  --text:#dde6f5; --text-muted:#7a94bc; --text-dim:#3f5878;
-  --green:#34d399; --green-bg:rgba(52,211,153,.10); --green-bd:rgba(52,211,153,.20);
-  --amber:#fbbf24; --amber-bg:rgba(251,191,36,.10); --amber-bd:rgba(251,191,36,.20);
-  --red:#f87171; --red-bg:rgba(248,113,113,.10); --red-bd:rgba(248,113,113,.20);
-  --blue:#60a5fa; --blue-bg:rgba(96,165,250,.10); --blue-bd:rgba(96,165,250,.20);
-  --purple:#c084fc; --purple-bg:rgba(192,132,252,.10); --purple-bd:rgba(192,132,252,.20);
-  --accent:#34d399; --r:10px; --rs:6px; --shadow:0 8px 32px rgba(0,0,0,.5); --font:'DM Sans',system-ui,sans-serif;
+  --bg:        #0d1117;
+  --surface:   #161b22;
+  --surface2:  #1c2333;
+  --surface3:  #21293a;
+  --border:    #2d3748;
+  --border2:   #374151;
+  --text:      #e2e8f0;
+  --muted:     #718096;
+  --dim:       #4a5568;
+  --green:     #22c55e;
+  --green-bg:  rgba(34,197,94,.10);
+  --green-bd:  rgba(34,197,94,.25);
+  --amber:     #f59e0b;
+  --amber-bg:  rgba(245,158,11,.10);
+  --amber-bd:  rgba(245,158,11,.25);
+  --red:       #ef4444;
+  --red-bg:    rgba(239,68,68,.10);
+  --red-bd:    rgba(239,68,68,.25);
+  --blue:      #3b9eff;
+  --blue-bg:   rgba(59,158,255,.10);
+  --blue-bd:   rgba(59,158,255,.25);
+  --accent:    #34d399;
+  --accent-bg: rgba(52,211,153,.10);
+  --accent-bd: rgba(52,211,153,.25);
+  --r:         10px;
+  --rs:        6px;
+  --rxs:       4px;
+  --shadow:    0 4px 24px rgba(0,0,0,.5);
+  --font:      'DM Sans', system-ui, sans-serif;
 }
 html.light {
   --bg:#f2f5fa; --bg2:#e8edf5; --surface:#fff; --surface2:#edf0f7; --surface3:#e2e7f0;
@@ -32,7 +52,7 @@ html.light {
   --purple:#7c3aed; --purple-bg:rgba(124,58,237,.09); --purple-bd:rgba(124,58,237,.22);
   --accent:#0a9e6a; --shadow:0 8px 32px rgba(0,0,0,.15);
 }
-html.light .field select option { background:#fff; color:#141e30; }
+html.light .field select option { background:var(--surface2); color:#141e30; }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
 body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
@@ -42,8 +62,8 @@ textarea,input,select{font-family:var(--font);font-size:14px}
 
 /* HEADER */
 .hdr{background:var(--bg2);border-bottom:1px solid var(--border);height:54px;padding:0 24px;display:flex;align-items:center;gap:14px;position:sticky;top:38px;z-index:300}
-.hdr-logo{width:32px;height:32px;background:#0c1526;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;border:1px solid rgba(52,211,153,0.25)}
-html.light .hdr-logo{background:#0c1526;border-color:rgba(52,211,153,0.40)}
+.hdr-logo{width:32px;height:32px;background:#0d1117;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;border:1px solid rgba(52,211,153,0.25)}
+html.light .hdr-logo{background:#0d1117;border-color:rgba(52,211,153,0.40)}
 .hdr-name{font-size:16px;font-weight:700;color:var(--text);line-height:1.1}
 .hdr-spacer{flex:1}
 .btn-icon{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--rs);width:34px;height:34px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:16px;transition:all .15s;flex-shrink:0}
@@ -143,7 +163,7 @@ html.light .hdr-logo{background:#0c1526;border-color:rgba(52,211,153,0.40)}
 
 /* BUTTONS */
 .btn{border:none;border-radius:var(--rs);padding:8px 16px;font-size:13px;font-weight:500;transition:all .15s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;font-family:var(--font)}
-.btn-primary{background:var(--green);color:#0c1526}
+.btn-primary{background:var(--green);color:#0d1117}
 .btn-primary:hover{filter:brightness(1.08)}
 .btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border2)}
 .btn-secondary:hover{background:var(--surface3)}
@@ -298,7 +318,7 @@ html.light .hdr-logo{background:#0c1526;border-color:rgba(52,211,153,0.40)}
 .toggle input{opacity:0;width:0;height:0;position:absolute}
 .toggle-track{position:absolute;inset:0;background:var(--surface3);border-radius:12px;border:1px solid var(--border2);cursor:pointer;transition:background .2s,border-color .2s}
 .toggle input:checked+.toggle-track{background:var(--accent);border-color:var(--accent)}
-.toggle-track::after{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:2px;left:2px;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.toggle-track::after{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:var(--surface2);top:2px;left:2px;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
 .toggle input:checked+.toggle-track::after{transform:translateX(18px)}
 .api-key-wrap{display:flex;gap:8px;width:100%;margin-top:8px}
 .api-key-input{flex:1;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--rs);color:var(--text);padding:8px 10px;font-size:13px;font-family:var(--font)}

@@ -4,8 +4,8 @@
   "description": "Daily and weekly time tracking for Hyland Professional Services",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#191E5E",
-  "theme_color": "#191E5E",
+  "background_color": "#0d1117",
+  "theme_color": "#EC5CBB",
   "orientation": "any",
   "icons": [
     {
