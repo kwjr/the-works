@@ -1638,9 +1638,9 @@ const STORAGE_KEY = 'time_tracker_v2';
 const DAY_NAMES   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
 const DEFAULT_PROJECTS = [
-  { id: 1, name: 'Internal / Admin',                    billable: false, localOnly: true },
-  { id: 2, name: 'Internal / Professional Development', billable: false, localOnly: true },
-  { id: 3, name: 'Internal / PTO',                      billable: false, localOnly: true },
+  { id: 'sys_admin', name: 'Internal / Admin',                    billable: false, localOnly: true },
+  { id: 'sys_pd',    name: 'Internal / Professional Development', billable: false, localOnly: true },
+  { id: 'sys_pto',   name: 'Internal / PTO',                      billable: false, localOnly: true },
 ];
 
 // ── UID + The Works · Shared Project Registry ─────────────
@@ -1681,7 +1681,7 @@ function twSyncFromRegistry() {
 let state = {
   projects:      [...DEFAULT_PROJECTS],
   nextId:        4,
-  activeProject: [1, 2],
+  activeProject: ['sys_admin', 'sys_pd'],
   log:           [],
   settings:      { utilTarget: 80, dailyTarget: 8 },
   psaLogged:     {},
@@ -1738,20 +1738,55 @@ function dayLabel(dateKey) {
 }
 
 // ── Storage ───────────────────────────────────
+
+// Migrates any legacy numeric project IDs (1/2/3 or nextId-based) to strings.
+// Called after loading from localStorage or restoring from any backup file.
+function migrateNumericIds(s) {
+  const DEF = { 1: 'sys_admin', 2: 'sys_pd', 3: 'sys_pto' };
+  const mapId = id => {
+    if (typeof id !== 'number') return id;         // already a string
+    return DEF[id] !== undefined ? DEF[id] : String(id); // map defaults, stringify others
+  };
+  if (Array.isArray(s.projects)) {
+    s.projects = s.projects.map(p => ({ ...p, id: mapId(p.id) }));
+  }
+  if (Array.isArray(s.activeProject)) {
+    s.activeProject = s.activeProject.map(mapId);
+  }
+  if (Array.isArray(s.log)) {
+    s.log = s.log.map(e => ({ ...e, projectId: mapId(e.projectId) }));
+  }
+  if (s.psaLogged && typeof s.psaLogged === 'object') {
+    // psaKey format: "YYYY-MM-DD_<projectId>"
+    const out = {};
+    Object.entries(s.psaLogged).forEach(([k, v]) => {
+      if (k.length > 10 && k[10] === '_') {
+        const dateKey = k.slice(0, 10);
+        const projStr = k.slice(11);
+        const numId   = +projStr;
+        const newId   = !isNaN(numId) ? mapId(numId) : projStr;
+        out[`${dateKey}_${newId}`] = v;
+      } else { out[k] = v; }
+    });
+    s.psaLogged = out;
+  }
+  return s;
+}
+
 function loadState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return;
-    const s = JSON.parse(raw);
-    if (s.projects)      state.projects      = s.projects;
-    if (s.nextId)        state.nextId        = s.nextId;
-    if (s.activeProject) state.activeProject = s.activeProject;
-    if (s.settings)      state.settings      = { ...state.settings, ...s.settings };
-    if (s.psaLogged)     state.psaLogged     = s.psaLogged;
-    if (s.taskHistory)   state.taskHistory   = s.taskHistory;
-    if (s.log) {
+    const loaded = migrateNumericIds(JSON.parse(raw));
+    if (loaded.projects)      state.projects      = loaded.projects;
+    if (loaded.nextId)        state.nextId        = loaded.nextId;
+    if (loaded.activeProject) state.activeProject = loaded.activeProject;
+    if (loaded.settings)      state.settings      = { ...state.settings, ...loaded.settings };
+    if (loaded.psaLogged)     state.psaLogged     = loaded.psaLogged;
+    if (loaded.taskHistory)   state.taskHistory   = loaded.taskHistory;
+    if (loaded.log) {
       const keep = new Set([...weekDays(0), ...weekDays(-1)]);
-      state.log = s.log.filter(e => keep.has(e.date));
+      state.log = loaded.log.filter(e => keep.has(e.date));
     }
     invalidateTaskHistoryCache();
   } catch(e) { console.warn('Load failed', e); }
@@ -1809,7 +1844,8 @@ function populateSelects() {
 }
 
 function onProjectChange(t) {
-  state.activeProject[t] = +document.getElementById('project-select-' + t).value;
+  // Store the raw string value — project IDs are always strings now.
+  state.activeProject[t] = document.getElementById('project-select-' + t).value;
   saveState();
 }
 
@@ -3133,7 +3169,7 @@ async function restoreFromBackup() {
     const text = await file.text();
     const data = JSON.parse(text);
     if (!data.state) throw new Error('Invalid backup format');
-    const s = data.state;
+    const s = migrateNumericIds(data.state);
     if (s.projects)      state.projects      = s.projects;
     if (s.nextId)        state.nextId        = s.nextId;
     if (s.activeProject) state.activeProject = s.activeProject;
@@ -3214,30 +3250,44 @@ function renderBackupSection() {
   const el = document.getElementById('backup-section-content');
   if (!el) return;
 
+  // ── Simple download / import (all browsers) ───────────────
+  const simpleHtml = `
+    <div style="font-size:12px;color:var(--text-3);margin-bottom:10px;line-height:1.5;">
+      Download a full backup of your projects and time log, or restore from a previous backup file.
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;">
+      <button class="btn-add-proj" onclick="downloadBackup()">⬇ Download Backup</button>
+      <label class="btn-add-proj" style="cursor:pointer;">
+        ⬆ Restore from File
+        <input type="file" accept=".json" style="display:none" onchange="importBackupFile(this)">
+      </label>
+    </div>
+    <div style="border-top:1px solid var(--border-light);margin-bottom:14px;"></div>
+    <div style="font-size:11px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Auto-save (Chrome / Edge only)</div>`;
+
   if (!('showSaveFilePicker' in window)) {
-    el.innerHTML = `<div style="font-size:12px;color:var(--text-3);line-height:1.5;">Requires Chrome or Edge — not supported in this browser.</div>`;
+    el.innerHTML = simpleHtml +
+      `<div style="font-size:12px;color:var(--text-3);line-height:1.5;">Auto-save to a local file requires Chrome or Edge.</div>`;
     return;
   }
 
   const meta = loadBackupMeta();
 
   if (!backupHandle || !meta) {
-    el.innerHTML = `
+    el.innerHTML = simpleHtml + `
       <div style="font-size:12px;color:var(--text-3);margin-bottom:8px;line-height:1.5;">
-        Link a local file to automatically back up your data whenever you log time. Survives browser history clears.
+        Link a local file to automatically save data whenever you log time.
       </div>
       <button class="btn-add-proj" onclick="linkBackupFile()">🔗 Link backup file</button>`;
     return;
   }
 
-  // Render linked state; check permission asynchronously
   const lastSaved = meta.lastSaved
     ? new Date(meta.lastSaved).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) +
       ' at ' + new Date(meta.lastSaved).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     : 'never';
 
-  // Placeholder while permission check runs
-  el.innerHTML = `
+  el.innerHTML = simpleHtml + `
     <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
       <span style="font-size:13px;color:var(--text-3);">…</span>
       <span style="font-size:13px;font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${meta.fileName}">${meta.fileName}</span>
@@ -3255,7 +3305,7 @@ function renderBackupSection() {
     const dotEl = el.querySelector('span[style*="text-3"]');
     if (dotEl) { dotEl.textContent = statusDot; dotEl.style.color = statusColor; }
     if (perm === 'prompt') {
-      const note = el.querySelector('div[style*="text-3"]');
+      const note = el.querySelector('div[style*="text-3"][style*="8px"]');
       if (note) { note.textContent = 'Permission needed after page reload — click Reconnect'; note.style.color = 'var(--amber)'; }
       const btns = el.querySelector('div[style*="flex-wrap"]');
       if (btns) btns.innerHTML = `
@@ -3264,6 +3314,72 @@ function renderBackupSection() {
     }
     updateBackupIndicator();
   }).catch(() => {});
+}
+
+// ── Simple download backup (all browsers) ─────────────────
+function downloadBackup() {
+  const payload = {
+    version:  2,
+    savedAt:  new Date().toISOString(),
+    source:   'clockwork-download',
+    state: {
+      projects:      state.projects,
+      nextId:        state.nextId,
+      activeProject: state.activeProject,
+      log:           state.log,
+      settings:      state.settings,
+      psaLogged:     state.psaLogged,
+      taskHistory:   state.taskHistory,
+    },
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `clockwork-backup-${todayKey()}.json`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ── Import backup from file (all browsers) ────────────────
+function importBackupFile(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      // Support both wrapped format { version, savedAt, state: {...} }
+      // and legacy raw format { projects, log, ... }
+      const raw = data.state || data;
+      if (!raw.projects && !raw.log) throw new Error('Unrecognised format');
+      const dateStr = data.savedAt
+        ? new Date(data.savedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+        : file.name;
+      if (!confirm(`Restore backup from ${dateStr}?\n\nThis replaces all current projects and time log data.`)) {
+        input.value = ''; return;
+      }
+      const s = migrateNumericIds({ ...raw });
+      if (s.projects)      state.projects      = s.projects;
+      if (s.activeProject) state.activeProject = s.activeProject;
+      if (s.log)           state.log           = s.log;
+      if (s.settings)      state.settings      = { ...state.settings, ...s.settings };
+      if (s.psaLogged)     state.psaLogged     = s.psaLogged;
+      if (s.taskHistory)   state.taskHistory   = s.taskHistory;
+      saveState(); invalidateTaskHistoryCache();
+      populateSelects(); renderDailyMeter(); updateWeekNav();
+      document.getElementById('log-count').textContent = todayEntries().length;
+      if (activeTab === 'log')     renderLogTab();
+      if (activeTab === 'daily')   renderDailySummary();
+      if (activeTab === 'summary') renderSummary();
+      hideBanner(); closeSettings();
+      alert(`Restored: ${state.projects.length} project(s) and ${state.log.length} log entr${state.log.length === 1 ? 'y' : 'ies'}.`);
+    } catch(err) {
+      alert('Could not restore — the file may be invalid or corrupted.\n\n' + err.message);
+    }
+    input.value = '';
+  };
+  reader.onerror = () => { alert('Could not read file.'); input.value = ''; };
+  reader.readAsText(file);
 }
 
 // Restore banner visibility
