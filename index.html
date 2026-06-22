@@ -269,7 +269,7 @@ html, body { background: var(--bg); color: var(--text); font-family: var(--font)
       <div class="stat-sub" id="stat-actions-sub"></div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">Tasks Due Today</div>
+      <div class="stat-label">Checklist Blocked</div>
       <div class="stat-value" id="stat-tasks">—</div>
       <div class="stat-sub" id="stat-tasks-sub"></div>
     </div>
@@ -369,7 +369,6 @@ document.getElementById('topbar-date').textContent =
 // ── Load all data ────────────────────────────────────────
 const todayStr   = today();
 const gwRaw      = ls('groundwork_v2');
-const bwRaw      = ls('fieldwork_v3');
 const fwRaw      = ls('framework-v2');
 const cwRaw      = ls('time_tracker_v2');
 const registry   = ls('theworks_projects') || [];
@@ -390,24 +389,25 @@ gwProjects.forEach(p => {
   gwByName[p.name] = { rag: p.rag || '', open, overdue, decisions: p.decisions || [], phase: p.type || '' };
 });
 
-// ── Busywork data ────────────────────────────────────────
-const bwTasks    = bwRaw?.tasks    || [];
-const bwProjects = bwRaw?.projects || [];
-const bwProjName = id => bwProjects.find(p => p.id === id)?.name || '';
-
-const bwDueToday   = bwTasks.filter(t => !t.completed && t.dueDate === todayStr);
-const bwOverdue    = bwTasks.filter(t => !t.completed && t.dueDate && t.dueDate < todayStr);
-const bwOpenTotal  = bwTasks.filter(t => !t.completed).length;
-
+// ── Busywork v2 data ─────────────────────────────────────────
+// v2 stores projects in cs_projs and task states in cs_ts_[projId]
+const bwProjects = ls('cs_projs') || [];
 const bwByProjName = {};
-bwTasks.filter(t => !t.completed).forEach(t => {
-  const name = bwProjName(t.projectId);
-  if (!bwByProjName[name]) bwByProjName[name] = { open: 0, dueToday: 0, overdue: 0 };
-  bwByProjName[name].open++;
-  if (t.dueDate === todayStr)          bwByProjName[name].dueToday++;
-  if (t.dueDate && t.dueDate < todayStr) bwByProjName[name].overdue++;
-});
+let bwBlockedTotal = 0, bwInProgressTotal = 0, bwOpenTotal = 0;
+const hasBwData = bwProjects.length > 0;
 
+bwProjects.forEach(p => {
+  const states = ls('cs_ts_' + p.id) || {};
+  const stateVals = Object.values(states);
+  const blocked    = stateVals.filter(s => s === 'On Hold/Blocked').length;
+  const inProgress = stateVals.filter(s => s === 'In Progress').length;
+  const complete   = stateVals.filter(s => s === 'Complete' || s === 'N/A').length;
+  const open       = stateVals.filter(s => s !== 'Complete' && s !== 'N/A').length;
+  bwBlockedTotal  += blocked;
+  bwInProgressTotal += inProgress;
+  bwOpenTotal     += open;
+  bwByProjName[p.name] = { blocked, inProgress, complete, total: stateVals.length, open };
+});
 // ── Framework data ───────────────────────────────────────
 const fwProjects = Object.values(fwRaw?.projects || {}).filter(p => !p.archived);
 const fwByName   = {};
@@ -455,12 +455,12 @@ setStatValue('stat-actions', totalOpenActions === 0 && !gwRaw ? '—' : totalOpe
   totalOverdueActs > 0 ? 'stat-red' : 'stat-blue');
 setStatSub('stat-actions', totalOverdueActs > 0 ? `${totalOverdueActs} overdue` : (gwRaw ? 'across all projects' : 'No Groundwork data'));
 
-// Tasks due today
-setStatValue('stat-tasks', !bwRaw ? '—' : bwDueToday.length,
-  bwDueToday.length > 0 ? 'stat-amber' : 'stat-green');
-setStatSub('stat-tasks', !bwRaw ? 'No Busywork data'
-  : bwOverdue.length > 0 ? `+ ${bwOverdue.length} overdue`
-  : `${bwOpenTotal} open total`);
+// Busywork v2 blocked/in-progress
+setStatValue('stat-tasks', !hasBwData ? '—' : bwBlockedTotal,
+  bwBlockedTotal > 0 ? 'stat-red' : bwInProgressTotal > 0 ? 'stat-amber' : 'stat-green');
+setStatSub('stat-tasks', !hasBwData ? 'No Busywork data'
+  : bwInProgressTotal > 0 ? `${bwInProgressTotal} in progress`
+  : `${bwOpenTotal} open tasks`);
 
 // Projects at risk
 setStatValue('stat-risk', (!gwRaw && !fwRaw) ? '—' : projAtRisk,
@@ -520,11 +520,14 @@ if (!allProjects.length) {
       ? `<span class="proj-col ${overdueActs > 0 ? 'num-red' : 'num-amber'}">${openActs}${overdueActs > 0 ? ` <span style="font-size:10px;font-weight:400">(${overdueActs} OD)</span>` : ''}</span>`
       : `<span class="proj-col num-dim">—</span>`;
 
-    const bwOpen = bw.open || 0;
-    const bwOD   = bw.overdue || 0;
-    const tasksHTML = bwOpen > 0
-      ? `<span class="proj-col ${bwOD > 0 ? 'num-red' : 'num-amber'}">${bwOpen}${bwOD > 0 ? ` <span style="font-size:10px;font-weight:400">(${bwOD} OD)</span>` : ''}</span>`
-      : `<span class="proj-col num-dim">—</span>`;
+    const bwBlocked = bw.blocked || 0;
+    const bwIP      = bw.inProgress || 0;
+    const bwOpen    = bw.open || 0;
+    const tasksHTML = bwBlocked > 0
+      ? `<span class="proj-col num-red">${bwOpen} <span style="font-size:10px;font-weight:400">(${bwBlocked} blk)</span></span>`
+      : bwOpen > 0
+        ? `<span class="proj-col num-amber">${bwOpen}</span>`
+        : `<span class="proj-col num-dim">—</span>`;
 
     const fwRed = fw.red || 0, fwAmber = fw.amber || 0;
     const artIssues = fwRed + fwAmber;
@@ -577,9 +580,12 @@ fwProjects.forEach(p => {
   }
 });
 
-// Overdue Busywork tasks
-bwOverdue.slice(0, 4).forEach(t => {
-  items.push({ sev: 'amber', src: 'Busywork', title: t.title, meta: `Due ${t.dueDate}${bwProjName(t.projectId) ? ' · ' + bwProjName(t.projectId) : ''}` });
+// Busywork v2 blocked items
+bwProjects.forEach(p => {
+  const d = bwByProjName[p.name] || {};
+  if (d.blocked > 0) {
+    items.push({ sev: 'amber', src: 'Busywork', title: `${p.name}: ${d.blocked} item${d.blocked > 1 ? 's' : ''} on hold/blocked`, meta: `${d.open} total open checklist tasks` });
+  }
 });
 
 // Amber RAG
@@ -597,14 +603,14 @@ fwProjects.forEach(p => {
   }
 });
 
-// Tasks due today
-bwDueToday.slice(0, 3).forEach(t => {
-  items.push({ sev: 'blue', src: 'Busywork', title: t.title, meta: `Due today${bwProjName(t.projectId) ? ' · ' + bwProjName(t.projectId) : ''}` });
-});
+// Busywork v2 in-progress (informational blue)
+if (hasBwData && bwInProgressTotal > 0 && bwBlockedTotal === 0) {
+  items.push({ sev: 'blue', src: 'Busywork', title: `${bwInProgressTotal} checklist item${bwInProgressTotal > 1 ? 's' : ''} in progress`, meta: 'Across all Busywork projects' });
+}
 
 const attnEl = document.getElementById('attention-list');
 if (!items.length) {
-  const hasAnyData = gwRaw || bwRaw || fwRaw || cwRaw;
+  const hasAnyData = gwRaw || hasBwData || fwRaw || cwRaw;
   attnEl.innerHTML = `<div class="empty">${hasAnyData ? '✓ Nothing needs attention right now.' : 'Open the tools and add your project data to see insights here.'}</div>`;
 } else {
   // Sort: red first, then amber, then blue; cap at 12

@@ -1562,24 +1562,37 @@ function buildPulseCtx() {
     }
   });
 
-  // ── Busywork: tasks ──
+  // ── Busywork v2 data (cs_projs + cs_ts_[projId]) ────────────
   try {
-    const bw = JSON.parse(localStorage.getItem('fieldwork_v3')||'{}');
-    const tasks = (bw.tasks||[]);
-    const projs = (bw.projects||[]);
-    const pName = id => projs.find(p=>p.id===id)?.name || id;
-    const overdue = tasks.filter(t=>!t.completed&&t.dueDate&&t.dueDate<todayStr);
-    const dueWeek = tasks.filter(t=>!t.completed&&t.dueDate&&t.dueDate>=todayStr&&t.dueDate<=weekEnd);
-    const q1 = tasks.filter(t=>!t.completed&&t.urgent&&t.important&&(!t.dueDate||t.dueDate>weekEnd));
-    if (overdue.length||dueWeek.length||q1.length) {
-      lines.push('\n=== BUSYWORK: TASKS ===');
-      if (overdue.length) { lines.push(`Overdue tasks (${overdue.length}):`); overdue.slice(0,10).forEach(t=>lines.push(`  - [OVERDUE ${t.dueDate}] ${t.title} [${pName(t.projectId)}]`)); }
-      if (dueWeek.length) { lines.push(`Due this week (${dueWeek.length}):`); dueWeek.slice(0,10).forEach(t=>lines.push(`  - [Due ${t.dueDate}] ${t.title} [${pName(t.projectId)}]`)); }
-      if (q1.length)      { lines.push(`Urgent+Important with no near due date (${q1.length}):`); q1.slice(0,6).forEach(t=>lines.push(`  - ${t.title} [${pName(t.projectId)}]`)); }
+    const bwProjs = JSON.parse(localStorage.getItem('cs_projs')||'[]');
+    if (bwProjs.length) {
+      const projSummaries = [];
+      bwProjs.forEach(p => {
+        try {
+          const states = JSON.parse(localStorage.getItem('cs_ts_'+p.id)||'{}');
+          const vals = Object.values(states);
+          const blocked    = vals.filter(s=>s==='On Hold/Blocked').length;
+          const inProgress = vals.filter(s=>s==='In Progress').length;
+          const complete   = vals.filter(s=>s==='Complete'||s==='N/A').length;
+          const open       = vals.filter(s=>s!=='Complete'&&s!=='N/A').length;
+          const total      = vals.length;
+          const pct        = total ? Math.round(complete/total*100) : 0;
+          projSummaries.push({name:p.name,blocked,inProgress,open,total,complete,pct});
+        } catch(e2) {}
+      });
+      if (projSummaries.length) {
+        lines.push('\n=== BUSYWORK v2: CONVERSION CHECKLISTS ===');
+        projSummaries.forEach(ps => {
+          lines.push(`  - ${ps.name}: ${ps.pct}% complete (${ps.complete}/${ps.total} tasks)`);
+          if (ps.blocked>0)    lines.push(`    ⚠️ ${ps.blocked} task(s) ON HOLD/BLOCKED`);
+          if (ps.inProgress>0) lines.push(`    ▶ ${ps.inProgress} task(s) In Progress`);
+          if (ps.open>0)       lines.push(`    Open: ${ps.open} remaining`);
+        });
+      }
     }
   } catch(e) {}
 
-  // ── Framework: governance health ──
+    // ── Framework: governance health ──
   try {
     const fw = JSON.parse(localStorage.getItem('framework-v2')||'{}');
     const fwProjs = Object.values(fw.projects||{}).filter(p=>!p.archived);
