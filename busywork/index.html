@@ -585,6 +585,8 @@ function renderOv(){
   var p=Math.round(calcOv()*100);
   document.getElementById("ov-pct").textContent=p+"%";
   document.getElementById("ov-bar").style.width=p+"%";
+  // Publish to shared localStorage so the dashboard can read it directly
+  if(curProjId) try{ localStorage.setItem("cs_ov_"+curProjId, String(p)); }catch(e){}
 }
 function updateAllProg(){
   renderProg();renderOv();

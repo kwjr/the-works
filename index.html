@@ -390,23 +390,34 @@ gwProjects.forEach(p => {
 });
 
 // ── Busywork v2 data ─────────────────────────────────────────
-// v2 stores projects in cs_projs and task states in cs_ts_[projId]
+// v2 stores projects in cs_projs, task states in cs_ts_[projId],
+// and the weighted overall % (matching the ov-pct display) in cs_ov_[projId]
 const bwProjects = ls('cs_projs') || [];
 const bwByProjName = {};
 let bwBlockedTotal = 0, bwInProgressTotal = 0, bwOpenTotal = 0;
 const hasBwData = bwProjects.length > 0;
 
 bwProjects.forEach(p => {
-  const states = ls('cs_ts_' + p.id) || {};
+  const states    = ls('cs_ts_' + p.id) || {};
   const stateVals = Object.values(states);
   const blocked    = stateVals.filter(s => s === 'On Hold/Blocked').length;
   const inProgress = stateVals.filter(s => s === 'In Progress').length;
-  const complete   = stateVals.filter(s => s === 'Complete' || s === 'N/A').length;
+  const complete   = stateVals.filter(s => s === 'Complete').length;
+  const na         = stateVals.filter(s => s === 'N/A').length;
   const open       = stateVals.filter(s => s !== 'Complete' && s !== 'N/A').length;
-  bwBlockedTotal  += blocked;
+  bwBlockedTotal    += blocked;
   bwInProgressTotal += inProgress;
-  bwOpenTotal     += open;
-  bwByProjName[p.name] = { blocked, inProgress, complete, total: stateVals.length, open };
+  bwOpenTotal       += open;
+
+  // Use the weighted overall % Busywork writes to cs_ov_[projId] on every render.
+  // This exactly matches what the ov-pct display shows (weighted by task hours,
+  // N/A tasks excluded). Falls back to a simple count if the key isn't populated yet.
+  const storedPct = ls('cs_ov_' + p.id);
+  const ovPct = storedPct !== null
+    ? parseInt(storedPct, 10)
+    : (stateVals.length - na > 0 ? Math.round(complete / (stateVals.length - na) * 100) : null);
+
+  bwByProjName[p.name] = { blocked, inProgress, complete, na, total: stateVals.length, open, ovPct };
 });
 // ── Framework data ───────────────────────────────────────
 const fwProjects = Object.values(fwRaw?.projects || {}).filter(p => !p.archived);
@@ -470,21 +481,18 @@ function setStatSub(id, text) {
 // Projects Active — set after allProjects is built below
 // (placeholder — actual rendering done after project list is assembled)
 
-// Busywork overall % complete
-const bwTotalTasks = bwProjects.reduce((s, p) => {
-  const states = ls('cs_ts_' + p.id) || {};
-  return s + Object.keys(states).length;
-}, 0);
-const bwDoneTasks = bwProjects.reduce((s, p) => {
-  const states = ls('cs_ts_' + p.id) || {};
-  return s + Object.values(states).filter(v => v === 'Complete' || v === 'N/A').length;
-}, 0);
-const bwPct = bwTotalTasks > 0 ? Math.round(bwDoneTasks / bwTotalTasks * 100) : null;
+// Busywork overall % complete — average of per-project weighted ovPct values
+const bwPcts = bwProjects
+  .map(p => { const v = ls('cs_ov_' + p.id); return v !== null ? parseInt(v, 10) : null; })
+  .filter(v => v !== null);
+const bwPct = bwPcts.length > 0 ? Math.round(bwPcts.reduce((a,b)=>a+b,0) / bwPcts.length) : null;
+const bwTotalTasks = bwProjects.reduce((s,p) => s + Object.keys(ls('cs_ts_'+p.id)||{}).length, 0);
+const bwDoneTasks  = bwProjects.reduce((s,p) => s + Object.values(ls('cs_ts_'+p.id)||{}).filter(v=>v==='Complete').length, 0);
 setStatValue('stat-tasks', !hasBwData ? '—' : (bwPct !== null ? bwPct + '%' : '—'),
-  bwPct === 100 ? 'stat-green' : bwPct > 50 ? 'stat-blue' : bwPct !== null ? 'stat-amber' : '');
+  bwPct === 100 ? 'stat-green' : bwPct >= 50 ? 'stat-blue' : bwPct !== null ? 'stat-amber' : '');
 setStatSub('stat-tasks', !hasBwData ? 'No Busywork data'
-  : bwTotalTasks > 0 ? `${bwDoneTasks} of ${bwTotalTasks} tasks done`
-  : 'No tasks logged');
+  : bwPct !== null ? `avg across ${bwProjects.length} project${bwProjects.length>1?'s':''}`
+  : 'Open Busywork to sync %');
 
 // Projects at risk
 setStatValue('stat-risk', (!gwRaw && !fwRaw) ? '—' : projAtRisk,
@@ -544,18 +552,19 @@ if (!allProjects.length) {
                   : rag === 'red'   ? '<span class="rag-pill rag-red">RED</span>'
                   : '<span class="rag-pill rag-none">—</span>';
 
-    // % Complete from Busywork
-    const pct = bw.total > 0 ? Math.round((bw.complete || 0) / bw.total * 100) : null;
-    const pctColor = pct === 100 ? 'num-green' : pct >= 50 ? 'num-amber' : pct !== null ? 'num-red' : 'num-dim';
+    // % Complete — uses the weighted overall % Busywork writes to cs_ov_[projId],
+    // matching exactly what the ov-pct display in the upper-right shows.
+    const pct = bw.ovPct ?? null;
+    const pctColor = pct === 100 ? 'num-green' : pct >= 75 ? 'stat-blue' : pct >= 40 ? 'num-amber' : pct !== null ? 'num-red' : 'num-dim';
     const pctHTML = pct !== null
-      ? `<span class="proj-col ${pctColor}" style="font-size:13px">${pct}%<span style="font-size:10px;font-weight:400;margin-left:3px">${bw.complete}/${bw.total}</span></span>`
+      ? `<span class="proj-col ${pctColor}" style="font-size:13px">${pct}%</span>`
       : `<span class="proj-col num-dim">—</span>`;
 
     // Billable hours this week from Clockwork (match by project name)
     const billMins = cwBillByProjName[proj.name] || 0;
-    const billHrs  = billMins / 60;
+    const billHrs  = (billMins / 60).toFixed(2);
     const billHTML = billMins > 0
-      ? `<span class="proj-col num-blue" style="font-size:13px">${billHrs % 1 === 0 ? billHrs + 'h' : billHrs.toFixed(1) + 'h'}</span>`
+      ? `<span class="proj-col num-blue" style="font-size:13px">${billHrs}h</span>`
       : `<span class="proj-col num-dim">—</span>`;
 
     projRowsHTML += `
