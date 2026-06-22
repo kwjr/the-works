@@ -2642,14 +2642,14 @@ function closeEntryModal() {
 
 function onEntryProjectChange() {
   const selProj = document.getElementById('em-project');
-  const proj = state.projects.find(p => p.id === +selProj.value);
+  const proj = state.projects.find(p => p.id === selProj.value);
   if (proj) document.getElementById('em-billable').value = String(proj.billable);
 }
 
 function saveEntry() {
   const task    = document.getElementById('em-task').value.trim();
   const dateVal = document.getElementById('em-date').value;
-  const projId  = +document.getElementById('em-project').value;
+  const projId  = document.getElementById('em-project').value;
   const hours   = parseInt(document.getElementById('em-hours').value)   || 0;
   const mins    = parseInt(document.getElementById('em-minutes').value) || 0;
   const rawMins = hours * 60 + mins;
