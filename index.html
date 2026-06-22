@@ -170,7 +170,7 @@ html, body { background: var(--bg); color: var(--text); font-family: var(--font)
 }
 .proj-table-row {
   display: grid;
-  grid-template-columns: 1fr 70px 80px 80px 80px;
+  grid-template-columns: 1fr 72px 90px 90px;
   align-items: center;
   padding: 0 16px;
   min-height: 44px;
@@ -211,6 +211,7 @@ html, body { background: var(--bg); color: var(--text); font-family: var(--font)
 .num-amber  { color: var(--amber); }
 .num-green  { color: var(--green); }
 .num-dim    { color: var(--dim); }
+.num-blue   { color: var(--blue); }
 
 /* ── Attention items ── */
 .attention-list { display: flex; flex-direction: column; gap: 6px; }
@@ -264,12 +265,12 @@ html, body { background: var(--bg); color: var(--text); font-family: var(--font)
   <!-- Stats strip -->
   <div class="stats-strip">
     <div class="stat-card">
-      <div class="stat-label">Open Actions</div>
+      <div class="stat-label">Projects Active</div>
       <div class="stat-value stat-blue" id="stat-actions">—</div>
       <div class="stat-sub" id="stat-actions-sub"></div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">Checklist Blocked</div>
+      <div class="stat-label">Checklist Progress</div>
       <div class="stat-value" id="stat-tasks">—</div>
       <div class="stat-sub" id="stat-tasks-sub"></div>
     </div>
@@ -323,9 +324,8 @@ html, body { background: var(--bg); color: var(--text); font-family: var(--font)
         <div class="proj-table-row proj-table-hd">
           <div>Project</div>
           <div style="text-align:center">Status</div>
-          <div style="text-align:center">Actions</div>
-          <div style="text-align:center">Tasks</div>
-          <div style="text-align:center">Artifacts</div>
+          <div style="text-align:center">% Complete</div>
+          <div style="text-align:center">Billable Hrs</div>
         </div>
         <div id="proj-rows"></div>
       </div>
@@ -435,10 +435,27 @@ fwProjects.forEach(p => {
 });
 
 // ── Clockwork data ───────────────────────────────────────
-const cwLog      = cwRaw?.log || [];
-const cwToday    = cwLog.filter(e => e.date === todayStr);
-const cwMinsToday = cwToday.reduce((s, e) => s + (e.minutes || 0), 0);
-const cwBillMins  = cwToday.filter(e => e.billable).reduce((s, e) => s + (e.minutes || 0), 0);
+const cwLog = cwRaw?.log || [];
+
+// Current week Mon-Sun range
+function weekRange() {
+  const d = new Date(); const dow = d.getDay();
+  const mon = new Date(d); mon.setDate(d.getDate() + (dow === 0 ? -6 : 1 - dow));
+  const sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+  const fmt = x => x.getFullYear() + '-' + String(x.getMonth()+1).padStart(2,'0') + '-' + String(x.getDate()).padStart(2,'0');
+  return { start: fmt(mon), end: fmt(sun) };
+}
+const { start: weekStart, end: weekEnd } = weekRange();
+const cwWeek = cwLog.filter(e => e.date >= weekStart && e.date <= weekEnd);
+const cwMinsToday = cwLog.filter(e => e.date === todayStr).reduce((s, e) => s + (e.minutes||0), 0);
+const cwBillMins  = cwLog.filter(e => e.date === todayStr && e.billable).reduce((s, e) => s + (e.minutes||0), 0);
+
+// Per-project billable minutes this week, keyed by project name
+const cwBillByProjName = {};
+cwWeek.filter(e => e.billable).forEach(e => {
+  const name = e.projectName || '';
+  cwBillByProjName[name] = (cwBillByProjName[name] || 0) + (e.minutes || 0);
+});
 
 // ── Stats strip ──────────────────────────────────────────
 function setStatValue(id, val, cls) {
@@ -450,17 +467,24 @@ function setStatSub(id, text) {
   document.getElementById(id).textContent = text;
 }
 
-// Open actions
-setStatValue('stat-actions', totalOpenActions === 0 && !gwRaw ? '—' : totalOpenActions,
-  totalOverdueActs > 0 ? 'stat-red' : 'stat-blue');
-setStatSub('stat-actions', totalOverdueActs > 0 ? `${totalOverdueActs} overdue` : (gwRaw ? 'across all projects' : 'No Groundwork data'));
+// Projects Active — set after allProjects is built below
+// (placeholder — actual rendering done after project list is assembled)
 
-// Busywork v2 blocked/in-progress
-setStatValue('stat-tasks', !hasBwData ? '—' : bwBlockedTotal,
-  bwBlockedTotal > 0 ? 'stat-red' : bwInProgressTotal > 0 ? 'stat-amber' : 'stat-green');
+// Busywork overall % complete
+const bwTotalTasks = bwProjects.reduce((s, p) => {
+  const states = ls('cs_ts_' + p.id) || {};
+  return s + Object.keys(states).length;
+}, 0);
+const bwDoneTasks = bwProjects.reduce((s, p) => {
+  const states = ls('cs_ts_' + p.id) || {};
+  return s + Object.values(states).filter(v => v === 'Complete' || v === 'N/A').length;
+}, 0);
+const bwPct = bwTotalTasks > 0 ? Math.round(bwDoneTasks / bwTotalTasks * 100) : null;
+setStatValue('stat-tasks', !hasBwData ? '—' : (bwPct !== null ? bwPct + '%' : '—'),
+  bwPct === 100 ? 'stat-green' : bwPct > 50 ? 'stat-blue' : bwPct !== null ? 'stat-amber' : '');
 setStatSub('stat-tasks', !hasBwData ? 'No Busywork data'
-  : bwInProgressTotal > 0 ? `${bwInProgressTotal} in progress`
-  : `${bwOpenTotal} open tasks`);
+  : bwTotalTasks > 0 ? `${bwDoneTasks} of ${bwTotalTasks} tasks done`
+  : 'No tasks logged');
 
 // Projects at risk
 setStatValue('stat-risk', (!gwRaw && !fwRaw) ? '—' : projAtRisk,
@@ -499,40 +523,39 @@ registry.forEach(r => {
 
 document.getElementById('proj-count').textContent = allProjects.length ? `${allProjects.length} projects` : '';
 
+// Now set Projects Active stat (needs allProjects)
+const activeProjectCount = allProjects.length;
+const hasAnyTool = gwRaw || hasBwData || fwRaw || cwRaw;
+setStatValue('stat-actions', !hasAnyTool ? '—' : activeProjectCount, 'stat-blue');
+setStatSub('stat-actions', !hasAnyTool ? 'No project data yet' : activeProjectCount === 1 ? '1 project tracked' : `${activeProjectCount} projects tracked`);
+
 let projRowsHTML = '';
 if (!allProjects.length) {
   projRowsHTML = '<div class="empty">No projects found — open any tool to create one.</div>';
 } else {
   allProjects.forEach(proj => {
-    const gw  = gwByName[proj.name]  || {};
+    const gw  = gwByName[proj.name] || {};
     const bw  = bwByProjName[proj.name] || {};
-    const fw  = fwByName[proj.name]  || {};
     const rag = (gw.rag || '').toLowerCase();
 
+    // Status pill
     const ragHTML = rag === 'green' ? '<span class="rag-pill rag-green">GREEN</span>'
                   : rag === 'amber' ? '<span class="rag-pill rag-amber">AMBER</span>'
                   : rag === 'red'   ? '<span class="rag-pill rag-red">RED</span>'
                   : '<span class="rag-pill rag-none">—</span>';
 
-    const openActs  = gw.open   ? gw.open.length   : 0;
-    const overdueActs = gw.overdue ? gw.overdue.length : 0;
-    const actsHTML = openActs > 0
-      ? `<span class="proj-col ${overdueActs > 0 ? 'num-red' : 'num-amber'}">${openActs}${overdueActs > 0 ? ` <span style="font-size:10px;font-weight:400">(${overdueActs} OD)</span>` : ''}</span>`
+    // % Complete from Busywork
+    const pct = bw.total > 0 ? Math.round((bw.complete || 0) / bw.total * 100) : null;
+    const pctColor = pct === 100 ? 'num-green' : pct >= 50 ? 'num-amber' : pct !== null ? 'num-red' : 'num-dim';
+    const pctHTML = pct !== null
+      ? `<span class="proj-col ${pctColor}" style="font-size:13px">${pct}%<span style="font-size:10px;font-weight:400;margin-left:3px">${bw.complete}/${bw.total}</span></span>`
       : `<span class="proj-col num-dim">—</span>`;
 
-    const bwBlocked = bw.blocked || 0;
-    const bwIP      = bw.inProgress || 0;
-    const bwOpen    = bw.open || 0;
-    const tasksHTML = bwBlocked > 0
-      ? `<span class="proj-col num-red">${bwOpen} <span style="font-size:10px;font-weight:400">(${bwBlocked} blk)</span></span>`
-      : bwOpen > 0
-        ? `<span class="proj-col num-amber">${bwOpen}</span>`
-        : `<span class="proj-col num-dim">—</span>`;
-
-    const fwRed = fw.red || 0, fwAmber = fw.amber || 0;
-    const artIssues = fwRed + fwAmber;
-    const artHTML = artIssues > 0
-      ? `<span class="proj-col ${fwRed > 0 ? 'num-red' : 'num-amber'}">${artIssues}</span>`
+    // Billable hours this week from Clockwork (match by project name)
+    const billMins = cwBillByProjName[proj.name] || 0;
+    const billHrs  = billMins / 60;
+    const billHTML = billMins > 0
+      ? `<span class="proj-col num-blue" style="font-size:13px">${billHrs % 1 === 0 ? billHrs + 'h' : billHrs.toFixed(1) + 'h'}</span>`
       : `<span class="proj-col num-dim">—</span>`;
 
     projRowsHTML += `
@@ -542,9 +565,8 @@ if (!allProjects.length) {
           ${gw.phase ? `<div class="proj-type">${esc(gw.phase)}</div>` : ''}
         </div>
         <div style="text-align:center">${ragHTML}</div>
-        <div>${actsHTML}</div>
-        <div>${tasksHTML}</div>
-        <div>${artHTML}</div>
+        <div>${pctHTML}</div>
+        <div>${billHTML}</div>
       </div>`;
   });
 }
