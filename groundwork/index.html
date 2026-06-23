@@ -64,7 +64,7 @@ html.light {
 html.light .field select option { background:var(--surface2); color:#141e30; }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{min-height:100%}
-body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh}
+body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh;padding-top:38px}
 a{color:inherit;text-decoration:none}
 button{cursor:pointer;font-family:var(--font)}
 textarea,input,select{font-family:var(--font);font-size:14px}
@@ -87,7 +87,7 @@ html.light .hdr-logo{background:#0d1117;border-color:rgba(52,211,153,0.40)}
 .tab-btn.active .cnt{background:var(--green-bg);color:var(--green)}
 
 /* PROJECT BAR */
-.proj-bar-wrap{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;position:sticky;top:145px;z-index:280}
+.proj-bar-wrap{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;position:sticky;top:145px;z-index:400}
 .proj-bar{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:10px;height:46px}
 .proj-switcher{position:relative;display:flex;align-items:center;flex:1;min-width:0}
 .proj-current-btn{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--rs);padding:6px 12px;color:var(--text);font-size:13px;font-weight:600;transition:all .15s;max-width:380px;min-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -112,7 +112,7 @@ html.light .hdr-logo{background:#0d1117;border-color:rgba(52,211,153,0.40)}
 .rag-opt.active-red{background:var(--red-bg);border-color:var(--red-bd);color:var(--red)}
 .rag-opt.active-none{background:var(--surface2);border-color:var(--border2);color:var(--text-muted)}
 /* Project dropdown */
-.proj-dropdown{position:absolute;top:calc(100% + 6px);left:0;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);box-shadow:var(--shadow);min-width:340px;max-width:440px;z-index:500;overflow:hidden;animation:fadeUp .15s ease}
+.proj-dropdown{position:absolute;top:calc(100% + 6px);left:0;background:var(--bg2,#161b22);border:1px solid var(--border2,#374151);border-radius:var(--r,10px);box-shadow:var(--shadow,0 4px 24px rgba(0,0,0,.5));min-width:340px;max-width:440px;z-index:500;overflow:hidden;animation:fadeUp .15s ease}
 .proj-dropdown-list{max-height:280px;overflow-y:auto}
 .proj-dropdown-item{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;transition:background .12s;border-bottom:1px solid var(--border)}
 .proj-dropdown-item:last-child{border-bottom:none}
@@ -403,7 +403,7 @@ mark.hl{background:rgba(251,191,36,.22);border-radius:2px;color:var(--amber)}
 </style>
 <style>
 /* ── The Works suite nav bar ──────────────────────────────── */
-.tw-nav{height:38px;background:#0d1117;border-bottom:1px solid #1c2333;display:flex;align-items:center;gap:8px;padding:0 16px;font-family:'DM Sans',system-ui,sans-serif;flex-shrink:0;box-sizing:border-box}
+.tw-nav{position:fixed;top:0;left:0;right:0;z-index:9999;height:38px;background:#0d1117;border-bottom:1px solid #1c2333;display:flex;align-items:center;gap:8px;padding:0 16px;font-family:'DM Sans',system-ui,sans-serif;flex-shrink:0;box-sizing:border-box}
 .tw-nav-home{display:flex;align-items:center;gap:7px;text-decoration:none;transition:opacity .15s}
 .tw-nav-home:hover{opacity:.75}
 .tw-nav-mark{width:20px;height:20px;background:#3b9eff;border-radius:5px;display:grid;place-items:center;font-size:11px;flex-shrink:0;line-height:1}
